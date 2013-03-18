@@ -19,25 +19,23 @@
 
 #include "pr.h"
 
-qnode   *abq, *ablocalq;
+qnode *abq, *ablocalq;
 
-struct abq_item
-{
-    int     msg_id;
-    int     priority;
-    char    tag;
-    message *msg;
+struct abq_item {
+	int msg_id;
+	int priority;
+	char tag;
+	message *msg;
 };
 
-extern  adesc   abq_adesc;
-#define abq_alloc()   ((abq_item *) mallocate (&abq_adesc))
-int     abq_free();
+extern adesc abq_adesc;
 
-int         pr_abcast(), ab_send2(), ab_recv1(), ab_recv2(), ab_takeover(),
-            ab_deliver(), ab_init(); 
-int         ab_send1(), ab_makedlist(), ab_makeplist(), ab_addtoqueues(),
-            abq_changeprops();
-abq_item    *abq_add(), *abq_find(); 
-message     *ab_createreply();
+#define abq_alloc()   ((abq_item *) mallocate (&abq_adesc))
+int abq_free();
+
+int pr_abcast(), ab_send2(), ab_recv1(), ab_recv2(), ab_takeover(), ab_deliver(), ab_init();
+int ab_send1(), ab_makedlist(), ab_makeplist(), ab_addtoqueues(), abq_changeprops();
+abq_item *abq_add(), *abq_find();
+message *ab_createreply();
 
 #endif

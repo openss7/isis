@@ -24,7 +24,7 @@
    function definitions, which is not defined in the standard. 
    Should match same defines done in isis.h and msg.h.
 */
-#ifdef __STDC__ 
+#ifdef __STDC__
 #  ifndef APOLLO
 #    define FUN_TYPES      1
 #  endif
@@ -44,7 +44,7 @@
 # ifdef   SUNLWP
 #   define exit(n)           pod_exit(n)
 # endif   SUNLWP
-#endif SUN
+#endif				/* SUN */
 
 #ifdef  AUX
 # define UNIX_DOM           1
@@ -52,7 +52,7 @@
 
 #ifdef  MACH
 # define UNIX_DOM           1
-# define CTHREADS           1  
+# define CTHREADS           1
 #endif
 
 #ifdef  APOLLO
@@ -80,7 +80,6 @@
 # define JB_SP              0
 #endif
 
-
 #ifdef  AIX
 # define JB_SP              10
 # define SIMWRITEV           1
@@ -95,12 +94,12 @@
 #  ifdef UNIX_DOM
 #    undef UNIX_DOM
 #  endif UNIX_DOM
-#endif NO_UNIX_DOM
+#endif				/* NO_UNIX_DOM */
 
 #ifndef TRUE
 #define TRUE                1
 #define FALSE               0
-#endif  TRUE
+#endif				/* TRUE */
 
 #define INCR_PRIO(prio)     (prio = (((((prio >> 8) + 1) & 0x7fffff) << 8) | \
                             (my_site_no & 0xff)))
@@ -141,14 +140,14 @@
 #define PN_FBCAST           10
 #define PN_IFBCAST          11
 
-int     collect_answ();
+int collect_answ();
 extern char *proto_names[];
 
 #define MC_ALLSITES         -1
 
 #define MAX_PROCS           64
-#define MAX_SITES           127         /* Also change in isis.h! */
-#define MAXCQUEUE           32*1024     /* Max client backlog: 32kbytes */
+#define MAX_SITES           127	/* Also change in isis.h! */
+#define MAXCQUEUE           32*1024	/* Max client backlog: 32kbytes */
 
 /*
  *      Per-processor options:
@@ -169,14 +168,14 @@ extern char *proto_names[];
 #endif
 
 /* Congestion related parameters */
-#define MEM_HI              500000      /* Memory usage is high */
-#define MSGMEM_HI           500000      /* Message memory usage is high */
-#define INTERSITE_HI       2000000      /* Intersite backlog is developing */
-#define TASK_HI                 15      /* Number of active tasks is high */
-#define MEM_LO              250000      /* Memory usage is ok */
-#define MSGMEM_LO           250000      /* Message memory usage is ok */
-#define TASK_LO                  6      /* Number of tasks is ok */
-#define INTERSITE_LO        250000      /* Intersite backlog is clear */
+#define MEM_HI              500000	/* Memory usage is high */
+#define MSGMEM_HI           500000	/* Message memory usage is high */
+#define INTERSITE_HI       2000000	/* Intersite backlog is developing */
+#define TASK_HI                 15	/* Number of active tasks is high */
+#define MEM_LO              250000	/* Memory usage is ok */
+#define MSGMEM_LO           250000	/* Message memory usage is ok */
+#define TASK_LO                  6	/* Number of tasks is ok */
+#define INTERSITE_LO        250000	/* Intersite backlog is clear */
 
 #include "pr_typedefs.h"
 #include "cl_typedefs.h"
@@ -205,29 +204,30 @@ extern char *proto_names[];
 #define begin
 #define NULLPRIO            0x80000000
 
-typedef	int		IFUNC();
+typedef int IFUNC();
+
 #define nullroutine     ((IFUNC*)0)
 
-int     pr_lastmsg, pr_lastbcast;
-extern  long    ab_priority;
+int pr_lastmsg, pr_lastbcast;
+extern long ab_priority;
 
-struct wait_struct
-{
-    int         n_events;
-    condition   cond;
+struct wait_struct {
+	int n_events;
+	condition cond;
 };
+
 #define W_INIT(w_struct)    (w_struct).n_events = 0; \
                             (w_struct).cond = 0
 #define W_WAIT(w_struct)    if ((w_struct).n_events > 0) \
                                 t_wait (&((w_struct).cond), "W_WAIT")
 
-adesc   *qu_adescp;
+adesc *qu_adescp;
 
 #ifndef print
 #define print                        isis_print
-#endif print
+#endif				/* print */
 
 #ifndef	NEXT
-char	*malloc();
+char *malloc();
 #endif
-#endif  PR
+#endif				/* PR */

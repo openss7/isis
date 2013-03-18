@@ -21,15 +21,13 @@
 #include "pr_abcast.h"
 #include "pr_cbcast.h"
 
-struct gb_answer
-{
-    int     priority;
-    int     idlist[1];
+struct gb_answer {
+	int priority;
+	int idlist[1];
 };
 
-qnode       *wait_queues, *wait1, *upgrade_queue;
+qnode *wait_queues, *wait1, *upgrade_queue;
 
-int         pr_gbcast(), gb_send1(), gb_send2(), gb_recv1(),
-            gb_recv2(), gb_callback(), gb_takeover();
+int pr_gbcast(), gb_send1(), gb_send2(), gb_recv1(), gb_recv2(), gb_callback(), gb_takeover();
 
-#endif  PR_GBCAST
+#endif				/* PR_GBCAST */

@@ -18,60 +18,50 @@
  */
 #include "pr.h"
 
-acquire_view_r_lock (sites)
-  bitvec    sites;
+acquire_view_r_lock(sites)
+	bitvec sites;
 {
-    register int    i;
+	register int i;
 
-    while (bitv (&sview_wlocks, &sites) || bitv (&sview_want_wlocks, &sites))
-        (void) t_wait (&wait_r_lock, "wait_rlock");
-    for (i = 1; i < MAX_SITES; i++)
-        if (bit (&sites, i))
-        {
-            sview_nlocks[i]++;
-            bis (&sview_rlocks, i);
-        }
-}
-            
-
-release_view_r_lock (sites)
-  bitvec    sites;
-{
-    register int    i;
-
-    for (i = 1; i < MAX_SITES; i++)
-        if (bit (&sites, i) && --sview_nlocks[i] == 0)
-            bic (&sview_rlocks, i);
-    if (btst (&sview_want_wlocks) && !bitv (&sview_rlocks, &sview_want_wlocks))
-    {
-        sview_wlocks = sview_want_wlocks;
-        bclr (&sview_want_wlocks);
-        t_sig (&wait_w_lock, 0);
-    }
+	while (bitv(&sview_wlocks, &sites) || bitv(&sview_want_wlocks, &sites))
+		(void) t_wait(&wait_r_lock, "wait_rlock");
+	for (i = 1; i < MAX_SITES; i++)
+		if (bit(&sites, i)) {
+			sview_nlocks[i]++;
+			bis(&sview_rlocks, i);
+		}
 }
 
-
-
-fd_lockview (sites)
-  bitvec    sites;
+release_view_r_lock(sites)
+	bitvec sites;
 {
-    if (btst (&sview_wlocks) || btst (&sview_want_wlocks))
-        print ("fd_lockview: WARNING: view is already locked\n");
-    if (bitv (&sview_rlocks, &sites))
-    {
-        bisv (&sview_want_wlocks, &sites);
-        (void) t_wait (&wait_w_lock, "wait_w_lock");
-    }
-    else
-        bisv (&sview_wlocks, &sites);
+	register int i;
+
+	for (i = 1; i < MAX_SITES; i++)
+		if (bit(&sites, i) && --sview_nlocks[i] == 0)
+			bic(&sview_rlocks, i);
+	if (btst(&sview_want_wlocks) && !bitv(&sview_rlocks, &sview_want_wlocks)) {
+		sview_wlocks = sview_want_wlocks;
+		bclr(&sview_want_wlocks);
+		t_sig(&wait_w_lock, 0);
+	}
 }
 
-
-
-fd_unlockview ()
+fd_lockview(sites)
+	bitvec sites;
 {
-    bclr (&sview_wlocks);
-    while (wait_r_lock)
-        t_sig (&wait_r_lock, 0);
+	if (btst(&sview_wlocks) || btst(&sview_want_wlocks))
+		print("fd_lockview: WARNING: view is already locked\n");
+	if (bitv(&sview_rlocks, &sites)) {
+		bisv(&sview_want_wlocks, &sites);
+		(void) t_wait(&wait_w_lock, "wait_w_lock");
+	} else
+		bisv(&sview_wlocks, &sites);
 }
 
+fd_unlockview()
+{
+	bclr(&sview_wlocks);
+	while (wait_r_lock)
+		t_sig(&wait_r_lock, 0);
+}

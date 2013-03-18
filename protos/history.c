@@ -1,5 +1,6 @@
 /* History file for protos */
-char protos_rcsid[] = "$Revision: 2.26 $$Date: 90/09/18 14:33:44 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/protos/RCS/history.c,v $";
+char protos_rcsid[] =
+    "$Revision: 2.26 $$Date: 90/09/18 14:33:44 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/protos/RCS/history.c,v $";
 
 /* $Log:	history.c,v $
  * Revision 2.26  90/09/18  14:33:44  ken

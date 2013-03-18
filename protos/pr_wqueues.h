@@ -17,10 +17,9 @@
 #ifndef WQUEUES
 #define WQUEUES
 
-struct wait_item
-{
-    message     *msg;
-    char        deleted;
+struct wait_item {
+	message *msg;
+	char deleted;
 };
 
-#endif  WQUEUES
+#endif				/* WQUEUES */

@@ -21,5 +21,5 @@ typedef struct gb_answer gb_answer;
 typedef struct wait_item wait_item;
 typedef struct pbuf_item pbuf_item;
 typedef struct packet packet;
-typedef struct wait_struct  wait_struct;
+typedef struct wait_struct wait_struct;
 typedef struct glock glock;

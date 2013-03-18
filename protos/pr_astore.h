@@ -20,11 +20,10 @@
 #ifndef PR_ASTORE
 #define PR_ASTORE
 
-struct st_idlist
-{
-        int        idl_id;
-        bitvec  idl_ignore;
-        bitvec  idl_scope;
+struct st_idlist {
+	int idl_id;
+	bitvec idl_ignore;
+	bitvec idl_scope;
 };
 
 #define             FTYPE_IDL       FTYPE_LONG
@@ -36,20 +35,21 @@ struct st_idlist
 #define         AS_ABFSENT      0x10
 #define         AS_IDLISTED     0x20
 
-#define         AS_THRESHOLD    15             /* Trigger collection if local */
-#define         AS_MAXDELETE    50             /* deletes reach AS_THRESHOLD  */
-                                               /* or all deletes AS_MAXDELETE */
-#define         AS_MCOLLECT     200            /* Limit on collection size */
+#define         AS_THRESHOLD    15	/* Trigger collection if local */
+#define         AS_MAXDELETE    50	/* deletes reach AS_THRESHOLD */
+					       /* or all deletes AS_MAXDELETE */
+#define         AS_MCOLLECT     200	/* Limit on collection size */
 
-#define         ABFREED         0x80000000     /* Indicates that this id was ab_freed */
+#define         ABFREED         0x80000000	/* Indicates that this id was ab_freed */
 
 #define st_add_int(id,fname,value)    st_add(id,fname,(char*)value,nullroutine)
 #define st_find_int(id,fname)         ((int)st_find(id,fname))
 #define st_add_bitvec(id,fname,bvec)  (st_add(id,fname,(char*)0, nullroutine)->qu_bitvec = bvec)
 
-qnode       *st_add(), *st_delete(), *st_find_node();
-char        *st_find();
-int         st_deleteable();
+qnode *st_add(), *st_delete(), *st_find_node();
+char *st_find();
+int st_deleteable();
+
 /*and others...*/
 
 #endif

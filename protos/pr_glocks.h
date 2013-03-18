@@ -18,18 +18,16 @@
 
 #include "pr.h"
 
-qnode  *glocks;
+qnode *glocks;
 
-struct glock
-{
-    qnode       *shrlock;
-    int         exlock;
-    qnode       *want_shrlock;
-    qnode       *want_exlock;
+struct glock {
+	qnode *shrlock;
+	int exlock;
+	qnode *want_shrlock;
+	qnode *want_exlock;
 };
 
-extern  adesc   glock_adesc;
-glock   *glock_find();
+extern adesc glock_adesc;
+glock *glock_find();
 
-#endif  PR_GLOCKS
-
+#endif				/* PR_GLOCKS */

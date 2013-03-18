@@ -16,46 +16,41 @@
  *      Queue management utilities
  */
 
-typedef	struct
-{
-	qnode	*qu_isqueue;
-	int	qu_isint;
+typedef struct {
+	qnode *qu_isqueue;
+	int qu_isint;
 } qun;
 
-
-struct  qnode
-{
-        qnode   *qu_next;
-        qnode   *qu_last;
-        int     (*qu_freeroutine)();
-        int     qu_flag;
-        union
-        {
-          int           qu_isint;
-          char          *qu_ischar;
-          address       qu_isaddress;
-          int           (*qu_isproc)();
-        }       qu_nun;
-        union
-        {
-          char          *qu_ischar;
-          char          *qu_arechars[2];
-          qnode         *qu_arequeues[2];
-	  qun           qu_qun;
-          int           qu_isint;
-          int           (*qu_isproc)();
-          bitvec        qu_isbitvec;
-          struct task   *qu_istask;
-          condition     qu_iscond;
-          address       qu_isdaddress;
-          message       *qu_ismsg;
-          mdesc         *qu_ismd;
-          site_id       qu_issid;
-          ioq           *qu_isioq;
-          sys_groupview *qu_issys_groupview;
-          wait_item     qu_iswitem;
-          char          *qu_aretimeargs[3];
-        }       qu_dun;
+struct qnode {
+	qnode *qu_next;
+	qnode *qu_last;
+	int (*qu_freeroutine) ();
+	int qu_flag;
+	union {
+		int qu_isint;
+		char *qu_ischar;
+		address qu_isaddress;
+		int (*qu_isproc) ();
+	} qu_nun;
+	union {
+		char *qu_ischar;
+		char *qu_arechars[2];
+		qnode *qu_arequeues[2];
+		qun qu_qun;
+		int qu_isint;
+		int (*qu_isproc) ();
+		bitvec qu_isbitvec;
+		struct task *qu_istask;
+		condition qu_iscond;
+		address qu_isdaddress;
+		message *qu_ismsg;
+		mdesc *qu_ismd;
+		site_id qu_issid;
+		ioq *qu_isioq;
+		sys_groupview *qu_issys_groupview;
+		wait_item qu_iswitem;
+		char *qu_aretimeargs[3];
+	} qu_dun;
 };
 
 /* Node names */
@@ -92,8 +87,8 @@ struct  qnode
 #define         qu_process      qu_address.process
 
 /* Aliased routines */
-extern qnode   *qu_freelist, *qu_newQP;
-extern  adesc qu_adesc;
+extern qnode *qu_freelist, *qu_newQP;
+extern adesc qu_adesc;
 
 #define qalloc()        ((qnode*)mallocate(&qu_adesc))
 
@@ -122,7 +117,6 @@ extern  adesc qu_adesc;
         QP->qu_freeroutine = ROUTINE;                                   \
   }
 
-
 #define qu_alloc3(QP, NAME, D0, D1, D2, ROUTINE)                        \
   {                                                                     \
         if((QP = qu_head(qu_freelist)) == (qnode*)0)                    \
@@ -140,7 +134,6 @@ extern  adesc qu_adesc;
         QP->qu_args[2] = (char*)D2;                                     \
         QP->qu_freeroutine = ROUTINE;                                   \
   }
-
 
 #define qu_allocpg(QP, PNAME, D0, ROUTINE)                              \
   {                                                                     \
@@ -182,8 +175,7 @@ extern  adesc qu_adesc;
         NP->qu_next = QP;                                               \
   }
 
- 
-#ifdef SUN /* Everyone else has a compiler bug */ 
+#ifdef SUN			/* Everyone else has a compiler bug */
 #define qu_free(QP)                                                     \
   {                                                                     \
         if(QP)                                                          \
@@ -203,7 +195,7 @@ extern  adesc qu_adesc;
             }                                                           \
         }                                                               \
   }
-#else 
+#else
 #define qu_free(QP)                                                     \
   {                                                                     \
         if(QP)                                                          \
@@ -225,7 +217,7 @@ extern  adesc qu_adesc;
             }                                                           \
         }                                                               \
   }
-#endif  
+#endif
 
 /* Simple aliased routines */
 #define         qu_null()               qu_alloc(0,(char*)0,nullroutine)
@@ -242,7 +234,7 @@ extern  adesc qu_adesc;
 #define         pg_add_sys_groupview(q,n,v,r)  pg_add(q,n,(char*)v,r)
 #define         pg_add_qu(q,n,v)        pg_add(q,n,(char*)v,qu_freeall)
 
-int     qu_freeall();
-qnode   *qu_alloc();
-qnode   *qu_find(), *pg_find(), *qu_add_bits();
-qnode   *qu_add(), *pg_add(), *qu_add_cb(), *qu_add_sid();
+int qu_freeall();
+qnode *qu_alloc();
+qnode *qu_find(), *pg_find(), *qu_add_bits();
+qnode *qu_add(), *pg_add(), *qu_add_cb(), *qu_add_sid();

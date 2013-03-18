@@ -17,41 +17,40 @@
 /* Error codes */
 
 #ifdef  ISIS_ERRORS
-static  char *IE_errors[] ={
-        "<< no error >>",                                       /* 0 */
-        "group unknown",                                        /* IE_UNKNOWN */
-        "restricted group address",                             /* IE_RESTRICTED */
-        "dest list too long",                                   /* IE_TOOLONG */
-        "not known locally",                                    /* IE_NOTLOCAL */
-        "bad argument",                                         /* IE_BADARG */
-        "total failure",                                        /* IE_TOTFAIL */
-        "not implemented",                                      /* IE_NOTIMP */
-        "try again?",                                           /* IE_AGAIN */
-        "not allowed",                                          /* IE_NOTALLOWED */
-        "connect failed",                                       /* IE_CONNECT */
-        "broken connection",                                    /* IE_BROKEN */
-        "bad format item",                                      /* IE_BADFITEM */
-        "missmatch",                                            /* IE_MISSMATCH */
-        "not member",                                           /* IE_NOTMEMB */
-        "illegal use of bcast guard",                           /* IE_GUARD */
-        "guard parsing problem",                                /* IE_GPARSE */
-        "must join but group hasn't been created yet",          /* IE_MUSTJOIN */
-        "the specified group is not logged",                    /* IE_NOTLOGGED */
-        "the specified group is already logged",                /* IE_RELOG */
-        "no log checkpoint exists for that group",              /* IE_NOCKPT */
-        "I/O error on log, see errno",                          /* IE_LOGIO */
-        "abortreply received",                                  /* IE_ABORT */
-        "nested transactions not allowed",                      /* IE_NESTEDTRANS*/
-        "no such transaction",                                  /* IE_NOTRANS */
-        "already a participant of this transaction",            /* IE_PARTICIPANT*/
-        "cannot contact transaction recover manager",           /* IE_NOTRANSRECOV */
-        "length mismatch",                                      /* IE_WRONGLEN */
-	"coordinator refused",					/* IE_REFUSED */
-	"empty plist",						/* IE_EMPTY */
-	"old format log file",					/* IE_OLDLOG */
+static char *IE_errors[] = {
+	"<< no error >>",	/* 0 */
+	"group unknown",	/* IE_UNKNOWN */
+	"restricted group address",	/* IE_RESTRICTED */
+	"dest list too long",	/* IE_TOOLONG */
+	"not known locally",	/* IE_NOTLOCAL */
+	"bad argument",		/* IE_BADARG */
+	"total failure",	/* IE_TOTFAIL */
+	"not implemented",	/* IE_NOTIMP */
+	"try again?",		/* IE_AGAIN */
+	"not allowed",		/* IE_NOTALLOWED */
+	"connect failed",	/* IE_CONNECT */
+	"broken connection",	/* IE_BROKEN */
+	"bad format item",	/* IE_BADFITEM */
+	"missmatch",		/* IE_MISSMATCH */
+	"not member",		/* IE_NOTMEMB */
+	"illegal use of bcast guard",	/* IE_GUARD */
+	"guard parsing problem",	/* IE_GPARSE */
+	"must join but group hasn't been created yet",	/* IE_MUSTJOIN */
+	"the specified group is not logged",	/* IE_NOTLOGGED */
+	"the specified group is already logged",	/* IE_RELOG */
+	"no log checkpoint exists for that group",	/* IE_NOCKPT */
+	"I/O error on log, see errno",	/* IE_LOGIO */
+	"abortreply received",	/* IE_ABORT */
+	"nested transactions not allowed",	/* IE_NESTEDTRANS */
+	"no such transaction",	/* IE_NOTRANS */
+	"already a participant of this transaction",	/* IE_PARTICIPANT */
+	"cannot contact transaction recover manager",	/* IE_NOTRANSRECOV */
+	"length mismatch",	/* IE_WRONGLEN */
+	"coordinator refused",	/* IE_REFUSED */
+	"empty plist",		/* IE_EMPTY */
+	"old format log file",	/* IE_OLDLOG */
 };
 #endif
-
 
 #define IE_UNKNOWN               -1
 #define IE_RESTRICTED            -2

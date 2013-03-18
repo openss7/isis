@@ -30,13 +30,12 @@
 #define     ILLEGAL_INCARN          0x81
 #define     DOWN_INCARN             0xff
 
-struct sview
-{
-            int                     sv_viewid;
-            site_id                 sv_slist[MAX_SITES + 1];
-            u_char                  sv_incarn[MAX_SITES + 1];
-            bitvec               sv_failed;
-            bitvec               sv_recovered;
+struct sview {
+	int sv_viewid;
+	site_id sv_slist[MAX_SITES + 1];
+	u_char sv_incarn[MAX_SITES + 1];
+	bitvec sv_failed;
+	bitvec sv_recovered;
 };
 
 #define     SITE_IS_UP(s_no,inc)    (current_view.sv_incarn[s_no] == (inc))
@@ -46,27 +45,25 @@ struct sview
 #define     INCR_VIEWID(id)         (((((id) >> 8) + 1) << 8) | \
                                                        (my_site_no & 0xff))
 
-extern sview       current_view;
-extern int         fd_coordinator, exists_proposal, exists_old_proposal,
-                     sent_old_proposal;
-extern int         proposed_viewid, old_proposed_viewid;
-extern site_id     proposed_slist[MAX_SITES + 1], old_proposed_slist[MAX_SITES + 1];
-extern bitvec      proposed_failed, proposed_recovered,
-                       old_proposed_failed, old_proposed_recovered;
-extern qnode       *pending_failures, *pending_recoveries, *replies_wanted;
-extern char        fd_forked, participant_failed;
-extern condition   got_all_replies;
-site_id     fd_growslist();
-int         fd_notifyview();
+extern sview current_view;
+extern int fd_coordinator, exists_proposal, exists_old_proposal, sent_old_proposal;
+extern int proposed_viewid, old_proposed_viewid;
+extern site_id proposed_slist[MAX_SITES + 1], old_proposed_slist[MAX_SITES + 1];
+extern bitvec proposed_failed, proposed_recovered, old_proposed_failed, old_proposed_recovered;
+extern qnode *pending_failures, *pending_recoveries, *replies_wanted;
+extern char fd_forked, participant_failed;
+extern condition got_all_replies;
+site_id fd_growslist();
+int fd_notifyview();
 
-u_char      sview_nlocks[MAX_SITES];
-extern bitvec   sview_wlocks, sview_rlocks, sview_want_wlocks;
-extern condition   wait_r_lock, wait_w_lock;
+u_char sview_nlocks[MAX_SITES];
+extern bitvec sview_wlocks, sview_rlocks, sview_want_wlocks;
+extern condition wait_r_lock, wait_w_lock;
 
-qnode       *watch_queue[MAX_SITES];
-int         wmagic ();
+qnode *watch_queue[MAX_SITES];
+int wmagic();
 
-extern int         lastviewid;
+extern int lastviewid;
 
 #define     FD_TOTAL                1
 #define     FD_PARTIAL              2
@@ -77,4 +74,4 @@ extern int         lastviewid;
 #define     FD_TIMEOUT              -1
 #define     FD_TIMEOUTVAL           2000
 
-#endif      FD
+#endif				/* FD */

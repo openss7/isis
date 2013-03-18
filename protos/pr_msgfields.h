@@ -13,11 +13,11 @@
  *      -- Copyright (c) 1990, The ISIS PROJECT
  *
  */
-/* Names for message fields used by protos code */      
-        
-#ifndef PR_MSGFIELDS    
-#define PR_MSGFIELDS    
-        
+/* Names for message fields used by protos code */
+
+#ifndef PR_MSGFIELDS
+#define PR_MSGFIELDS
+
 /* Used for client->isis communication */
 #define CL_ALEN                 1
 #define CL_ALIST                2
@@ -48,7 +48,7 @@
 /* Used for isis->isis communication */
 #define ADDR_GID                (SYSFLD+1)
 #define ADDR_ADDRESS            (SYSFLD+2)
-        
+
 #define FLD_ADDCACHE            (SYSFLD+3)
 #define FLD_MSGID               (SYSFLD+4)
 #define FLD_MSG                 (SYSFLD+5)
@@ -68,19 +68,19 @@
 #define FLD_TRUESENDER          (SYSFLD+19)
 #define FLD_SLIST               (SYSFLD+20)
 #define FLD_FDTYPE              (SYSFLD+21)
-        
+
 #define GMGR_PNAME              (SYSFLD+22)
 #define GMGR_GNAME              (SYSFLD+23)
 #define GMGR_MODE               (SYSFLD+24)
 
 #define AS_IGNORES              (SYSFLD+25)
-        
+
 #define INTERSITE_HDR           (SYSFLD+28)
 #define INTERSITE_MSG           (SYSFLD+29)
 #define INTERSITE_FHDR          (SYSFLD+30)
 #define INTERSITE_FRAG          (SYSFLD+31)
 #define INTERSITE_DEBUG         (SYSFLD+32)
-        
+
 #define FLD_OLDVIEWID           (SYSFLD+33)
 #define FLD_OLDSLIST            (SYSFLD+34)
 #define FLD_DEADLIST            (SYSFLD+35)
@@ -93,5 +93,5 @@
 #define INTERCLIENT_MSG         (SYSFLD+39)
 #define INTERCLIENT_FHDR        (SYSFLD+40)
 #define INTERCLIENT_FRAG        (SYSFLD+41)
-        
-#endif  
+
+#endif

@@ -24,9 +24,8 @@
 #define ISIS_BSHIFT  5
 #define ISIS_BVL     4
 
-struct  bitvec
-{
-        long    bv_data[ISIS_BVL];
+struct bitvec {
+	long bv_data[ISIS_BVL];
 };
 
 #  define bis(vec,b)      ((vec)->bv_data[(b)>>ISIS_BSHIFT] |= 1<<((b) & ISIS_BO))

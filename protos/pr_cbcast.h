@@ -21,28 +21,27 @@
 #include "pr.h"
 #include "pr_gbcast.h"
 
-struct pbuf_item
-{
-    message     *msg;
-    qnode       *rem_dests; /* dests not received at or sent to from here */
-    bitvec   sent;       /* sites received at or sent to from here     */
-    bitvec   received;   /* sites known to have received the message   */
-    short       piggy_flag;
-    short       refcount;
-    qnode       *wakeup;    /* qnode of wait_structs for this message     */
+struct pbuf_item {
+	message *msg;
+	qnode *rem_dests;		/* dests not received at or sent to from here */
+	bitvec sent;			/* sites received at or sent to from here */
+	bitvec received;		/* sites known to have received the message */
+	short piggy_flag;
+	short refcount;
+	qnode *wakeup;			/* qnode of wait_structs for this message */
 };
 
-extern  adesc   pbuf_adesc;
+extern adesc pbuf_adesc;
+
 #define pbuf_alloc()   ((pbuf_item *) mallocate (&pbuf_adesc))
-int     pbuf_free();
+int pbuf_free();
 
-qnode  *pbufs, *pb_itemlist, *idlists, *piggylists;
+qnode *pbufs, *pb_itemlist, *idlists, *piggylists;
 
-int         pr_cbcast(), cb_sendpkt(), cb_recvpkt(), cb_deliver(),
-            cb_finddests(), idlist_add(), cb_addtopbuf(), cb_init();
-int         cb_updatepbuf(), cb_makeplist(), cb_makelist(),
-            cb_cleanup(), pbuf_free();
-qnode       *pbuf_find();
-pbuf_item   *cb_createpbitem();
+int pr_cbcast(), cb_sendpkt(), cb_recvpkt(), cb_deliver(),
+cb_finddests(), idlist_add(), cb_addtopbuf(), cb_init();
+int cb_updatepbuf(), cb_makeplist(), cb_makelist(), cb_cleanup(), pbuf_free();
+qnode *pbuf_find();
+pbuf_item *cb_createpbitem();
 
 #endif

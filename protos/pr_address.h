@@ -38,7 +38,7 @@
 #define CL_CREATE               18
 #define CL_FBCAST               19
 #define CL_CBCAST               21
-#define CL_BCAST                23      /* BCAST is an alias for ABCAST */
+#define CL_BCAST                23	/* BCAST is an alias for ABCAST */
 #define CL_ABCAST               23
 #define CL_GBCAST               25
 #define CL_GBCAST_GROW          27
@@ -70,7 +70,7 @@
 #define CL_DIED                 53
 
 #ifdef  ISIS_ENTRY_NAMES
-char	*isis_entry_names[] ={
+char *isis_entry_names[] = {
 	0,			/* 0 */
 	0,			/* 1 */
 	0,			/* 2 */
@@ -80,7 +80,7 @@ char	*isis_entry_names[] ={
 	0,			/* 6 */
 	0,			/* 7 */
 	0,			/* 8 */
-	0,     			/* 9 */
+	0,			/* 9 */
 	0,			/* 10 */
 	0,			/* 11 */
 	0,			/* 12 */
@@ -132,8 +132,8 @@ char	*isis_entry_names[] ={
 
 #include "generic.h"
 
-#define ADDR_LEN                128     /* Length of an alist */
+#define ADDR_LEN                128	/* Length of an alist */
 
-extern address         NULLADDRESS;
+extern address NULLADDRESS;
 
 #endif

@@ -23,19 +23,17 @@
 #ifndef CINFO
 #define CINFO
 
-#if ! ( __cplusplus || c_plusplus ) 
+#if ! ( __cplusplus || c_plusplus )
 typedef struct cinfo cinfo;
 #endif
 
-
-struct  cinfo
-{
-        int     ci_my_site_no;
-        int     ci_my_site_incarn;
-        int     ci_my_site_id;
-        int     ci_genid;
-        char    ci_isisdir[128];
-	int     ci_portno;
+struct cinfo {
+	int ci_my_site_no;
+	int ci_my_site_incarn;
+	int ci_my_site_id;
+	int ci_genid;
+	char ci_isisdir[128];
+	int ci_portno;
 };
 
 #define SIG_OVERFLOW    SIGUSR1
@@ -52,8 +50,7 @@ struct  cinfo
 /* my_genid is always 0 in protos, non-zero in local clients */
 #define GENMSGID            GEN_MSGID(my_genid)
 
- 
 #define LOCALFLAG           0x80000000
 #define PID_REMOTE          0x00008000
- 
+
 #endif

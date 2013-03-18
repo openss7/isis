@@ -23,20 +23,20 @@
 #define TANK_OTHER      2
 #define TANK_FULL       3
 
-typedef struct msg_tank{
-  qnode *head;                  /* Queue (FIFO) of pending messages. */
-  long max_size;                /* Bound on number of bytes of stored messages. */
-  long size;                    /* Current number of bytes of stored messages. */
+typedef struct msg_tank {
+	qnode *head;			/* Queue (FIFO) of pending messages. */
+	long max_size;			/* Bound on number of bytes of stored messages. */
+	long size;			/* Current number of bytes of stored messages. */
 #ifdef tankstats
-  long max_bytes_used;                /* Maximum bytes ever used. */
-  long nr_msgs1;
-  long nr_msgs2;
-#endif tankstats
+	long max_bytes_used;		/* Maximum bytes ever used. */
+	long nr_msgs1;
+	long nr_msgs2;
+#endif					/* tankstats */
 } msg_tank;
 
-int     tankcount[MAX_SITES];   /* Number from each sender */
+int tankcount[MAX_SITES];		/* Number from each sender */
 
-#define default_max_size 50000 /* bytes. */
+#define default_max_size 50000	/* bytes. */
 
 msg_tank *msg_tank_create();
 extern int msg_tank_enqueue();

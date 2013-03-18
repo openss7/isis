@@ -15,15 +15,13 @@
  *
  */
 /* Intersite information, added to message */
-struct  intersite
-{
-        site_id is_from;                /* Sender */
-        site_id is_dest;                /* Dest */
-        short   is_seqn;                /* Seqn for this packet */
-        short   is_aseqn;               /* Seqn acknowledged */
-        short   is_viewid;              /* Sender's view id */
-        short   is_xxxxxx;              /* Unused, inserted to ensure padding */
-        long    is_abits;               /* Ack bits */
-        long    is_abprio;              /* ABCAST priority maintained as logical clock */
+struct intersite {
+	site_id is_from;		/* Sender */
+	site_id is_dest;		/* Dest */
+	short is_seqn;			/* Seqn for this packet */
+	short is_aseqn;			/* Seqn acknowledged */
+	short is_viewid;		/* Sender's view id */
+	short is_xxxxxx;		/* Unused, inserted to ensure padding */
+	long is_abits;			/* Ack bits */
+	long is_abprio;			/* ABCAST priority maintained as logical clock */
 };
-
