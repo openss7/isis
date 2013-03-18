@@ -1,5 +1,6 @@
 /* History file for util */
-char util_rcsid[] = "$Revision: 2.37 $$Date: 90/09/17 09:11:31 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/history.c,v $";
+char util_rcsid[] =
+    "$Revision: 2.37 $$Date: 90/09/17 09:11:31 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/history.c,v $";
 
 /* $Log:	history.c,v $
  * Revision 2.37  90/09/17  09:11:31  ken

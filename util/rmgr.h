@@ -16,9 +16,9 @@
 
 #define MAXNAMELEN      128
 
-char    sbuf1[MAXNAMELEN], sbuf2[MAXNAMELEN], sbuf3[MAXNAMELEN], sbuf4[MAXNAMELEN];
+char sbuf1[MAXNAMELEN], sbuf2[MAXNAMELEN], sbuf3[MAXNAMELEN], sbuf4[MAXNAMELEN];
 
-char    *rmgrbuf_init();
+char *rmgrbuf_init();
 
 #define RMGRDIR  rmgrbuf_init(sbuf1, "%s/rmgr_dir", isis_dir)
 #define RMGRRC   rmgrbuf_init(sbuf2, "%s/rmgr.rc", isis_dir)

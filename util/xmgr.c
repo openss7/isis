@@ -42,91 +42,95 @@
    very reliable and its unlikely to experience total failure.
 */
 
-char xmgr_rcsid[] = "$Revision: 2.25 $$Date: 90/08/14 11:24:34 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/xmgr.c,v $";
+char xmgr_rcsid[] =
+    "$Revision: 2.25 $$Date: 90/08/14 11:24:34 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/xmgr.c,v $";
 #include "isis.h"
 
 typedef struct {
-    x_id *ids; 
-    int max;     /* Elements 0 to max-1 of ids exist. */
-    int n;       /* Elements 0 to n-1 of ids are defined, n <= max. */
+	x_id *ids;
+	int max;			/* Elements 0 to max-1 of ids exist. */
+	int n;				/* Elements 0 to n-1 of ids are defined, n <= max. */
 } idlist;
-#define increment 20 /* Amount by which to increase ids when it gets full. */
+
+#define increment 20		/* Amount by which to increase ids when it gets full. */
 
 /* Replicated state of recovery manager. */
-idlist committed; /* Ids of committed transactions. */
+idlist committed;			/* Ids of committed transactions. */
 
 void
 add_to_list(list, id)
-  idlist *list;
-  x_id *id;
+	idlist *list;
+	x_id *id;
+
   /* Add id to list. id should not already exist in list. */
 {
-    if (list-> n >= list-> max) {
-        /* Increase the size of the array by increment. */
-        list-> max += increment;
-        list-> ids = (x_id *) realloc(list-> ids, sizeof(x_id) * (list-> max));
-    }
-    list-> ids[(list-> n)++] = *id;
+	if (list->n >= list->max) {
+		/* Increase the size of the array by increment. */
+		list->max += increment;
+		list->ids = (x_id *) realloc(list->ids, sizeof(x_id) * (list->max));
+	}
+	list->ids[(list->n)++] = *id;
 }
 
 bool
 search_list(list, id)
-  idlist *list;
-  x_id *id;
+	idlist *list;
+	x_id *id;
+
   /* Test whether id is a member of list. */
 {
-    register int i;
-    register int n = list-> n;
-    register x_id *ids = list-> ids;
-    
-    for (i = 0; i < n; i++) {
-        if (xid_cmp(id, &(ids[i])) == 0) {
-            return(TRUE);
-        }
-    }
-    return(FALSE);
-}  
+	register int i;
+	register int n = list->n;
+	register x_id *ids = list->ids;
+
+	for (i = 0; i < n; i++) {
+		if (xid_cmp(id, &(ids[i])) == 0) {
+			return (TRUE);
+		}
+	}
+	return (FALSE);
+}
 
 void
 send_state(locator, gaddr)
-  int locator;
-  address *gaddr;
+	int locator;
+	address *gaddr;
 {
-    xfer_out(1, "%d", committed.n);
-    xfer_out(2, "%A", committed.ids, committed.n);
+	xfer_out(1, "%d", committed.n);
+	xfer_out(2, "%A", committed.ids, committed.n);
 }
 
 void
 receive_state(locator, msg)
-  int locator;
-  message *msg;
+	int locator;
+	message *msg;
 {
-    if (locator == 1) {
+	if (locator == 1) {
 #       ifdef trans_debug
-        print("Transaction Recovery Manager: restart");
+		print("Transaction Recovery Manager: restart");
 #       endif
-        msg_get(msg, "%d", &(committed.n));
-        committed.max = committed.n + increment;
-        committed.ids = (x_id *) malloc(sizeof(x_id) * committed.max);
+		msg_get(msg, "%d", &(committed.n));
+		committed.max = committed.n + increment;
+		committed.ids = (x_id *) malloc(sizeof(x_id) * committed.max);
 
-    } else if (locator == 2) {
-        msg_get(msg, "%A", committed.ids, (int *) 0);
+	} else if (locator == 2) {
+		msg_get(msg, "%A", committed.ids, (int *) 0);
 
-    } else {
-        panic("XMgr, receive_state: got bad locator");
-    }
+	} else {
+		panic("XMgr, receive_state: got bad locator");
+	}
 }
 
 void
 init_lists(gaddr)
-  address *gaddr; /* Ignored. */
+	address *gaddr;			/* Ignored. */
 {
 #   ifdef trans_debug
-    print("Transaction Recovery Manager: total startup\n");    
+	print("Transaction Recovery Manager: total startup\n");
 #   endif
-    committed.n = 0;
-    committed.max = increment;
-    committed.ids = (x_id *) malloc(sizeof(x_id) * increment);
+	committed.n = 0;
+	committed.max = increment;
+	committed.ids = (x_id *) malloc(sizeof(x_id) * increment);
 }
 
 condition wake_me_up;
@@ -135,7 +139,9 @@ void
 lmgr_check_done()
 {
 	address lmgr;
-	lmgr = my_address; lmgr.addr_process = LMGR;
+
+	lmgr = my_address;
+	lmgr.addr_process = LMGR;
 	cbcast(&lmgr, LR_CHECK_DONE, "", 1, "");
 	t_sig(&wake_me_up, 0);
 }
@@ -143,99 +149,105 @@ lmgr_check_done()
 void
 lmgr_check_timeout()
 {
-        sleep(30);
+	sleep(30);
 	t_sig(&wake_me_up, 0);
 }
 
 void
-transaction_service() {
-    address *gaddr;
-    int join_retries = 10;
+transaction_service()
+{
+	address *gaddr;
+	int join_retries = 10;
 
-    sleep(15);
-    forever {
-        print("Transaction Manager: checking that lmgr is initialized...\n");
-	t_fork((void*)lmgr_check_done, 0);
-	t_fork((void*)lmgr_check_timeout, 0);
-	t_wait(&wake_me_up);
-        print("Transaction Manager: lmgr initialized, resuming xmgr startup seq...\n");
-        gaddr = pg_join(xmgr_service,
-                        PG_INIT, init_lists,
-                        PG_LOGGED, xmgr_service, 0, L_AUTO, NULL,
-                        PG_XFER, 1, send_state, receive_state,
-                        0);
-        if (addr_isnull(gaddr)) {
-            if (isis_errno == IE_MUSTJOIN &&
-                join_retries-- > 0)
-            {
-		static printed;
-		if(printed++ == 0)
-                    print("XMgr: waiting for a more recently failed XMgr to recover\n");
-                sleep(30);
-                continue;
-            } else {
-                isis_perror("XMgr, pg_join");
-                panic("");
-            }
-        } else {
-            break;
-        }
-    }
-    isis_logentry(gaddr, XR_SAVE_OUTCOME);
-    isis_start_done();
-    
-    print("Transaction Manager (xmgr): initialization complete.\n");
+	sleep(15);
+	forever {
+		print("Transaction Manager: checking that lmgr is initialized...\n");
+		t_fork((void *) lmgr_check_done, 0);
+		t_fork((void *) lmgr_check_timeout, 0);
+		t_wait(&wake_me_up);
+		print("Transaction Manager: lmgr initialized, resuming xmgr startup seq...\n");
+		gaddr = pg_join(xmgr_service,
+				PG_INIT, init_lists,
+				PG_LOGGED, xmgr_service, 0, L_AUTO, NULL,
+				PG_XFER, 1, send_state, receive_state, 0);
+		if (addr_isnull(gaddr)) {
+			if (isis_errno == IE_MUSTJOIN && join_retries-- > 0) {
+				static printed;
+
+				if (printed++ == 0)
+					print
+					    ("XMgr: waiting for a more recently failed XMgr to recover\n");
+				sleep(30);
+				continue;
+			} else {
+				isis_perror("XMgr, pg_join");
+				panic("");
+			}
+		} else {
+			break;
+		}
+	}
+	isis_logentry(gaddr, XR_SAVE_OUTCOME);
+	isis_start_done();
+
+	print("Transaction Manager (xmgr): initialization complete.\n");
 
 #   ifndef trans_debug
-    begin
-    {
-        char logfile[128];
-        sprintf(logfile, "%s/xmgr.log", isis_dir);
-        freopen(logfile, "w", stdout); /* Save error messages in a log. */
-        chmod(logfile, 666);
-    }
+	begin {
+		char logfile[128];
+
+		sprintf(logfile, "%s/xmgr.log", isis_dir);
+		freopen(logfile, "w", stdout);	/* Save error messages in a log. */
+		chmod(logfile, 666);
+	}
 #   endif
 }
 
 void
 handle_save_outcome(msg)
-  message *msg;
-  /* Input: "%A %d" id, outcome (must be X_COMMIT)
-     Output: ""
+	message *msg;
 
-     Record the outcome of the transaction with this id. Since we presume abort
-     we only allow X_COMMIT outcomes to be recorded.
-  */
+  /* Input: "%A %d" id, outcome (must be X_COMMIT) Output: ""
+
+     Record the outcome of the transaction with this id. Since we presume abort we only allow
+     X_COMMIT outcomes to be recorded. */
 {
-    int i;
-    x_id id;
-    int dummy;
-    int outcome;
-    msg_get(msg, "%A %d", &id, &dummy, &outcome);
+	int i;
+	x_id id;
+	int dummy;
+	int outcome;
 
-    if (outcome == X_ABORT) {
-        print("XMgr: save_outcome got obsolete X_ABORT outcome for transaction ");
-        paddr(&id); print("\n");
-        reply(msg, "");
-    } 
+	msg_get(msg, "%A %d", &id, &dummy, &outcome);
 
-    /* Check it doesn't already exist. */
-    if (search_list(&committed, &id)) {
+	if (outcome == X_ABORT) {
+		print("XMgr: save_outcome got obsolete X_ABORT outcome for transaction ");
+		paddr(&id);
+		print("\n");
+		reply(msg, "");
+	}
+
+	/* Check it doesn't already exist. */
+	if (search_list(&committed, &id)) {
 #       ifdef trans_debug
-        print("save_outcome: "); paddr(&id); print(" duplicate commit\n");
-#       endif            
-    } else {
+		print("save_outcome: ");
+		paddr(&id);
+		print(" duplicate commit\n");
+#       endif
+	} else {
 #       ifdef trans_debug
-        print("save_outcome: "); paddr(&id); print(" commit\n");
-#       endif            
-        add_to_list(&committed, &id);
-    }
-    reply(msg, "");
+		print("save_outcome: ");
+		paddr(&id);
+		print(" commit\n");
+#       endif
+		add_to_list(&committed, &id);
+	}
+	reply(msg, "");
 }
 
 void
 handle_get_outcome(msg)
-  message *msg;
+	message *msg;
+
 /* Input: "%A" id
    Output: "%d" outcome (one of X_COMMIT, X_ABORT).
 
@@ -243,52 +255,57 @@ handle_get_outcome(msg)
    a transaction aborted if we don't know anything about it.
 */
 {
-    int i;
-    x_id id;
-    int dummy;
-    msg_get(msg, "%A", &id, &dummy);
+	int i;
+	x_id id;
+	int dummy;
 
-    if (search_list(&committed, &id)) {
+	msg_get(msg, "%A", &id, &dummy);
+
+	if (search_list(&committed, &id)) {
 #       ifdef trans_debug
-        print("get_outcome: "); paddr(&id); print(" commit\n");
-#       endif            
-        reply(msg, "%d", X_COMMIT);
-        return;
-    } else {
+		print("get_outcome: ");
+		paddr(&id);
+		print(" commit\n");
+#       endif
+		reply(msg, "%d", X_COMMIT);
+		return;
+	} else {
 #       ifdef trans_debug
-        print("get_outcome: "); paddr(&id); print(" abort\n");
-#       endif            
-        reply(msg, "%d", X_ABORT);
-        return;
-    }
+		print("get_outcome: ");
+		paddr(&id);
+		print(" abort\n");
+#       endif
+		reply(msg, "%d", X_ABORT);
+		return;
+	}
 }
 
 void
-main (argc, argv)
-  int argc;
-  char *argv[];
+main(argc, argv)
+	int argc;
+	char *argv[];
 {
-    int isis_port = 0;
+	int isis_port = 0;
 
-    if (argc != 2) {
-        fprintf(stderr, "usage: %s port\n", argv[0]);
-        exit(-1);
-    }
-    isis_port = atoi(argv[1]);
-    if (isis_port == 0) {
-        fprintf(stderr, "usage: %s port\n", argv[0]);
-        exit(-1);
-    }
-    my_process_id = XMGR; /* Special negative process id to ease identification. */
-        /* Need to modify cmd to recognize this process. */
+	if (argc != 2) {
+		fprintf(stderr, "usage: %s port\n", argv[0]);
+		exit(-1);
+	}
+	isis_port = atoi(argv[1]);
+	if (isis_port == 0) {
+		fprintf(stderr, "usage: %s port\n", argv[0]);
+		exit(-1);
+	}
+	my_process_id = XMGR;	/* Special negative process id to ease identification. */
+	/* Need to modify cmd to recognize this process. */
 
-    isis_init(isis_port);
- 
-    isis_task((vfunc*)transaction_service, "transaction_service");
-    isis_task((vfunc*)lmgr_check_done, "lmgr_check_done");
-    isis_task((vfunc*)lmgr_check_timeout, "lmgr_check_timeout");
-    isis_entry(XR_SAVE_OUTCOME, (vfunc*)handle_save_outcome, "handle_save_outcome");
-    isis_entry(XR_GET_OUTCOME, (vfunc*)handle_get_outcome, "handle_get_outcome");
+	isis_init(isis_port);
 
-    isis_mainloop((vfunc*)transaction_service, NULLARG);
+	isis_task((vfunc *) transaction_service, "transaction_service");
+	isis_task((vfunc *) lmgr_check_done, "lmgr_check_done");
+	isis_task((vfunc *) lmgr_check_timeout, "lmgr_check_timeout");
+	isis_entry(XR_SAVE_OUTCOME, (vfunc *) handle_save_outcome, "handle_save_outcome");
+	isis_entry(XR_GET_OUTCOME, (vfunc *) handle_get_outcome, "handle_get_outcome");
+
+	isis_mainloop((vfunc *) transaction_service, NULLARG);
 }

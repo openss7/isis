@@ -19,51 +19,56 @@
 *
 *********************************************************************/
 
-char  rmgr_cmd_rcsid[] = "$Revision: 2.0 $$Date: 90/05/04 15:24:10 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/rmgr_cmd.c,v $";
+char rmgr_cmd_rcsid[] =
+    "$Revision: 2.0 $$Date: 90/05/04 15:24:10 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/util/RCS/rmgr_cmd.c,v $";
 #include <stdio.h>
 #include "isis.h"
 
-void  usage(s)
-    char  *s;
+void
+usage(s)
+	char *s;
 {
-    fprintf(stderr, "usage: %s site [-E] key [program arg0 arg1 ...]\n", s);
-    exit (-1);
+	fprintf(stderr, "usage: %s site [-E] key [program arg0 arg1 ...]\n", s);
+	exit(-1);
 }
 
 main(argc, argv, envp)
-    int  argc;
-    char *argv[], *envp[];
+	int argc;
+	char *argv[], *envp[];
 {
-    char  *key, *program, **args;
-    int   rc;
+	char *key, *program, **args;
+	int rc;
 
-    if (argc < 3) usage(argv[0]);
-    my_site_no = atoi(argv[1]);
-    if (my_site_no == 0) usage(argv[0]);
-    if (strcmp(argv[2], "-E") == 0) {
-        if (argc < 5) usage(argv[0]);
-        key = argv[3];
-        program = argv[4];
-        args = &argv[5];
-    } else {
-        key = argv[2];
-        program = argv[3];
-        args = (program != NULL)? &argv[4]: NULL;
-        envp = NULL;
-    }
+	if (argc < 3)
+		usage(argv[0]);
+	my_site_no = atoi(argv[1]);
+	if (my_site_no == 0)
+		usage(argv[0]);
+	if (strcmp(argv[2], "-E") == 0) {
+		if (argc < 5)
+			usage(argv[0]);
+		key = argv[3];
+		program = argv[4];
+		args = &argv[5];
+	} else {
+		key = argv[2];
+		program = argv[3];
+		args = (program != NULL) ? &argv[4] : NULL;
+		envp = NULL;
+	}
 
-    if (strlen(key) > RMLEN) {
-        fprintf(stderr, "%s: key too long\n", key);
-        exit (-1);
-    }
-    isis_init(0);
-    switch (rc = rmgr_update(key, program, args, envp)) {
-    case RM_ELOCKED:
-        fprintf(stderr, "%s: rmgr.rc file locked\n", argv[0]);
-        break;
-    case RM_ENOTFOUND:
-        fprintf(stderr, "%s: key not found in rmgr.rc file\n", argv[0]);
-        break;
-    }
-    exit(rc);
+	if (strlen(key) > RMLEN) {
+		fprintf(stderr, "%s: key too long\n", key);
+		exit(-1);
+	}
+	isis_init(0);
+	switch (rc = rmgr_update(key, program, args, envp)) {
+	case RM_ELOCKED:
+		fprintf(stderr, "%s: rmgr.rc file locked\n", argv[0]);
+		break;
+	case RM_ENOTFOUND:
+		fprintf(stderr, "%s: key not found in rmgr.rc file\n", argv[0]);
+		break;
+	}
+	exit(rc);
 }

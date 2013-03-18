@@ -15,25 +15,23 @@
  */
 /* Expand tabs into spaces, because of lousy emacs conventions */
 main()
-  {
-        register c, n = 0;
+{
+	register c, n = 0;
 
-        while((c = getchar()) > 0)
-        {
-            switch(c)
-            {
-                case '\n':
-                    n = 0;
-                    break;
-                default:
-                    ++n;
-                    break;
-                case '\t':
-                    do
-                        putchar(' ');
-                    while(++n%8);
-                    continue;
-            }
-            putchar(c);
-        }
-   }
+	while ((c = getchar()) > 0) {
+		switch (c) {
+		case '\n':
+			n = 0;
+			break;
+		default:
+			++n;
+			break;
+		case '\t':
+			do
+				putchar(' ');
+			while (++n % 8);
+			continue;
+		}
+		putchar(c);
+	}
+}
