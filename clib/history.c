@@ -1,5 +1,6 @@
 /* History file for clib */
-char clib_rcsid[] = "$Revision: 2.122 $$Date: 90/09/19 14:28:44 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/clib/RCS/history.c,v $";
+char clib_rcsid[] =
+    "$Revision: 2.122 $$Date: 90/09/19 14:28:44 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/clib/RCS/history.c,v $";
 
 /* $Log:	history.c,v $
  * Revision 2.122  90/09/19  14:28:44  ken

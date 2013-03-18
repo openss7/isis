@@ -12,4 +12,6 @@
  *      in the event of questions or for special situations.
  *      -- Copyright (c) 1990, The ISIS PROJECT
  */
-sv_init() {}
+sv_init()
+{
+}

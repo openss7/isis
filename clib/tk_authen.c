@@ -17,53 +17,54 @@
  */
 #include "isis.h"
 
-static  qnode *au_queue;
-static  ifunc *authenticator;
-static  vfunc *old_filter;
+static qnode *au_queue;
+static ifunc *authenticator;
+static vfunc *old_filter;
 
 void
 au_request_verify(routine)
-  ifunc *routine;
-  {
-        void au_filter();
-        authenticator = routine;
-        old_filter = isis_setfilter(au_filter);
-  }
+	ifunc *routine;
+{
+	void au_filter();
+
+	authenticator = routine;
+	old_filter = isis_setfilter(au_filter);
+}
 
 void
 au_filter(mp)
-  register message *mp;
-  {
-        switch(_ISISCALL1(authenticator, mp))
-        {
-          case -1:
-            nullreply(mp);
-            return;
+	register message *mp;
+{
+	switch (_ISISCALL1(authenticator, mp)) {
+	case -1:
+		nullreply(mp);
+		return;
 
-          case 0:
-            ISISCALL1(old_filter, mp);
-            return;
+	case 0:
+		ISISCALL1(old_filter, mp);
+		return;
 
-          default:
-            return;
-        }
-  }
+	default:
+		return;
+	}
+}
 
 void
 au_permit(who)
-  address *who;
-  {
-        if(au_queue == NULLQP)
-            au_queue = qu_null();
-        if(pg_find(au_queue, who) == NULLQP)
-            pg_add(au_queue, who, NULLARG, NULLROUTINE);
-  }
+	address *who;
+{
+	if (au_queue == NULLQP)
+		au_queue = qu_null();
+	if (pg_find(au_queue, who) == NULLQP)
+		pg_add(au_queue, who, NULLARG, NULLROUTINE);
+}
 
 void
 au_revoke_perm(who)
-  address *who;
-  {
-        register qnode *qp;
-        if(au_queue && (qp = pg_find(au_queue, who)))
-            qu_free(qp);
-  }
+	address *who;
+{
+	register qnode *qp;
+
+	if (au_queue && (qp = pg_find(au_queue, who)))
+		qu_free(qp);
+}

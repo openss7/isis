@@ -19,15 +19,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	cl_dump( /* int level, char *why, ... */ );
-void	isis_logging	(int flag);
-void	paddr		(address *addr);
-void	paddrs		(address *addrs);
-void	peid		(event_id eid);
-void	pmsg		(message *msg);
-void	psid		(int sid);
+	void cl_dump( /* int level, char *why, ... */ );
+	void isis_logging(int flag);
+	void paddr(address * addr);
+	void paddrs(address * addrs);
+	void peid(event_id eid);
+	void pmsg(message * msg);
+	void psid(int sid);
 #ifdef __cplusplus
-	      }
+}
 #endif
 #else
 
@@ -41,19 +41,17 @@ void cl_dump(), isis_logging(), paddr(), peid(), pmsg(), psid();
 #ifdef __cplusplus
 extern "C" {
 #endif
-address	atoaddr	(char *str);
-char	*callername	(int n_levels);
-void	dump_cond	(qnode *qp);
-void	dump_sid	(qnode *qp);
-void	dump_sview	(sview *sv);
-void	dump_task	(qnode *qp);
+	address atoaddr(char *str);
+	char *callername(int n_levels);
+	void dump_cond(qnode * qp);
+	void dump_sid(qnode * qp);
+	void dump_sview(sview * sv);
+	void dump_task(qnode * qp);
 #ifdef __cplusplus
 }
 #endif
-
 #else
 
 void dump_task();
 
 #endif
-

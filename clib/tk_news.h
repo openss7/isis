@@ -14,7 +14,6 @@
  */
 /* cl_news.h:  news service */
 
-
 #define MSG_SUBSRCIBE   1
 #define MSG_CANCEL      2
 #define MSG_POST        3
@@ -32,24 +31,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	news_apost	(site_id *slist, char *subj, struct message *mp,
-                         int back);
-int	news_cancel	(char *subj);
-void	news_clear	(site_id *slist, char *subj);
-void	news_clear_all	(site_id *slist, char *subj);
-void	news_post	(site_id *slist, char *subj, struct message *mp,
-                         int back);
-int	news_subscribe	(char *subj, int entry, int back);
+	void news_apost(site_id * slist, char *subj, struct message *mp, int back);
+	int news_cancel(char *subj);
+	void news_clear(site_id * slist, char *subj);
+	void news_clear_all(site_id * slist, char *subj);
+	void news_post(site_id * slist, char *subj, struct message *mp, int back);
+	int news_subscribe(char *subj, int entry, int back);
 #ifdef __cplusplus
 }
 #endif
 #else
 
-extern  int  news_subscribe (/* char  *subj;  int  entry, back; */);
-extern  int  news_cancel    (/* char  *subj; */);
-extern  void news_post  (/* site_id slist[]; char *subj; message *mp; int back; */);
-extern  void news_apost (/* site_id slist[]; char *subj; message *mp; int back; */);
-extern  void news_clear (/* site_id slist[]; char *subj; */);
-extern  void news_clear_all(/* site_id  slist[];  char  *subj; */);
+extern int news_subscribe( /* char *subj; int entry, back; */ );
+extern int news_cancel( /* char *subj; */ );
+extern void news_post( /* site_id slist[]; char *subj; message *mp; int back; */ );
+extern void news_apost( /* site_id slist[]; char *subj; message *mp; int back; */ );
+extern void news_clear( /* site_id slist[]; char *subj; */ );
+extern void news_clear_all( /* site_id slist[]; char *subj; */ );
 
 #endif

@@ -21,6 +21,6 @@
 
 #ifdef FORK_BROKEN
 ISIS_fork_execve()
-  {
-  }
-#endif FORK_BROKEN
+{
+}
+#endif				/* FORK_BROKEN */

@@ -18,8 +18,8 @@
 #include "isis.h"
 
 notify_set_itimer_func(client, infunc, which, value, ovalue)
-  ifunc *client, *infunc;
-  int which;
-  struct itimerval *value, *ovalue;
-  {
-  }
+	ifunc *client, *infunc;
+	int which;
+	struct itimerval *value, *ovalue;
+{
+}

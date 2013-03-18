@@ -18,8 +18,8 @@
 
 int
 spool_replay(gname, flag)
-  char *gname;
-  int flag;
-  {
-      return 0;
-  }
+	char *gname;
+	int flag;
+{
+	return 0;
+}

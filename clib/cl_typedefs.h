@@ -17,12 +17,12 @@
 #define CL_TYPEDEFS
 
 /* Define ISIS version here since this file is included by clib and protos. */
-#define ISIS_VERSION    "2.1"		/* 3 char limit */
+#define ISIS_VERSION    "2.1"	/* 3 char limit */
 #define FULL_VERSION    "ISIS release V2.1, Aug 1990"
 
 #if (  __cplusplus || c_plusplus )
 #define VOID void
-typedef  void    vfunc();
+typedef void vfunc();
 struct qnode;
 struct task;
 struct sys_groupview;
@@ -53,11 +53,11 @@ struct token;
 struct bc_node;
 #else
 #if     (MIPS|VAX|AIX|GOULD|RT43)
-#  define   VOID    char /* Many compilers crash on void* args and assigns! */
+#  define   VOID    char	/* Many compilers crash on void* args and assigns! */
 #else
 #  define   VOID    void
 #endif
-typedef  VOID    vfunc();
+typedef VOID vfunc();
 typedef struct qnode qnode;
 typedef struct task task;
 typedef struct sys_groupview sys_groupview;
@@ -90,8 +90,8 @@ typedef struct token token;
 typedef struct sockaddr_in saddr;
 typedef struct qnode *condition;
 typedef union address x_id;
-typedef int    ifunc();
-typedef short  site_id;
+typedef int ifunc();
+typedef short site_id;
 
 typedef unsigned int bool;
 
@@ -103,4 +103,3 @@ typedef unsigned int bool;
 #endif
 
 #endif
-

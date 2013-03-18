@@ -19,39 +19,35 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-sview	*site_getview	();
-int	sv_monitor_cancel(int svid);
-int	sv_watch_cancel	(int svid);
+	sview *site_getview();
+	int sv_monitor_cancel(int svid);
+	int sv_watch_cancel(int svid);
 
 #if  ( __cplusplus || c_plusplus )
-int	sv_monitor	(v_routine_vs, VOID *arg);
-int	sv_watch	(int sid, int event, v_routine_vs, VOID *arg);
+	int sv_monitor(v_routine_vs, VOID * arg);
+	int sv_watch(int sid, int event, v_routine_vs, VOID * arg);
 #else
-int	sv_monitor	(void (*routine)(VOID *arg0), VOID *arg1);
-int	sv_watch	(int sid, int event, void (*routine)(VOID *arg0),
-                         VOID *arg1);
+	int sv_monitor(void (*routine) (VOID * arg0), VOID * arg1);
+	int sv_watch(int sid, int event, void (*routine) (VOID * arg0), VOID * arg1);
 #endif
 #ifdef __cplusplus
 }
 #endif
 #endif
-
 /*** Internal routines ***/
-
 #if FUN_TYPES
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	site_monitor_dump();
-void	sv_doecall	(svmon *svm);
-void	sv_dovcall	(svmon *svm);
-void	sv_free		(svmon *svm);
-void	sv_init		();
-void	sv_new_sview	(message *mp);
+	void site_monitor_dump();
+	void sv_doecall(svmon * svm);
+	void sv_dovcall(svmon * svm);
+	void sv_free(svmon * svm);
+	void sv_init();
+	void sv_new_sview(message * mp);
 #ifdef __cplusplus
 }
 #endif
 #else
-
-void	sv_new_sview();
+void sv_new_sview();
 #endif

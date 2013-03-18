@@ -17,48 +17,47 @@
  *      in the event of questions or for special situations.
  *      -- Copyright (c) 1990, The ISIS PROJECT
  */
-int ___lwpdummy___; /* Just to prevent there being a null object file. */
+int ___lwpdummy___;			/* Just to prevent there being a null object file. */
 
 #if SUNLWP && SUN4
-#if __GNUC__ 
-       #error Must be compiled using Sun C!!!
+#if __GNUC__
+#error Must be compiled using Sun C!!!
 #endif
 
 #include <lwp/lwp.h>
 
-int 
+int
 _mon_enter(mid)
-  struct mon_t *mid;
+	struct mon_t *mid;
 {
-    return(mon_enter(*mid));
+	return (mon_enter(*mid));
 }
 
-int 
+int
 _mon_exit(mid)
-  struct mon_t *mid;
+	struct mon_t *mid;
 {
-    return(mon_exit(*mid));
+	return (mon_exit(*mid));
 }
 
-int 
+int
 _cv_wait(cv)
-  struct cv_t *cv;
+	struct cv_t *cv;
 {
-    return(cv_wait(*cv));
+	return (cv_wait(*cv));
 }
 
-int 
+int
 _cv_notify(cv)
-  struct cv_t *cv;
+	struct cv_t *cv;
 {
-    return(cv_notify(*cv));
+	return (cv_notify(*cv));
 }
 
-int 
+int
 _cv_destroy(cv)
-  struct cv_t *cv;
+	struct cv_t *cv;
 {
-    return(cv_destroy(*cv));
+	return (cv_destroy(*cv));
 }
 #endif
-

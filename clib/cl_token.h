@@ -19,23 +19,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-address	*t_holder	(address *gaddr, char *name);
-int	t_pass		(address *gaddr, char *name);
-int	t_request	(address *gaddr, char *name, int pass_on_fail);
+	address *t_holder(address * gaddr, char *name);
+	int t_pass(address * gaddr, char *name);
+	int t_request(address * gaddr, char *name, int pass_on_fail);
 #ifdef __cplusplus
 }
 #endif
 #endif
-
 /*** Internal routines ***/
-
 #if FUN_TYPES
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	dump_tokens	();
-token	*map_token(address *gaddr, char *name);
-void	tk_init		();
+	void dump_tokens();
+	token *map_token(address * gaddr, char *name);
+	void tk_init();
 #ifdef __cplusplus
 }
 #endif

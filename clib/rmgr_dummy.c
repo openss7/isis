@@ -18,8 +18,8 @@
 
 int
 rmgr_start_log(gname, logfname)
-  address *gname;
-  char *logfname;
-  {
-      return 0;
-  }
+	address *gname;
+	char *logfname;
+{
+	return 0;
+}

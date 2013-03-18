@@ -1,20 +1,19 @@
 /*  $RCSfile: spooler.h,v $ $Revision: 2.97 $ $Date: 90/09/07 16:54:23 $  */
  /* 
- *      Originally coded by Ken Birman 
- *      Spooler definitions file
- *
- *      ISIS release V2.0, May 1990
- *      Export restrictions apply
- *
- *      The contents of this file are subject to a joint, non-exclusive
- *      copyright by members of the ISIS Project.  Permission is granted for
- *      use of this material in unmodified form in commercial or research
- *      settings.  Creation of derivative forms of this software may be
- *      subject to restriction; obtain written permission from the ISIS Project
- *      in the event of questions or for special situations.
- *      -- Copyright (c) 1990, The ISIS PROJECT
- */ 
- 
+  *      Originally coded by Ken Birman 
+  *      Spooler definitions file
+  *
+  *      ISIS release V2.0, May 1990
+  *      Export restrictions apply
+  *
+  *      The contents of this file are subject to a joint, non-exclusive
+  *      copyright by members of the ISIS Project.  Permission is granted for
+  *      use of this material in unmodified form in commercial or research
+  *      settings.  Creation of derivative forms of this software may be
+  *      subject to restriction; obtain written permission from the ISIS Project
+  *      in the event of questions or for special situations.
+  *      -- Copyright (c) 1990, The ISIS PROJECT
+  */
 
 #define SP_BASE                 10
 
@@ -59,7 +58,6 @@
 #define SP_LH_SRCERR            15
 #define SP_LH_DSTERR            16
 
-
 /* Long-haul entry points start here */
 #define LH_BASE			20
 #define REG_ENTRY               (LH_BASE + 1)
@@ -101,9 +99,7 @@
 src = dst = net = (char*) 0; err = 0; \
 (msg_get(mp, "%-s%-s%-s%d", &src, &dst, &net, &err));
 
-
-int	spool_in_replay;	/* Set when delivery of a "replayed message" is occuring */
-
+int spool_in_replay;			/* Set when delivery of a "replayed message" is occuring */
 
 /*  Spooler interface routines. */
 
@@ -111,48 +107,45 @@ int	spool_in_replay;	/* Set when delivery of a "replayed message" is occuring */
 #ifdef __cplusplus
 extern "C" {
 #endif
-int	spool_cancel	(char *sname, int sid);
-int	spool_inquire	(char *sname, int sid);
-void	spool_play_through(char *sname, int on_off);
-void	spool_set_ckpt_pointer(char *sname, int spseqn);
-void	spool_set_replay_pointer(char *sname, int spseqn);
-int	spool_wait	(char *sname, int sid);
+	int spool_cancel(char *sname, int sid);
+	int spool_inquire(char *sname, int sid);
+	void spool_play_through(char *sname, int on_off);
+	void spool_set_ckpt_pointer(char *sname, int spseqn);
+	void spool_set_replay_pointer(char *sname, int spseqn);
+	int spool_wait(char *sname, int sid);
 #if ( __cplusplus || c_plusplus )
-void	spool		(char *sname, int entry, char *fmt ...);
-void	spool_and_discard(char *sname, int entry, char *fmt ...);
-void	spool_discard	(char *sname, int pat ...);
-void	spool_m		(char *sname, int entry, message *msg, int sp_key,
-                         ...);
-void	spool_m_and_discard(char *sname, int entry, message *msg, int sp_key,
-                            ...);
-void	spool_replay	(char *sname, int sp_pat ...);
+	void spool(char *sname, int entry, char *fmt ...);
+	void spool_and_discard(char *sname, int entry, char *fmt ...);
+	void spool_discard(char *sname, int pat ...);
+	void spool_m(char *sname, int entry, message * msg, int sp_key, ...);
+	void spool_m_and_discard(char *sname, int entry, message * msg, int sp_key, ...);
+	void spool_replay(char *sname, int sp_pat ...);
 #else
-void	spool		();
-void	spool_and_discard();
-void	spool_discard	();
-void	spool_m		();
-void	spool_m_and_discard();
-void	spool_replay	();
+	void spool();
+	void spool_and_discard();
+	void spool_discard();
+	void spool_m();
+	void spool_m_and_discard();
+	void spool_replay();
 #endif
 
 #ifdef __cplusplus
 }
 #endif
-
 #else
 
-void	spool		();
-void	spool_and_discard();
-int	spool_cancel	();
-void	spool_discard	();
-int	spool_inquire	();
-void	spool_m		();
-void	spool_m_and_discard();
-void	spool_play_through();
-void	spool_replay	();
-void	spool_set_ckpt_pointer();
-void	spool_set_replay_pointer();
-int	spool_wait	();
+void spool();
+void spool_and_discard();
+int spool_cancel();
+void spool_discard();
+int spool_inquire();
+void spool_m();
+void spool_m_and_discard();
+void spool_play_through();
+void spool_replay();
+void spool_set_ckpt_pointer();
+void spool_set_replay_pointer();
+int spool_wait();
 
 #endif
 
@@ -162,25 +155,24 @@ int	spool_wait	();
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	do_spool	(va_list *ap, int m_mode);
-void	do_spool_and_discard(va_list *ap, int m_mode);
-void	do_spool_discard(va_list *ap);
-void	do_spool_replay	(va_list *ap);
-void	sp_init		();
-void	sp_send	(int action, char *sname, message *sp_msg);
-void	sp_control_send(int entry, message *sp_msg);
+	void do_spool(va_list * ap, int m_mode);
+	void do_spool_and_discard(va_list * ap, int m_mode);
+	void do_spool_discard(va_list * ap);
+	void do_spool_replay(va_list * ap);
+	void sp_init();
+	void sp_send(int action, char *sname, message * sp_msg);
+	void sp_control_send(int entry, message * sp_msg);
 #ifdef __cplusplus
 }
 #endif
-
 #else
 
-void	do_spool();
-void	do_spool_and_discard();
-void	do_spool_discard();
-void	do_spool_replay	();
-void	sp_init();
-void	sp_send();
-void	sp_control_send();
+void do_spool();
+void do_spool_and_discard();
+void do_spool_discard();
+void do_spool_replay();
+void sp_init();
+void sp_send();
+void sp_control_send();
 
 #endif

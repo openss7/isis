@@ -15,7 +15,6 @@
  *
  */
 
-
 /*********************************************************************
 *
 *  Process lists 
@@ -26,15 +25,15 @@
 #define  pl_rank(paddr, list_p) pg_rank((paddr), (list_p))
 
 #if FUN_TYPES
-address *pl_create(address *gaddr, address *paddrs);
-address *pl_makegroup(address *list_p, char *gname);
-void     pl_add(address *list_p, address *addr_p);
-void     pl_remove(address *list_p, address *addr_p);
-void     pl_delete(address *list_p);
+address *pl_create(address * gaddr, address * paddrs);
+address *pl_makegroup(address * list_p, char *gname);
+void pl_add(address * list_p, address * addr_p);
+void pl_remove(address * list_p, address * addr_p);
+void pl_delete(address * list_p);
 #else
 address *pl_create();
 address *pl_makegroup();
-void     pl_add();
-void     pl_remove();
-void     pl_delete();
+void pl_add();
+void pl_remove();
+void pl_delete();
 #endif

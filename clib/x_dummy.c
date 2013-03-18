@@ -17,10 +17,10 @@
 
 void
 x_init()
-  {
-  }
+{
+}
 
 void
 dump_trans()
-  {
-  }
+{
+}

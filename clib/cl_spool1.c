@@ -15,46 +15,44 @@
  *      -- Copyright (c) 1990, The ISIS PROJECT
  */
 
-
 #define ISIS_SYS
 #include "isis.h"
 #include "spooler.h"
 
-static  void sp_rcv_replay();
-qnode   *spool_waitq;
+static void sp_rcv_replay();
+qnode *spool_waitq;
 
 void
 sp_init()
-  {
-        isis_entry(GENERIC_SP_REPLAY, (vfunc *) sp_rcv_replay,
-                   "isis-spooler: receive spool replay");
-        spool_waitq = qu_null();
-  }
+{
+	isis_entry(GENERIC_SP_REPLAY, (vfunc *) sp_rcv_replay,
+		   "isis-spooler: receive spool replay");
+	spool_waitq = qu_null();
+}
 
-int	spool_seqn = -1;
+int spool_seqn = -1;
 
 static void
 sp_rcv_replay(msg)
-  register message *msg;
-  {
+	register message *msg;
+{
 	register address *ap;
 	int entry, seqn;
 	message *sp_msg;
-	if(msg_get(msg, "%m,%d,%d", &sp_msg, &entry, &seqn) != 3)
-	    panic("sp_rcv_replay");
-	if(spool_seqn >= seqn)
-	{
-	    msg_delete(sp_msg);
-	    return;
+
+	if (msg_get(msg, "%m,%d,%d", &sp_msg, &entry, &seqn) != 3)
+		panic("sp_rcv_replay");
+	if (spool_seqn >= seqn) {
+		msg_delete(sp_msg);
+		return;
 	}
 	spool_seqn = seqn;
 	ap = msg_setdests(sp_msg, msg_getdests(msg));
-	while(!aptr_isnull(ap))
-	{
-	    if(ap->addr_entry == GENERIC_SP_REPLAY)
-		ap->addr_entry = entry;
-	    ++ap;
+	while (!aptr_isnull(ap)) {
+		if (ap->addr_entry == GENERIC_SP_REPLAY)
+			ap->addr_entry = entry;
+		++ap;
 	}
 	cl_local_delivery(sp_msg);
 	msg_delete(sp_msg);
-  }
+}

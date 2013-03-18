@@ -19,71 +19,67 @@
 #include "isis.h"
 #include "rexec.h"
 
-
 static void
 joined(gaddr, addr, event, cond)
-  address *gaddr, *addr;
-  int event;
-  char *cond;
-  {
-        t_sig((condition *) cond, (void *) ((event == W_FAIL)? -1: 0));
-  }
+	address *gaddr, *addr;
+	int event;
+	char *cond;
+{
+	t_sig((condition *) cond, (void *) ((event == W_FAIL) ? -1 : 0));
+}
 
 int
 isis_rexec(nwanted, gid, sites, prog, args, env, user, passwd, addrs)
-  int nwanted;
-  address *gid, *addrs;
-  register site_id *sites;
-  char *prog, **args, **env, *user, *passwd;   
-  {
-        register message *mp;
-        register nrep;
-        static firsttime = 0;
+	int nwanted;
+	address *gid, *addrs;
+	register site_id *sites;
+	char *prog, **args, **env, *user, *passwd;
+{
+	register message *mp;
+	register nrep;
+	static firsttime = 0;
 
 	ISIS_ENTER();
 	mp = msg_newmsg();
-        if(firsttime++ == 0)
-            isis_task(joined, "isis_rexec:joined");
+	if (firsttime++ == 0)
+		isis_task(joined, "isis_rexec:joined");
 
-        msg_addfield(mp, RE_PROG, prog, FTYPE_CHAR, strlen(prog)+1);
-        while(args && *args)
-        {
-            msg_addfield(mp, RE_ARGS, *args, FTYPE_CHAR, strlen(*args)+1);
-            ++args;
-        }
-        while(env && *env)
-        {
-            msg_addfield(mp, RE_ENV, *env, FTYPE_CHAR, strlen(*env)+1);
-            ++env;
-        }
-        msg_addfield(mp, RE_USER, user, FTYPE_CHAR, strlen(user)+1);
-        msg_addfield(mp, RE_PASSWD, passwd, FTYPE_CHAR, strlen(passwd)+1);
-        nrep = 0;
-        while(nrep < nwanted && *sites)
-        {
-            address where, addr;
-            where = ADDRESS(SITE_NO(*sites), SITE_INCARN(*sites), REXEC, 0);
-            if(cbcast_l("s", &where, REXEC_REQ, mp, ALL, "%a", &addr) > 0)
-                if(addr.addr_entry == 0 && !addr_isnull(&addr))
-                {
-                    if(!addr_isnull(gid))
-                    {
-                        switch(pg_watch(gid, &addr, W_JOIN, joined, (void *) &isis_ctp->task_cond))
-                        {
-                          case -1:
-                          case 0:
-                                break;
-                          default:
-                                if((int)t_wait_l(&isis_ctp->task_cond,
-                                                 "isis system: waiting for join or failure of rexec-ed process")
-                                   == -1) 
-                                    continue; 
-                        }
-                    }
-                    addrs[nrep++] = addr;
-                }
-            ++sites;
-        }
-        addrs[nrep] = NULLADDRESS;
-        ISIS_RETURN(nrep);
-  }
+	msg_addfield(mp, RE_PROG, prog, FTYPE_CHAR, strlen(prog) + 1);
+	while (args && *args) {
+		msg_addfield(mp, RE_ARGS, *args, FTYPE_CHAR, strlen(*args) + 1);
+		++args;
+	}
+	while (env && *env) {
+		msg_addfield(mp, RE_ENV, *env, FTYPE_CHAR, strlen(*env) + 1);
+		++env;
+	}
+	msg_addfield(mp, RE_USER, user, FTYPE_CHAR, strlen(user) + 1);
+	msg_addfield(mp, RE_PASSWD, passwd, FTYPE_CHAR, strlen(passwd) + 1);
+	nrep = 0;
+	while (nrep < nwanted && *sites) {
+		address where, addr;
+
+		where = ADDRESS(SITE_NO(*sites), SITE_INCARN(*sites), REXEC, 0);
+		if (cbcast_l("s", &where, REXEC_REQ, mp, ALL, "%a", &addr) > 0)
+			if (addr.addr_entry == 0 && !addr_isnull(&addr)) {
+				if (!addr_isnull(gid)) {
+					switch (pg_watch
+						(gid, &addr, W_JOIN, joined,
+						 (void *) &isis_ctp->task_cond)) {
+					case -1:
+					case 0:
+						break;
+					default:
+						if ((int) t_wait_l(&isis_ctp->task_cond,
+								   "isis system: waiting for join or failure of rexec-ed process")
+						    == -1)
+							continue;
+					}
+				}
+				addrs[nrep++] = addr;
+			}
+		++sites;
+	}
+	addrs[nrep] = NULLADDRESS;
+	ISIS_RETURN(nrep);
+}

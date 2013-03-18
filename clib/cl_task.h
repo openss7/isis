@@ -22,30 +22,30 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	isis_entry_stacksize(int entry, int size);
-void	t_scheck	();
-void	t_set_stacksize	(int size);
-void	t_sig		(condition *cp, VOID *rval);
-void	t_sig_all	(condition *cp, VOID *rval);
-void	t_sig_urgent	(condition *cp, VOID *rval);
-void	*t_yield	();
-void 	*t_wait		(condition *cp);
-void	*t_wait_l	(condition *cp, char *why);
+	void isis_entry_stacksize(int entry, int size);
+	void t_scheck();
+	void t_set_stacksize(int size);
+	void t_sig(condition * cp, VOID * rval);
+	void t_sig_all(condition * cp, VOID * rval);
+	void t_sig_urgent(condition * cp, VOID * rval);
+	void *t_yield();
+	void *t_wait(condition * cp);
+	void *t_wait_l(condition * cp, char *why);
 #if ( __cplusplus || c_plusplus )
-int	t_on_sys_stack	(i_routine_vs, VOID *arg);
+	int t_on_sys_stack(i_routine_vs, VOID * arg);
 #else
-int	t_on_sys_stack	(int (*routine)(VOID *argp), VOID *arg);
+	int t_on_sys_stack(int (*routine) (VOID * argp), VOID * arg);
 #endif
 #ifdef __cplusplus
 }
 #endif
 #else
 
-void	*t_yield();
-void	*t_wait_();
-void	*t_wait_l();
-void	t_sig();
-void    t_sig_all();
+void *t_yield();
+void *t_wait_();
+void *t_wait_l();
+void t_sig();
+void t_sig_all();
 
 #endif
 
@@ -55,32 +55,32 @@ void    t_sig_all();
 #ifdef __cplusplus
 extern "C" {
 #endif
-task	*do_task_dequeue(condition *cp);
-void	isis_accept_events_loop	(int flag);
-void	spanic		();
-void	t_init		();
-void	task_swtch	(task *tp, void (*routine)(VOID *arg), VOID *arg0);
-int	thread_isis_cleanup();
-void	thread_isis_enter(condition *cp, char *why);
-void	thread_isis_exit();
+	task *do_task_dequeue(condition * cp);
+	void isis_accept_events_loop(int flag);
+	void spanic();
+	void t_init();
+	void task_swtch(task * tp, void (*routine) (VOID * arg), VOID * arg0);
+	int thread_isis_cleanup();
+	void thread_isis_enter(condition * cp, char *why);
+	void thread_isis_exit();
 
-#if ( __cplusplus || c_plusplus ) 
-task	*isis_fork	(v_routine_vs, VOID *arg0, message *mp);
-void	isis_fork_urgent(v_routine_vs, VOID *arg0, message *mp);
+#if ( __cplusplus || c_plusplus )
+	task *isis_fork(v_routine_vs, VOID * arg0, message * mp);
+	void isis_fork_urgent(v_routine_vs, VOID * arg0, message * mp);
 #else
-task	*isis_fork	(void (*routine)(VOID *arg), VOID *arg0, message *mp);
-void	isis_fork_urgent(void (*routine)(VOID *arg), VOID *arg0, message *mp);
+	task *isis_fork(void (*routine) (VOID * arg), VOID * arg0, message * mp);
+	void isis_fork_urgent(void (*routine) (VOID * arg), VOID * arg0, message * mp);
 #endif
 #ifdef __cplusplus
 }
 #endif
 #else
 
-task                   *do_task_dequeue();
-void     isis_accept_events_loop(), task_swtch();
-void	 spanic(), t_set_stacksize();
-void	thread_isis_enter();
-void	thread_isis_exit();
+task *do_task_dequeue();
+void isis_accept_events_loop(), task_swtch();
+void spanic(), t_set_stacksize();
+void thread_isis_enter();
+void thread_isis_exit();
 #endif
 
 #ifdef  DB_TASKS
@@ -90,17 +90,17 @@ void	thread_isis_exit();
 #endif
 
 /* Task-related constants */
-# define        words           *4              /* Bytes per word */
-# define        kw              *4*1024         /* Bytes per k-word */
+# define        words           *4	/* Bytes per word */
+# define        kw              *4*1024	/* Bytes per k-word */
 #ifndef SUN4
-# define        DEF_TASKLEN         (4 kw)          /* size of task struct */
+# define        DEF_TASKLEN         (4 kw)	/* size of task struct */
 #else
-# define        DEF_TASKLEN         (6 kw)          /* size of task struct */
+# define        DEF_TASKLEN         (6 kw)	/* size of task struct */
 #endif
 
 /* Signal disciplines */
-# define        SD              0               /* Signal delayed */
-# define        SU              1               /* Signal urgent */
+# define        SD              0	/* Signal delayed */
+# define        SU              1	/* Signal urgent */
 
 #include <setjmp.h>
 
@@ -172,10 +172,8 @@ void	thread_isis_exit();
 #define ISISCALL4(rtn, arg1, arg2, arg3, arg4) ISIS_BGCALL ((*rtn)(arg1, arg2, arg3, arg4)); ISIS_ECALL
 
 #if    FUN_TYPES
-int    _ISISCALL1( ifunc *rtn, VOID *arg);
-#endif FUN_TYPES
-
-
+int _ISISCALL1(ifunc * rtn, VOID * arg);
+#endif				/* FUN_TYPES */
 
 /*** MACH C Threads implementation. ***/
 #ifdef	CTHREADS
@@ -196,25 +194,26 @@ int    _ISISCALL1( ifunc *rtn, VOID *arg);
 #define THREAD_WAIT(tp)  	{ db_print("THREAD_WAIT will release MUTEX (task %x)\n", tp); condition_wait((tp)-> task_runme,isis_mutex); db_print("THREAD_WAIT has re-acquired MUTEX (task %x)\n", isis_ctp); }
 #define THREAD_SIGNAL(tp)     	{ db_print("CONDITION_SIGNAL thread %x\n", tp); condition_signal((tp)-> task_runme); }
 #define THREAD_FREE(tp)		condition_free((tp)-> task_runme)
-#endif CTHREADS
+#endif				/* CTHREADS */
 
 /*** Sun Lightweight Processes implementation. ***/
-#ifdef  SUNLWP 
-#define THREADS                 1 
- 
+#ifdef  SUNLWP
+#define THREADS                 1
+
 #include <lwp/lwp.h>
 #include <lwp/stackdep.h>
 
 #if __GNUC__ && SUN4
 /* On a SUN4 8-byte structures can't be passed by value between gcc and Sun C.
    So we use some wrapper functions. */
-int _mon_enter(mon_t *mid);
-int _mon_exit(mon_t *mid);
-int _cv_wait(cv_t *cv);
-int _cv_notify(cv_t *cv);
-int _cv_destroy(cv_t *cv);
-#define mon_enter(mid) _mon_enter(&(mid)) 
-#define mon_exit(mid)  _mon_exit(&(mid)) 
+int _mon_enter(mon_t * mid);
+int _mon_exit(mon_t * mid);
+int _cv_wait(cv_t * cv);
+int _cv_notify(cv_t * cv);
+int _cv_destroy(cv_t * cv);
+
+#define mon_enter(mid) _mon_enter(&(mid))
+#define mon_exit(mid)  _mon_exit(&(mid))
 #define cv_wait(cv) _cv_wait(&(cv))
 #define cv_notify(cv) _cv_notify(&(cv))
 #define cv_destroy(cv) _cv_destroy(&(cv))
@@ -229,8 +228,8 @@ int _cv_destroy(cv_t *cv);
 #ifdef __cplusplus
 extern "C" {
 #endif
-int lwp_self(thread_t *tid);
-int lwp_create();
+	int lwp_self(thread_t * tid);
+	int lwp_create();
 #ifdef __cplusplus
 }
 #endif
@@ -247,7 +246,8 @@ int lwp_create();
 #define THREAD_YIELD(m)         { MUTEX_UNLOCK(m); MUTEX_LOCK(m); }
 
 #define THREAD_T                caddr_t
-thread_t  lwp_tid;              /* lwp IDs are big so need this variable. */
+thread_t lwp_tid;			/* lwp IDs are big so need this variable. */
+
 #define THREAD_SELF(s)          { lwp_self(&lwp_tid); s = lwp_tid.thread_id; }
 #define THREAD_FORK(f,a,s)      lwp_create(&lwp_tid,f,MINPRIO,0,s,1,a)
 
@@ -257,12 +257,12 @@ thread_t  lwp_tid;              /* lwp IDs are big so need this variable. */
 #define THREAD_SIGNAL(tp)       cv_notify((tp)-> task_runme)
 #define THREAD_FREE(tp)         cv_destroy((tp)-> task_runme)
 
-#endif SUNLWP   
+#endif				/* SUNLWP */
 
 /*** Apollo task implementation. ***/
-#ifdef  APOLLO 
-#define THREADS                 1 
- 
+#ifdef  APOLLO
+#define THREADS                 1
+
 #include <apollo/base.h>
 #include <apollo/task.h>
 #include <apollo/mutex.h>
@@ -279,7 +279,7 @@ thread_t  lwp_tid;              /* lwp IDs are big so need this variable. */
 #define THREAD_T                task_$handle_t
 #define THREAD_SELF(s)          s = task_$get_handle()
 #define THREAD_FORK(f,a,s)      task_$create((task_$routine_p)f,(void*)a,0,DEF_STACKLEN,1,task_$forever,0,&acr_status)
- 
+
 #define THREAD_COND_T           mutex_$lock_rec_t
 #define THREAD_ALLOC(tp)        { MUTEX_ALLOC((tp)->task_runme);     \
                                   MUTEX_LOCK((tp)-> task_runme); }
@@ -291,38 +291,38 @@ thread_t  lwp_tid;              /* lwp IDs are big so need this variable. */
 
 status_$t acr_status;
 
-#endif APOLLO   
+#endif				/* APOLLO */
 
 /*** Allegro Common Lisp task defines. ***/
 #ifdef ALLEGRO_CL
 #include <lisp.h>
-#define THREADS                 1 
+#define THREADS                 1
 
 /* Struct of pointers to C-callable lisp functions. */
 typedef struct {
-    void (*mutex_lock)();
-    void (*mutex_unlock)();
-    int  (*thread_self)();
-    void (*thread_wait)();
-    void (*thread_signal)();
-    void (*thread_fork)();
-    void (*thread_free)();
-    void (*thread_cleanup)();
-    void (*thread_wait_fun)();
-    void (*thread_yield)();
-    void (*panic)();
+	void (*mutex_lock) ();
+	void (*mutex_unlock) ();
+	int (*thread_self) ();
+	void (*thread_wait) ();
+	void (*thread_signal) ();
+	void (*thread_fork) ();
+	void (*thread_free) ();
+	void (*thread_cleanup) ();
+	void (*thread_wait_fun) ();
+	void (*thread_yield) ();
+	void (*panic) ();
 } clisp_funs;
 
 clisp_funs *cl;
 
 /* Since there's only one mutex lock we'll avoid passing it to/from lisp. */
-#define MUTEX_T           long  /* Never used */
-#define MUTEX_ALLOC(m)  
+#define MUTEX_T           long	/* Never used */
+#define MUTEX_ALLOC(m)
 #define MUTEX_LOCK(m) 	  call_allegro(cl-> mutex_lock, 0)
 #define MUTEX_UNLOCK(m)   call_allegro(cl-> mutex_unlock, 0)
 
 #define THREAD_COND_T	  long
-#define THREAD_ALLOC(tp)  (tp)-> task_runme = -1; /* Dummy value. */
+#define THREAD_ALLOC(tp)  (tp)-> task_runme = -1;	/* Dummy value. */
 #define THREAD_FREE(tp)   call_allegro(cl-> thread_free, (tp)-> task_threadid)
 #define THREAD_WAIT(tp)   call_allegro(cl-> thread_wait, (tp)-> task_threadid)
 #define THREAD_SIGNAL(tp) call_allegro(cl-> thread_signal, (tp)-> task_threadid)
@@ -344,7 +344,7 @@ clisp_funs *cl;
 
 # undef SELECT
 #define SELECT(b,i,o,e,t)  lisp_select(b,i,o,e,t)
-       
+
 /* Possible future optimizations:
    Actually we need only claim the mutex lock when leaving the C 
    when upcalling back into lisp. All C-code is executing without timeslicing
@@ -354,16 +354,16 @@ clisp_funs *cl;
    However upon any process switch a test must be made for TASK_TEMP and
    the mutex not unlocked in such cases.
 */
-#endif ALLEGRO_CL
+#endif				/* ALLEGRO_CL */
 
 /*** Lucid CL task defines ***/
 #ifdef LUCID_CL
-#define THREADS                 1 
+#define THREADS                 1
 
 /* C-callable functions in Lucid. */
 void cl_mutex_lock();
 void cl_mutex_unlock();
-int  cl_thread_self();
+int cl_thread_self();
 void cl_thread_wait();
 void cl_thread_signal();
 void cl_thread_fork();
@@ -372,16 +372,16 @@ void cl_thread_cleanup();
 void cl_thread_wait_fun();
 void cl_thread_yield();
 void cl_panic();
-int  call_lucid();
+int call_lucid();
 
 /* Since there's only one mutex lock we'll avoid passing it to/from lisp. */
-#define MUTEX_T              long  /* Never used */
-#define MUTEX_ALLOC(m)  	
+#define MUTEX_T              long	/* Never used */
+#define MUTEX_ALLOC(m)
 #define MUTEX_LOCK(m) 	     cl_mutex_lock();
 #define MUTEX_UNLOCK(m)      cl_mutex_unlock();
 
 #define THREAD_COND_T	     long
-#define THREAD_ALLOC(tp)     (tp)-> task_runme = -1; /* Dummy value. */
+#define THREAD_ALLOC(tp)     (tp)-> task_runme = -1;	/* Dummy value. */
 #define THREAD_FREE(tp)      cl_thread_free((tp)-> task_threadid)
 #define THREAD_WAIT(tp)      cl_thread_wait((tp)-> task_threadid)
 #define THREAD_SIGNAL(tp)    cl_thread_signal((tp)-> task_threadid)
@@ -427,68 +427,67 @@ int  call_lucid();
     (((int)rtn&1 == 1) ? call_lucid(rtn, 3, a1,a2,a3,0)  : (*(ifunc *)rtn)(a1,a2,a3))
 #define ISISCALL4(rtn, a1, a2, a3, a4) \
     (((int)rtn&1 == 1) ? call_lucid(rtn, 4, a1,a2,a3,a4) : (*(ifunc *)rtn)(a1,a2,a3,a4))
-#endif LUCID_CL
+#endif				/* LUCID_CL */
 
-struct  event_id
-{
-        int            e_msgid;                        /* Event corresponds to this message  */
-        int            e_op;                           /* Operation name */
-        address        e_pname;                        /* Process */
+struct event_id {
+	int e_msgid;			/* Event corresponds to this message */
+	int e_op;			/* Operation name */
+	address e_pname;		/* Process */
 };
 
-struct  task
-{
-        jmp_buf         task_env;                       /* Saved registers */
-        int             env_pad[16];                    /* Some jmp_bufs are too small */
-        event_id        task_eid;                       /* Current event id */
-        int             task_msgid;                     /* RPC msgid number */
-        int             task_ccmsgid;                   /* msgid number for cc_terminate */
-        VOID            *task_rval;                     /* To return from t_wait */
-        vfunc           *task_routine;                  /* Routine called */
-        int             task_sleep;                     /* How long? */
-        int             task_entry;                     /* Entry number, if any */
-	int		task_entries;			/* Counts calls to ISIS_ENTER */
-        short           task_act;                       /* Activity id for this task, if any */
-        short           task_flag;                      /* flags */
-        char            *task_arg0;                     /* Arg passed */
-        address         task_addr;                      /* Address of this task */
-        message         *task_msg_arg;                  /* Message arg to routine, if any */
-        condition       *task_queue;                    /* Waiting on this qnode */
-        condition       task_cond;                      /* For waiting */
-        char            *task_waitingfor;               /* Why waiting */
-        condition       task_mwant;                     /* Wants message */
-        message         *task_msg;                      /* Special for indirect (iterated) addressing */
-        qnode           *task_msgs;                     /* Message we got */
-        qnode           *task_active;                   /* Node on active task qnode */
-        address         *task_cohorts;                  /* Cohort list, if in cc alg. */
-        address         task_truesender;                /* Also for cc alg */
-        address         task_sentto;                    /* Who I sent the last message to */
-        char            task_nwant;                     /* Number wanted */
-        char            task_nreplies;                  /* Number so far */
-        char            task_nullreps;                  /* Null reps, failures observed so far */
-        char            task_nsent;                     /* Number of messages sent */
-        char            task_nresp;                     /* ... answers received */
-        char            *task_done;                     /* Used for cl_dump */
-        address         *task_dests;                    /* Used for cl_dump */
+struct task {
+	jmp_buf task_env;		/* Saved registers */
+	int env_pad[16];		/* Some jmp_bufs are too small */
+	event_id task_eid;		/* Current event id */
+	int task_msgid;			/* RPC msgid number */
+	int task_ccmsgid;		/* msgid number for cc_terminate */
+	VOID *task_rval;		/* To return from t_wait */
+	vfunc *task_routine;		/* Routine called */
+	int task_sleep;			/* How long? */
+	int task_entry;			/* Entry number, if any */
+	int task_entries;		/* Counts calls to ISIS_ENTER */
+	short task_act;			/* Activity id for this task, if any */
+	short task_flag;		/* flags */
+	char *task_arg0;		/* Arg passed */
+	address task_addr;		/* Address of this task */
+	message *task_msg_arg;		/* Message arg to routine, if any */
+	condition *task_queue;		/* Waiting on this qnode */
+	condition task_cond;		/* For waiting */
+	char *task_waitingfor;		/* Why waiting */
+	condition task_mwant;		/* Wants message */
+	message *task_msg;		/* Special for indirect (iterated) addressing */
+	qnode *task_msgs;		/* Message we got */
+	qnode *task_active;		/* Node on active task qnode */
+	address *task_cohorts;		/* Cohort list, if in cc alg. */
+	address task_truesender;	/* Also for cc alg */
+	address task_sentto;		/* Who I sent the last message to */
+	char task_nwant;		/* Number wanted */
+	char task_nreplies;		/* Number so far */
+	char task_nullreps;		/* Null reps, failures observed so far */
+	char task_nsent;		/* Number of messages sent */
+	char task_nresp;		/* ... answers received */
+	char *task_done;		/* Used for cl_dump */
+	address *task_dests;		/* Used for cl_dump */
 #ifdef THREADS
-        THREAD_COND_T   task_runme;                     /* Signal to run me... */
-        THREAD_T        task_threadid;                  /* Thread's unique id */
-	char            *task_name;                     /* Copy of cthread->name */
-#endif THREADS
-        char            *task_end;                      /* stack area, normal case */
-        char            *task_stack;                    /* stack area, normal case */
+	THREAD_COND_T task_runme;	/* Signal to run me... */
+	THREAD_T task_threadid;		/* Thread's unique id */
+	char *task_name;		/* Copy of cthread->name */
+#endif					/* THREADS */
+	char *task_end;			/* stack area, normal case */
+	char *task_stack;		/* stack area, normal case */
 };
 
 /* Field names for qnode nodes */
 #define TA_ISTASK               1
 
 /* Variables for managing the task table */
-extern task            *isis_ctp;                      /* Current task */
-extern condition       isis_runqueue;                  /* Runqueue */
-extern condition       isis_tasks;                     /* Task qnode */
-extern condition       task_decongested;
-extern int             task_congest;
-extern int             isis_ntasks;                    /* Counts active tasks */
+extern task *isis_ctp;			/* Current task */
+extern condition isis_runqueue;		/* Runqueue */
+extern condition isis_tasks;		/* Task qnode */
+extern condition task_decongested;
+extern int task_congest;
+extern int isis_ntasks;			/* Counts active tasks */
+
 #define                my_eid                          isis_ctp->task_eid
 
 /* Macros for fork routines */
@@ -499,15 +498,15 @@ extern int             isis_ntasks;                    /* Counts active tasks */
 
 # define t_waiting(condp)               ((*(condp)) != 0)
 
-#define TASK_START      0x01                            /* Set for the startup task */
-#define TASK_LOGGED     0x02                            /* Set if logged */
-#define TASK_INHIBIT    0x04                            /* Set if inhibits joins */
-#define TASK_CONGESTED  0x08                            /* Congested and waiting */
-#define TASK_XBYREF     0x10                            /* Current caller used pass-by-ref */
-#define TASK_ABYREF     0x20                            /* Called used address passing by ref */
-#define TASK_TEMP       0x40                            /* Just visiting */
-#define TASK_PRNAME     0x80                            /* Printable routine name */
-#define TASK_ZOMBIE     0x100				/* A member of the walking dead */
+#define TASK_START      0x01	/* Set for the startup task */
+#define TASK_LOGGED     0x02	/* Set if logged */
+#define TASK_INHIBIT    0x04	/* Set if inhibits joins */
+#define TASK_CONGESTED  0x08	/* Congested and waiting */
+#define TASK_XBYREF     0x10	/* Current caller used pass-by-ref */
+#define TASK_ABYREF     0x20	/* Called used address passing by ref */
+#define TASK_TEMP       0x40	/* Just visiting */
+#define TASK_PRNAME     0x80	/* Printable routine name */
+#define TASK_ZOMBIE     0x100	/* A member of the walking dead */
 
 #define task_dequeue(cp)  ((*cp == 0)? (task*)-1: do_task_dequeue(cp))
 
@@ -515,7 +514,7 @@ extern int             isis_ntasks;                    /* Counts active tasks */
 #define ISIS_MONITOR_EXIT(count,cond)   if(1) { if(--count == 0) t_sig(&cond, 0); } else
 
 #ifdef  THREADS
-MUTEX_T isis_mutex;   /* Define the single ISIS mutex variable. */
+MUTEX_T isis_mutex;			/* Define the single ISIS mutex variable. */
 
 # define        ISIS_ENTER()	ISIS_ENTER_L(&isis_runqueue,0)
 # define        ISIS_ENTER_L(cp,why) if(1) {                            \
@@ -524,7 +523,7 @@ MUTEX_T isis_mutex;   /* Define the single ISIS mutex variable. */
                                     if(isis_ctp->task_threadid != self) \
                                         thread_isis_enter(cp, why);     \
                                     else ++isis_ctp->task_entries;      \
-                                } else 
+                                } else
 # define        ISIS_EXIT()	if(1) {                                 \
                                     if(isis_ctp->task_flag&TASK_TEMP)   \
                                         thread_isis_exit();             \
@@ -538,11 +537,11 @@ MUTEX_T isis_mutex;   /* Define the single ISIS mutex variable. */
 # define        THREAD_LEAVE_ISIS()   thread_isis_exit()
 # define        THREAD_ENTER_ISIS()   ISIS_ENTER()
 
-#else    THREADS
+#else				/* THREADS */
 
 # define	ISIS_ENTER()
 # define	ISIS_ENTER_L(a,b)
 # define 	ISIS_EXIT()
 # define 	ISIS_RETURN(x)    return(x)
 
-#endif   THREADS
+#endif				/* THREADS */

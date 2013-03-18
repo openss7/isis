@@ -16,125 +16,126 @@
 
 #include "isis.h"
 
-log_nod
-*log_init(fname, gname, replay_entno, flush_type, end_of_replay, cs, ignore)
-  register char *fname, *gname;
-  int replay_entno, flush_type;
-  int (*end_of_replay)();
-  {
+log_nod *
+log_init(fname, gname, replay_entno, flush_type, end_of_replay, cs, ignore)
+	register char *fname, *gname;
+	int
+	 replay_entno, flush_type;
+	int (*end_of_replay) ();
+{
 	isis_errno = IE_LOGIO;
-	return(NULL);
-  }
+	return (NULL);
+}
 
 int
 log_action(gname, new_incarn_p)
-  char *gname;
-  int  *new_incarn_p;
-  {
-        return(-1);
-  }
+	char *gname;
+	int *new_incarn_p;
+{
+	return (-1);
+}
 
 int
 log_start_recovery(gname)
-  char *gname;
-  {
-        return(-1);
-  }
+	char *gname;
+{
+	return (-1);
+}
 
 int
 log_remove(gname)
-  char *gname;
-  {
-        return(-1);
-  }
+	char *gname;
+{
+	return (-1);
+}
 
 int
 log_has_ckpt(gname)
-  char *gname;
-  {
-        return(0);
-  }
+	char *gname;
+{
+	return (0);
+}
 
 int
 log_checkpoint(gname)
-  char *gname;
-  {
-        return(-1);
-  }
+	char *gname;
+{
+	return (-1);
+}
 
 int
 log_write_msg(gip, msg, entry)
-  register ginfo *gip;
-  message *msg;
-  int entry;
-  {
-        return(-1);
-  }
+	register ginfo *gip;
+	message *msg;
+	int entry;
+{
+	return (-1);
+}
 
 int
 log_write(gaddr, msg)
-  address *gaddr;
-  register message *msg;
-  {
-        return(-1);
-  }
+	address *gaddr;
+	register message *msg;
+{
+	return (-1);
+}
 
 void
 logging_out(msg)
-  message *msg;
-  {
-  }
+	message *msg;
+{
+}
 
 int
 log_end_log_msg()
-  {
-        return(0);
-  }
+{
+	return (0);
+}
 
 int
 log_flush(gaddr)
-  address *gaddr;
-  {
-        return(0);
-  }
+	address *gaddr;
+{
+	return (0);
+}
 
 int
 log_recovered(gaddr)
-  address *gaddr;
-  {
-        return(-1);
-  }
+	address *gaddr;
+{
+	return (-1);
+}
 
 int
 log_replay_msgs()
-  {
-        return(0);
-  }
+{
+	return (0);
+}
 
 int
 log_replay_ckpt(gname)
-  char *gname;
-  {
-        return(0);
-  }
+	char *gname;
+{
+	return (0);
+}
 
 log_cntthresh(gname, nmbuf)
-  char *gname;
-  {
-  }
+	char *gname;
+{
+}
 
 log_reqsthresh(gname, nmdsk)
-  char *gname;
-  {
-  }
+	char *gname;
+{
+}
 
 log_lenthresh(gname, lflen)
-  char *gname;
-  {
-  }
+	char *gname;
+{
+}
 
 log_timer(gname, timer)
-  char *gname;
-  unsigned timer;
-  {
-  }
+	char *gname;
+	unsigned timer;
+{
+}

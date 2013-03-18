@@ -15,53 +15,52 @@
  *
  */
 
-
 #if FUN_TYPES
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	abortreply	(message *msg);
-int	abortreply_l	(message *msg, int errno);
-int	bc_cancel	(int bcid);
-event_id *bc_getevent	(int bcid);
-int	bc_poll		(int bcid);
-int	bc_wait		(int bcid);
-void	flush		();
-void	forward		(message *fmsg, address *to, int ent, message *cmsg);
-int	nullreply	(message *msg);
+	void abortreply(message * msg);
+	int abortreply_l(message * msg, int errno);
+	int bc_cancel(int bcid);
+	event_id *bc_getevent(int bcid);
+	int bc_poll(int bcid);
+	int bc_wait(int bcid);
+	void flush();
+	void forward(message * fmsg, address * to, int ent, message * cmsg);
+	int nullreply(message * msg);
 #if ( __cplusplus || c_plusplus )
-int	abcast		(address *dest, int entry, char *out_fmt ...);
-int	bcast		(address *dest, int entry, char *out_fmt ...);
-int	cbcast		(address *dest, int entry, char *out_fmt ...);
-int	fbcast		(address *dest, int entry, char *out_fmt ...);
-int	gbcast		(address *dest, int entry, char *out_fmt ...);
-int	abcast_l	(char *option_string ...);
-int	bcast_l		(char *option_string ...);
-int	cbcast_l	(char *option_string ...);
-int	fbcast_l	(char *option_string ...);
-int	gbcast_l	(char *option_string ...);
-void	reply		(message *in_msg, char *out_format ...);
-void	reply_l		(char *option_string, message *in_msg ...);
+	int abcast(address * dest, int entry, char *out_fmt ...);
+	int bcast(address * dest, int entry, char *out_fmt ...);
+	int cbcast(address * dest, int entry, char *out_fmt ...);
+	int fbcast(address * dest, int entry, char *out_fmt ...);
+	int gbcast(address * dest, int entry, char *out_fmt ...);
+	int abcast_l(char *option_string ...);
+	int bcast_l(char *option_string ...);
+	int cbcast_l(char *option_string ...);
+	int fbcast_l(char *option_string ...);
+	int gbcast_l(char *option_string ...);
+	void reply(message * in_msg, char *out_format ...);
+	void reply_l(char *option_string, message * in_msg ...);
 #else
-int	abcast	();
-int	abcast_l	();
-int	bcast		();
-int	bcast_l		();
-int	cbcast		();
-int	cbcast_l	();
-int	fbcast		();
-int	fbcast_l	();
-int	gbcast		();
-int	gbcast_l	();
-void	reply		();
-void	reply_l		();
+	int abcast();
+	int abcast_l();
+	int bcast();
+	int bcast_l();
+	int cbcast();
+	int cbcast_l();
+	int fbcast();
+	int fbcast_l();
+	int gbcast();
+	int gbcast_l();
+	void reply();
+	void reply_l();
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 #else
-int	nullreply	();
+int nullreply();
 #endif
 
 /*** Internal routines ***/
@@ -70,21 +69,21 @@ int	nullreply	();
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	BCAST		(bc_args *bc);
-int	bc_free		(bc_args *bc);
-int	do_bcast	(int pro, char *opstr, va_list *ap);
-void	do_reply	(va_list *ap);
-void	do_reply_l	(va_list *ap);
-address	*eid_sender	(event_id *eid);
-int	gbcast_grow	();
+	void BCAST(bc_args * bc);
+	int bc_free(bc_args * bc);
+	int do_bcast(int pro, char *opstr, va_list * ap);
+	void do_reply(va_list * ap);
+	void do_reply_l(va_list * ap);
+	address *eid_sender(event_id * eid);
+	int gbcast_grow();
 #ifdef __cplusplus
 }
 #endif
 #else
 
-void	BCAST		();
-void	do_reply	();
-void	do_reply_l	();
+void BCAST();
+void do_reply();
+void do_reply_l();
 
 #endif
 
@@ -102,4 +101,4 @@ void	do_reply_l	();
 #define ISISBC_NONVSYNC      0x0800
 #define ISISBC_GROW          0x1000
 
-#define CL_MBCAST	-1		/* Special-case in bypass */
+#define CL_MBCAST	-1	/* Special-case in bypass */

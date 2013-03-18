@@ -30,42 +30,41 @@
 
 extern sview *site_getview();
 
-
 /*********************************************************************
 *
 *  news_subscribe, news_cancel
 *
 *********************************************************************/
 
-int  news_subscribe(subj, entry, back)
-    char  *subj;
-    int   entry; 
-    int   back;
+int
+news_subscribe(subj, entry, back)
+	char *subj;
+	int entry;
+	int back;
 {
-    int         n;
-    long        answer;
-    address addr;
+	int n;
+	long answer;
+	address addr;
 
     /*** send subscription message to local news service ***/
-    addr = ADDRESS(my_site_no, my_site_incarn, NEWS, 0);
-    n = cbcast(&addr, MSG_SUBSRCIBE, "%s %d %d", subj, entry, back, 1, "%d", &answer);
-    return (n == 1)? (int)answer: -1;
+	addr = ADDRESS(my_site_no, my_site_incarn, NEWS, 0);
+	n = cbcast(&addr, MSG_SUBSRCIBE, "%s %d %d", subj, entry, back, 1, "%d", &answer);
+	return (n == 1) ? (int) answer : -1;
 }
 
-
-int  news_cancel(subj)
-    char  *subj;
+int
+news_cancel(subj)
+	char *subj;
 {
-    int         n;
-    long        answer;
-    address     addr;
+	int n;
+	long answer;
+	address addr;
 
     /*** send cancel message to local news service ***/
-    addr = ADDRESS(my_site_no, my_site_incarn, NEWS, 0);
-    n = cbcast(&addr, MSG_CANCEL, "%s", subj, 1, "%d", &answer);
-    return (n == 1)? answer: -1;
+	addr = ADDRESS(my_site_no, my_site_incarn, NEWS, 0);
+	n = cbcast(&addr, MSG_CANCEL, "%s", subj, 1, "%d", &answer);
+	return (n == 1) ? answer : -1;
 }
-
 
 /*********************************************************************
 *
@@ -73,84 +72,86 @@ int  news_cancel(subj)
 *
 *********************************************************************/
 
-static  address  *make_alist(slist, entry)
-    site_id  slist[];
-    int      entry;
+static address *
+make_alist(slist, entry)
+	site_id slist[];
+	int entry;
 {
-        int      i;
-static  address  alist[MAX_SITES+1];
+	int i;
+	static address alist[MAX_SITES + 1];
 
-    if (slist == NULL) {
-        slist = site_getview()->sv_slist;
-    }
-    for(i = 0; slist[i] != 0; i++) {
-        alist[i].addr_site    =  SITE_NO(slist[i]);
-        alist[i].addr_incarn  =  SITE_INCARN(slist[i]);
-        alist[i].addr_portno  =  0;
-        alist[i].addr_process =  NEWS;
-        alist[i].addr_entry   =  entry;
-    }
-    alist[i] = NULLADDRESS;
-    return alist;
+	if (slist == NULL) {
+		slist = site_getview()->sv_slist;
+	}
+	for (i = 0; slist[i] != 0; i++) {
+		alist[i].addr_site = SITE_NO(slist[i]);
+		alist[i].addr_incarn = SITE_INCARN(slist[i]);
+		alist[i].addr_portno = 0;
+		alist[i].addr_process = NEWS;
+		alist[i].addr_entry = entry;
+	}
+	alist[i] = NULLADDRESS;
+	return alist;
 }
 
-
-void  news_post(slist, subj, mp, back)
-    site_id  slist[];
-    char     *subj;
-    message  *mp;
-    int      back;
-{
-    /*** add subject and back field to message ***/
-    msg_putfld(mp, FLD_SUBJ, "%s", subj);
-    msg_putfld(mp, FLD_BACK, "%d", back);
-
-    /*** broadcast message to news services ***/
-    (void) cbcast_l("lm", make_alist(slist, MSG_POST), mp, 0);
-}
-
-void  news_apost(slist, subj, mp, back)
-    site_id  slist[];
-    char     *subj;
-    message  *mp;
-    int      back;
+void
+news_post(slist, subj, mp, back)
+	site_id slist[];
+	char *subj;
+	message *mp;
+	int back;
 {
     /*** add subject and back field to message ***/
-    msg_putfld(mp, FLD_SUBJ, "%s", subj);
-    msg_putfld(mp, FLD_BACK, "%d", back);
+	msg_putfld(mp, FLD_SUBJ, "%s", subj);
+	msg_putfld(mp, FLD_BACK, "%d", back);
 
     /*** broadcast message to news services ***/
-    (void) abcast_l("lm", make_alist(slist, MSG_POST), mp, 0);
+	(void) cbcast_l("lm", make_alist(slist, MSG_POST), mp, 0);
 }
 
-
-void  news_clear(slist, subj)
-    site_id  slist[];
-    char     *subj;
+void
+news_apost(slist, subj, mp, back)
+	site_id slist[];
+	char *subj;
+	message *mp;
+	int back;
 {
-    message  *mp;
+    /*** add subject and back field to message ***/
+	msg_putfld(mp, FLD_SUBJ, "%s", subj);
+	msg_putfld(mp, FLD_BACK, "%d", back);
+
+    /*** broadcast message to news services ***/
+	(void) abcast_l("lm", make_alist(slist, MSG_POST), mp, 0);
+}
+
+void
+news_clear(slist, subj)
+	site_id slist[];
+	char *subj;
+{
+	message *mp;
 
     /*** prepare clear message ***/
-    mp = msg_newmsg();
-    msg_putfld(mp, FLD_SUBJ, "%s", subj);
+	mp = msg_newmsg();
+	msg_putfld(mp, FLD_SUBJ, "%s", subj);
 
     /*** broadcast message to news services ***/
-    (void) cbcast_l("lm", make_alist(slist, MSG_CLEAR), mp, 0);
-    msg_delete(mp);
+	(void) cbcast_l("lm", make_alist(slist, MSG_CLEAR), mp, 0);
+	msg_delete(mp);
 }
 
-void  news_clear_all(slist, subj)
-    site_id  slist[];
-    char     *subj;
+void
+news_clear_all(slist, subj)
+	site_id slist[];
+	char *subj;
 {
-    message  *mp;
+	message *mp;
 
     /*** prepare clear message ***/
-    mp = msg_newmsg();
-    msg_putfld(mp, FLD_SUBJ, "%s", subj);
+	mp = msg_newmsg();
+	msg_putfld(mp, FLD_SUBJ, "%s", subj);
 
     /*** broadcast message to news services ***/
-    (void) cbcast_l("lm", make_alist(slist, MSG_CLEARALL), mp, 0);
-    msg_delete(mp);
+	(void) cbcast_l("lm", make_alist(slist, MSG_CLEARALL), mp, 0);
+	msg_delete(mp);
 }
-

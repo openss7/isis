@@ -15,58 +15,55 @@
  *      -- Copyright (c) 1990, The ISIS PROJECT
  */
 
-struct  qnode
-{
-        qnode   *qu_next;
-        qnode   *qu_last;
-        vfunc   *qu_freeroutine;
-        int     qu_flag;
-        union
-        {
-          int           qu_isint;
-          char          *qu_ischar;
-          address       qu_isaddress;
-          int           (*qu_isproc)();
-          site_id       qu_issid;
-          x_id          qu_isxid;
-        }       qu_nun;
-        union
-        {
-          char          *qu_ischar;
-          qnode         *qu_isqueue;
-          int           qu_isint;
-          int           qu_areints[3];
-          char          *qu_arechars[3];
-          int           (*qu_isproc)();
-          bitvec        qu_isbitvec;
-          task          *qu_istask;
-          condition     qu_iscond;
-          address       qu_isdaddress;
-          site_id       qu_issid;
-          pwatch        *qu_ispw;
-          wnode         *qu_iswnode;
-          groupview     *qu_isgroupv;
-          etree         *qu_iset;
-          gnode         *qu_isnd;
-          event_id      *qu_iseid;
-          svmon         *qu_issvm;
-          bc_args       *qu_isbc;
-          cl_watch      *qu_isclw;
-          ioq           *qu_isioq;
-          mdesc         *qu_ismd;
-	  ginfo		*qu_isgip;
-          x_info        *qu_isxinfo;
-          x_part        *qu_isxpart;
-          bc_node       *qu_isbcn;
-          struct {
-            qnode       *qu_isaqueue;
-            int         qu_isanint;
-          }             qu_ismlist;
-          struct {
-            message     *qu_ismsg;
-            int         qu_isanint;
-          }             qu_ismslist;
-        }       qu_dun;
+struct qnode {
+	qnode *qu_next;
+	qnode *qu_last;
+	vfunc *qu_freeroutine;
+	int qu_flag;
+	union {
+		int qu_isint;
+		char *qu_ischar;
+		address qu_isaddress;
+		int (*qu_isproc) ();
+		site_id qu_issid;
+		x_id qu_isxid;
+	} qu_nun;
+	union {
+		char *qu_ischar;
+		qnode *qu_isqueue;
+		int qu_isint;
+		int qu_areints[3];
+		char *qu_arechars[3];
+		int (*qu_isproc) ();
+		bitvec qu_isbitvec;
+		task *qu_istask;
+		condition qu_iscond;
+		address qu_isdaddress;
+		site_id qu_issid;
+		pwatch *qu_ispw;
+		wnode *qu_iswnode;
+		groupview *qu_isgroupv;
+		etree *qu_iset;
+		gnode *qu_isnd;
+		event_id *qu_iseid;
+		svmon *qu_issvm;
+		bc_args *qu_isbc;
+		cl_watch *qu_isclw;
+		ioq *qu_isioq;
+		mdesc *qu_ismd;
+		ginfo *qu_isgip;
+		x_info *qu_isxinfo;
+		x_part *qu_isxpart;
+		bc_node *qu_isbcn;
+		struct {
+			qnode *qu_isaqueue;
+			int qu_isanint;
+		} qu_ismlist;
+		struct {
+			message *qu_ismsg;
+			int qu_isanint;
+		} qu_ismslist;
+	} qu_dun;
 };
 
 /* Node names */
@@ -126,7 +123,7 @@ struct  qnode
 /* Aliased routines */
 extern qnode *qu_freelist;
 extern qnode *qu_newqp;
-extern  adesc qu_adesc;
+extern adesc qu_adesc;
 
 #define qalloc()        ((qnode*)mallocate(&qu_adesc))
 
@@ -185,8 +182,7 @@ extern  adesc qu_adesc;
         np->qu_next = qp;                                               \
   }
 
-
-#ifdef SUN /* Everyone else has a compiler bug */
+#ifdef SUN			/* Everyone else has a compiler bug */
 #define qu_free(qp)                                                     \
   {                                                                     \
         if(qp)                                                          \
@@ -205,7 +201,7 @@ extern  adesc qu_adesc;
             }                                                           \
         }                                                               \
   }
-#else 
+#else
 #define qu_free(qp)                                                     \
   {                                                                     \
         if(qp)                                                          \
@@ -261,29 +257,25 @@ extern  adesc qu_adesc;
 #ifdef __cplusplus
 extern "C" {
 #endif
-qnode	*pg_add		(qnode *qp, address *pname, VOID *data,
-                         void (*routine)(VOID *arg));
-qnode	*pg_alloc	(address *pname, VOID *data,
-                         void (*routine)(VOID *arg));
-qnode	*pg_find	(qnode *qp, address *pname);
-qnode	*qu_add		(qnode *qp, int name, VOID *data,
-                         void (*routine)(VOID *arg));
-qnode	*qu_add_cb	(qnode *qp, void (*proc)(VOID *arg),
-                         VOID *arg0, VOID *arg1);
-qnode	*qu_add_pg	(qnode *qp, int name, address *paddr);
-qnode	*qu_add_sid	(qnode *qp, int name, int sid);
-qnode	*qu_alloc	(int name, VOID *data, void (*routine)(VOID *arg));
-qnode	*qu_alloc_pg	(int name, address *paddr);
-qnode	*qu_find	(qnode *qp, int item);
-void	qu_freeall	(qnode *qp);
-void	qu_resort	(qnode *qp, qnode *np);
+	qnode *pg_add(qnode * qp, address * pname, VOID * data, void (*routine) (VOID * arg));
+	qnode *pg_alloc(address * pname, VOID * data, void (*routine) (VOID * arg));
+	qnode *pg_find(qnode * qp, address * pname);
+	qnode *qu_add(qnode * qp, int name, VOID * data, void (*routine) (VOID * arg));
+	qnode *qu_add_cb(qnode * qp, void (*proc) (VOID * arg), VOID * arg0, VOID * arg1);
+	qnode *qu_add_pg(qnode * qp, int name, address * paddr);
+	qnode *qu_add_sid(qnode * qp, int name, int sid);
+	qnode *qu_alloc(int name, VOID * data, void (*routine) (VOID * arg));
+	qnode *qu_alloc_pg(int name, address * paddr);
+	qnode *qu_find(qnode * qp, int item);
+	void qu_freeall(qnode * qp);
+	void qu_resort(qnode * qp, qnode * np);
 #ifdef __cplusplus
 }
 #endif
 #else
 
-void    qu_freeall();
-qnode   *qu_alloc(), *qu_find(), *pg_find(), *qu_add();
-qnode   *pg_add(), *qu_add_pg(), *qu_add_sid(), *qu_add_cb();
+void qu_freeall();
+qnode *qu_alloc(), *qu_find(), *pg_find(), *qu_add();
+qnode *pg_add(), *qu_add_pg(), *qu_add_sid(), *qu_add_cb();
 
 #endif

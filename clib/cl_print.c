@@ -16,18 +16,16 @@
 
 void
 isis_print(fmt, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)
-  char * fmt;
-  int a0, a1, a2, a3, a4, a5, a6, a7, a8, a9;
-  {
-        extern FILE *isis_outfile;
-        if(isis_outfile)
-        {
-            fprintf(isis_outfile, fmt, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-            fflush(isis_outfile);
-        }
-        else
-        {
-            fprintf(stdout, fmt, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-            fflush(stdout);
-        }
-  }
+	char *fmt;
+	int a0, a1, a2, a3, a4, a5, a6, a7, a8, a9;
+{
+	extern FILE *isis_outfile;
+
+	if (isis_outfile) {
+		fprintf(isis_outfile, fmt, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+		fflush(isis_outfile);
+	} else {
+		fprintf(stdout, fmt, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+		fflush(stdout);
+	}
+}

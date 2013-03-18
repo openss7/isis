@@ -18,5 +18,5 @@
 
 void
 isis_connect_init()
-  {
-  }
+{
+}

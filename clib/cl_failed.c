@@ -15,7 +15,7 @@
  */
 int
 isis_failed()
-  {
-        /* Dummy routine if client doesn't define it instead */
-        return(-1);
-  }
+{
+	/* Dummy routine if client doesn't define it instead */
+	return (-1);
+}
