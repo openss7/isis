@@ -3,11 +3,11 @@
  *	Control of the implicit suffix rules
  */
 
-
 #include <make.h>
 
 #if	defined(HPUX)
 char *strrchr();
+
 #define	rindex(a,b)	strrchr(a,b)
 #endif
 
@@ -16,11 +16,10 @@ char *strrchr();
  */
 char *
 suffix(name)
-char *			name;
+	char *name;
 {
 	return rindex(name, '.');
 }
-
 
 /*
  *	Dynamic dependency.  This routine applies the suffis rules
@@ -31,23 +30,22 @@ char *			name;
  */
 bool
 dyndep(np)
-struct name *		np;
+	struct name *np;
 {
-	register char *		p;
-	register char *		q;
-	register char *		suff;		/*  Old suffix  */
-	register char *		basename;	/*  Name without suffix  */
-	struct name *		op;		/*  New dependent  */
-	struct name *		sp;		/*  Suffix  */
-	struct line *		lp;
-	struct depend *		dp;
-	char *			newsuff;
-
+	register char *p;
+	register char *q;
+	register char *suff;		/* Old suffix */
+	register char *basename;	/* Name without suffix */
+	struct name *op;		/* New dependent */
+	struct name *sp;		/* Suffix */
+	struct line *lp;
+	struct depend *dp;
+	char *newsuff;
 
 	p = str1;
 	q = np->n_name;
 	if (!(suff = suffix(q)))
-		return FALSE;		/* No suffix */
+		return FALSE;	/* No suffix */
 	while (q < suff)
 		*p++ = *q++;
 	*p = '\0';
@@ -57,37 +55,30 @@ struct name *		np;
 		return FALSE;
 
 	for (lp = sp->n_line; lp; lp = lp->l_next)
-		for (dp = lp->l_dep; dp; dp = dp->d_next)
-		{
+		for (dp = lp->l_dep; dp; dp = dp->d_next) {
 			newsuff = dp->d_name->n_name;
-			if (strlen(suff)+strlen(newsuff)+1 >= LZ)
+			if (strlen(suff) + strlen(newsuff) + 1 >= LZ)
 				fatal("Suffix rule too long");
 			p = str1;
 			q = newsuff;
-			while (*p++ = *q++)
-				;
+			while (*p++ = *q++) ;
 			p--;
 			q = suff;
-			while (*p++ = *q++)
-				;
+			while (*p++ = *q++) ;
 			sp = newname(str1);
-			if (sp->n_flag & N_TARG)
-			{
+			if (sp->n_flag & N_TARG) {
 				p = str1;
 				q = basename;
-				if (strlen(basename) + strlen(newsuff)+1 >= LZ)
+				if (strlen(basename) + strlen(newsuff) + 1 >= LZ)
 					fatal("Implicit name too long");
-				while (*p++ = *q++)
-					;
+				while (*p++ = *q++) ;
 				p--;
 				q = newsuff;
-				while (*p++ = *q++)
-					;
+				while (*p++ = *q++) ;
 				op = newname(str1);
 				if (!op->n_time)
 					modtime(op);
-				if (op->n_time)
-				{
+				if (op->n_time) {
 					dp = newdep(op, 0);
 					newline(np, dp, sp->n_line->l_cmd, 0);
 					setmacro("<", op->n_name);
@@ -98,21 +89,19 @@ struct name *		np;
 	return FALSE;
 }
 
-
 /*
  *	Make the default rules
  */
 void
 makerules()
 {
-	struct cmd *		cp;
-	struct name *		np;
-	struct depend *		dp;
-
+	struct cmd *cp;
+	struct name *np;
+	struct depend *dp;
 
 #ifdef eon
 	setmacro("BDSCC", "asm");
-	/*	setmacro("BDSCFLAGS", "");	*/
+	/* setmacro("BDSCFLAGS", ""); */
 	cp = newcmd("$(BDSCC) $(BDSCFLAGS) -n $<", 0);
 	np = newname(".c.o");
 	newline(np, 0, cp, 0);
@@ -124,13 +113,13 @@ makerules()
 	newline(np, 0, cp, 0);
 
 	setmacro("M80", "asm -n");
-	/*	setmacro("M80FLAGS", "");	*/
+	/* setmacro("M80FLAGS", ""); */
 	cp = newcmd("$(M80) $(M80FLAGS) $<", 0);
 	np = newname(".mac.o");
 	newline(np, 0, cp, 0);
 
 	setmacro("AS", "zas");
-	/*	setmacro("ASFLAGS", "");	*/
+	/* setmacro("ASFLAGS", ""); */
 	cp = newcmd("$(ZAS) $(ASFLAGS) -o $@ $<", 0);
 	np = newname(".as.obj");
 	newline(np, 0, cp, 0);
@@ -165,7 +154,7 @@ makerules()
 	newline(np, 0, cp, 0);
 
 	setmacro("YACC", "yacc");
-	/*	setmacro("YFLAGS", "");	*/
+	/* setmacro("YFLAGS", ""); */
 	cp = newcmd("$(YACC) $(YFLAGS) $<", 0);
 	cp = newcmd("mv y.tab.c $@", cp);
 	np = newname(".y.c");

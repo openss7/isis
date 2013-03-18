@@ -15,157 +15,149 @@
 /* trick debug print technique */
 #define dbgp if (debug) printf(
 #define dbge )
-  
-#include <isis.h>  /* ISIS declarations */
+
+#include <isis.h>		/* ISIS declarations */
 
 /* manual debug flags */
 #undef dbglst
 #undef dbggph
 #undef dbgsim
 #undef dbgio
-  
+
 #define MAX_INT 1000000
 #define PMK_SCR "/usr/u/isis/demos/pmk/pmktemp"
-                                         /* directory for scratch output */
+					 /* directory for scratch output */
 /* field sizes and custom types */
 
 #include <sys/param.h>
 
-#define dname_sz MAXPATHLEN    /* data item ( file ) name size */
-#define dtype int      /* file type - 0 = unkenon */
-#define sname_sz 2048    /* step name ( invokation string ) size */
+#define dname_sz MAXPATHLEN	/* data item ( file ) name size */
+#define dtype int		/* file type - 0 = unkenon */
+#define sname_sz 2048		/* step name ( invokation string ) size */
 #define time_type long
-#define pname_sz 80    /* processor name ( RPC identity ) size */
-#define fname_sz dname_sz    /* file name size - actually same as dname_sz */
-#define line_sz 4096   /* input line buffer - can get some very long lines */
-#define key_sz 8       /* size of key in intermediate graph file */
+#define pname_sz 80		/* processor name ( RPC identity ) size */
+#define fname_sz dname_sz	/* file name size - actually same as dname_sz */
+#define line_sz 4096		/* input line buffer - can get some very long lines */
+#define key_sz 8		/* size of key in intermediate graph file */
 #define bool char
 
 typedef char *gen_ptr;
- 
+
 /* graph nodes represent invokations of process steps */
 /* the following enumerated type indicates the status ( stage of processing )
      of each step.  */
 
-#define RAW 1        /* new unevaluated step */
-#define EVAL 2       /* evaluated ( decorated ) step */
-#define ALLOCATED 3  /* step allocated to processor */
-#define SCHEDULED 4  /* all dependencies are fulfilled */
-#define SCHED_LOCK 5 /* scheduled but temporarily locked */
-#define DONE  6      /* processing is complete */
+#define RAW 1			/* new unevaluated step */
+#define EVAL 2			/* evaluated ( decorated ) step */
+#define ALLOCATED 3		/* step allocated to processor */
+#define SCHEDULED 4		/* all dependencies are fulfilled */
+#define SCHED_LOCK 5		/* scheduled but temporarily locked */
+#define DONE  6			/* processing is complete */
 typedef int sstat_type;
-  
+
 /* STATE VARIABLES - The following constants and variables constitute the
                      state variables of a server  */
- 
+
 #define IDLE 0
 #define WAIT_DEP 1
 #define WAIT_EXEC 2
- 
+
 #define STEP_REQUESTED 3
- 
+
 #define SERVER_UP 4
 #define SERVER_DOWN 5
-#define STEP_SENT 6      /* used only by centralized scheduler */
+#define STEP_SENT 6		/* used only by centralized scheduler */
 
 /* exceptional values for server.rank field */
 #define SRVR_AVAIL -1
 #define AVAIL_WORK -2
 
-#define MIN_SRVRS 32   /* minimum number of server address slots to allocate
-			  (they're cheap) */
+#define MIN_SRVRS 32		/* minimum number of server address slots to allocate (they're
+				   cheap) */
 
 /* generic list structure */
-struct list_node_type { struct list_node_type *next;
-                   struct list_node_type *last;
-                   gen_ptr content; } /* list structure */
-               ;
+struct list_node_type {
+	struct list_node_type *next;
+	struct list_node_type *last;
+	gen_ptr content;
+} /* list structure */ ;
 
 typedef struct list_node_type list_node;
- 
-struct list_type_type { list_node *head,*tail;   } /* reference to a list */
-               ;
+
+struct list_type_type {
+	list_node *head, *tail;
+} /* reference to a list */ ;
 
 typedef struct list_type_type list_type;
- 
+
 /* server_type retains information regarding each server. */
- 
+
 struct server_type_type {
-               char name[pname_sz];   /* processor name */
-	       int server_num;        /* server index into server_addr */
-               list_type queue;       /* current queue of steps */
-               list_node *done_step;  /* last step executed null=none */
-	       int state;             /* UP DOWN or STEP_REQUESTED */
-	       address addr;          /* ISIS address of server */
-	       int rank;              /* most recently computed rank */
-               time_type comp_time;   /* total execution time */
-	       float speed_factor;    /* actual / expected performance */
-	       float sort_factor;     /* speed factor used for last sort */
-               int resched;           /* reschedule interval */
-               bool queue_complete,   /* no more elements for queue */
-                    server_ena;       /* server enabled for execution */
-	       float dummy_speed;     /* force dummy speed factor on server */
-        };
+	char name[pname_sz];		/* processor name */
+	int server_num;			/* server index into server_addr */
+	list_type queue;		/* current queue of steps */
+	list_node *done_step;		/* last step executed null=none */
+	int state;			/* UP DOWN or STEP_REQUESTED */
+	address addr;			/* ISIS address of server */
+	int rank;			/* most recently computed rank */
+	time_type comp_time;		/* total execution time */
+	float speed_factor;		/* actual / expected performance */
+	float sort_factor;		/* speed factor used for last sort */
+	int resched;			/* reschedule interval */
+	bool queue_complete,		/* no more elements for queue */
+	 server_ena;			/* server enabled for execution */
+	float dummy_speed;		/* force dummy speed factor on server */
+};
 
 typedef struct server_type_type server_type;
 
 struct calc_type_type {
-               time_type duration,   /* execution time of step */
-                  cpath_time, /* minimum time to completion of
-                                  processing dependent on this step */
-                  dep_time;    /* amount of processing which depends
-                                        on this step */
-                bool recompute;      /* TRUE if step must be recomputed */
-                sstat_type status;   /* enumerated type - step status */
-         };
+	time_type duration,		/* execution time of step */
+	 cpath_time,			/* minimum time to completion of processing dependent on
+					   this step */
+	 dep_time;			/* amount of processing which depends on this step */
+	bool recompute;			/* TRUE if step must be recomputed */
+	sstat_type status;		/* enumerated type - step status */
+};
 
 typedef struct calc_type_type calc_type;
 
-typedef char **env_ptr;           /* pointer to an array of pointers to
-                                     environment strings.  -  compatible with
-                                     unix standard environment notation */ 
-struct graph_node_type{
-              char *sname;        /* step invokation string */
-              int step_num;       /* step number in sorted graph */
-	      char *stdout_file;  /* file containing standard output */
-              list_type in_list; /* data_items on which step depends */
-              list_type output;  /* data items generated by this step */
-              int num_deps,        /* number of nodes on which step depends */
-                  cur_dep;         /* number of dependencies processed */
-              env_ptr env;         /* pointer to the environment array */
-              calc_type calc; /* make's calculations concerning node */
-	      float speed_factor;  /* actual duration/expected  */
-              server_type *processor; /* server assigned to this step */
-	      time_type deny_time;  /* time of last request denied */
-              time_type start_time,
-                  stop_time,
-                  exp_stop_time;  /* start and stop of step execution 0=unk. */
-	      time_type dummy_duration;  /* force dummy duration for step */
-                  };
+typedef char **env_ptr;			/* pointer to an array of pointers to environment strings.
+					   - compatible with unix standard environment notation */
+struct graph_node_type {
+	char *sname;			/* step invokation string */
+	int step_num;			/* step number in sorted graph */
+	char *stdout_file;		/* file containing standard output */
+	list_type in_list;		/* data_items on which step depends */
+	list_type output;		/* data items generated by this step */
+	int num_deps,			/* number of nodes on which step depends */
+	 cur_dep;			/* number of dependencies processed */
+	env_ptr env;			/* pointer to the environment array */
+	calc_type calc;			/* make's calculations concerning node */
+	float speed_factor;		/* actual duration/expected */
+	server_type *processor;		/* server assigned to this step */
+	time_type deny_time;		/* time of last request denied */
+	time_type start_time, stop_time, exp_stop_time;	/* start and stop of step execution 0=unk. */
+	time_type dummy_duration;	/* force dummy duration for step */
+};
 
 typedef struct graph_node_type graph_node;
- 
+
 /* data items represent files either input to or output from make steps */
 struct data_item_type {
-               char *dname;         /* name of data item including path */
-               int data_num;        /* numeric index of data item */
-               int  size;           /* size of data item in bytes 0=unk. */
-               dtype file_type;     /* type of file known to pstep 0=unk. */
-               bool  changed;       /* if TRUE, reexecute dependent steps */
-               list_type dependers; /* list of dependent nodes */
-               graph_node *source;  /* pointer to step that outputs file */
-               list_type gen_deps;  /* generate dependencies - list of 
-                                        dependencies implied for whatever 
-                                        graph node generates this data */
-             };
+	char *dname;			/* name of data item including path */
+	int data_num;			/* numeric index of data item */
+	int size;			/* size of data item in bytes 0=unk. */
+	dtype file_type;		/* type of file known to pstep 0=unk. */
+	bool changed;			/* if TRUE, reexecute dependent steps */
+	list_type dependers;		/* list of dependent nodes */
+	graph_node *source;		/* pointer to step that outputs file */
+	list_type gen_deps;		/* generate dependencies - list of dependencies implied for 
+					   whatever graph node generates this data */
+};
 typedef struct data_item_type data_item;
 
 /* index array types */
 typedef graph_node *step_addr_type[];
 typedef data_item *item_addr_type[];
 typedef server_type *server_addr_type[];
-
-
-
-
-

@@ -1,5 +1,6 @@
 /* History file for pmake. */
-extern char demos_rcsid[] = "$Revision: 2.4 $$Date: 90/08/27 14:03:58 $$Source: /usr/fsys/bullwinkle/b/isis/isisv2.1/demos/pmk/RCS/history.c,v $";
+extern char demos_rcsid[] =
+    "$Revision: 2.4 $$Date: 90/08/27 14:03:58 $$Source: /usr/fsys/bullwinkle/b/isis/isisv2.1/demos/pmk/RCS/history.c,v $";
 
 /* $Log:	history.c,v $
  * Revision 2.4  90/08/27  14:03:58  ken
@@ -55,4 +56,3 @@ extern char demos_rcsid[] = "$Revision: 2.4 $$Date: 90/08/27 14:03:58 $$Source: 
  * Initial revision
  * 
  */
-
