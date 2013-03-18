@@ -16,37 +16,35 @@
 #define PR_ALLOC
 /*  general purpose memory allocation/deallocation mechanism */
 
-#if ! ( __cplusplus || c_plusplus ) 
-typedef    struct adesc    adesc;
+#if ! ( __cplusplus || c_plusplus )
+typedef struct adesc adesc;
 #endif
 
-#if ! ( __cplusplus || c_plusplus ) 
-typedef    struct chunk    chunk;
+#if ! ( __cplusplus || c_plusplus )
+typedef struct chunk chunk;
 #endif
 
-struct chunk
-{
-        chunk   *c_next;                /* Next chunk */
-        char    *c_first;               /* First byte of this chunk */
-        char    *c_last;                /* Last byte of this chunk */
-        long    c_inuse;                /* Bitmap of items in use */
+struct chunk {
+	chunk *c_next;			/* Next chunk */
+	char *c_first;			/* First byte of this chunk */
+	char *c_last;			/* Last byte of this chunk */
+	long c_inuse;			/* Bitmap of items in use */
 };
 
-struct adesc
-{
-        long    a_isize;                /* Item size */
-        long    a_izero;                /* Amount to zero */
-        short   a_nalloc;               /* Number to allocate at a time (32 max) */
-        long    a_flags;                /* Flags */
-        chunk   *a_chunks;              /* To list of chunks */
-        chunk   *a_notfull;             /* To a chunk that isn't full */
-        int     a_nmalloc;              /* Number of mallocs done */
-        int     a_nmfree;                /* Number of mallocs done */
+struct adesc {
+	long a_isize;			/* Item size */
+	long a_izero;			/* Amount to zero */
+	short a_nalloc;			/* Number to allocate at a time (32 max) */
+	long a_flags;			/* Flags */
+	chunk *a_chunks;		/* To list of chunks */
+	chunk *a_notfull;		/* To a chunk that isn't full */
+	int a_nmalloc;			/* Number of mallocs done */
+	int a_nmfree;			/* Number of mallocs done */
 };
 
-#define A_INIT  0x01                    /* Set after first time */
+#define A_INIT  0x01		/* Set after first time */
 
-extern int     nalloc, nfree, memused, memfree, memalloc;
+extern int nalloc, nfree, memused, memfree, memalloc;
 
 /* Memory allocator routines. */
 
@@ -54,16 +52,16 @@ extern int     nalloc, nfree, memused, memfree, memalloc;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void	malloc_dump	();
-void 	*mallocate	(adesc *ap);
-void	mdeallocate	(void *pt, adesc *ap);
+	void malloc_dump();
+	void *mallocate(adesc * ap);
+	void mdeallocate(void *pt, adesc * ap);
 #ifdef __cplusplus
 }
 #endif
 #else
 
-void *mallocate ();
+void *mallocate();
 
 #endif
 
-#endif PR_ALLOC
+#endif				/* PR_ALLOC */
