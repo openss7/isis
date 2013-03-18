@@ -1,0 +1,569 @@
+.TH SPOOL 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+spool, spool_replay, spool_and_discard \-- ISIS spooling and long-haul functions.
+.SH SYNOPSIS
+.B 
+#include ``isis.h''
+.PP
+.B id = spool(sname, entry, fmt, args, SP_KEY, args, ... , 0);
+.br
+.B char *sname, *fmt;
+.br
+.B int entry;
+.PP
+.B id = spool_m(sname, entry, msg, SP_KEY, args, ... , 0);
+.br
+.B char *sname;
+.br
+.B message *msg;
+.br
+.B int entry;
+.PP
+.B spseqn = spool_getseqn(msg)
+.br
+.B int spseqn;
+.br
+.B message *msg;
+.PP
+.B spool_replay(sname, SP_PAT, args, ..., 0);
+.br
+.B char *sname;
+.br
+.PP
+.B int spool_in_replay;
+.PP
+.B spool_discard(sname, discard-pattern, 0);
+.PP
+.B spool_and_discard(sname, spool-request... 0, discard-pattern, 0);
+.PP
+.B spool_m_and_discard(sname, spool_m-request... 0, discard-pattern, 0);
+.PP
+.B prepend_and_discard(sname, spool-request... 0, discard-pattern, 0);
+.br
+.B char *sname;
+.PP
+.B spool_set_replay_pointer(sname, spseqn);
+.PP
+.B spool_set_ckpt_pointer(sname, spseqn);
+.PP
+.B spool_play_through(sname, SP_OFF/SP_ON);
+.PP
+.B spool_cancel(id)
+.PP
+.B spool_inquire(id)
+.PP
+.B spool_wait(id)
+.PP
+.B spool_advise(sname, options, 0);
+.PP
+.B bin/spooler [-v] [-l long_haul_conf] [portno]
+.PP
+.SH DESCRIPTION
+.PP
+An ISIS spool is used for \fIasynchronous\fR communication with
+a process group that is either known to be down, or where
+the group may need to spool input for fault-tolerance reasons.
+A typical user of the spool is the ISIS long-haul facility,
+which is only active when a line to a given remote destination
+is up.  All communication with  this facility is via the spooler,
+reducing what would otherwise require a case-by-case interaction
+to a single, asynchronous case.
+.PP
+The interface is somewhat restricted by comparison to the remainder of
+ISIS, and is intended to be used in a manner
+that explicitly recognizes the long delays that may occur
+between when these types of messages are sent and when they are received.
+These delays make it impractical to support, for example,  a ``spooled broadcast''
+that would spool a request until the destination service becomes available
+and then perform the broadcast and return whatever replies are received.
+(The user who wishes to implement the equivalent functionality can do so using
+a ``call-back'' approach.)
+.PP
+When using spools for communication with a remote network, the destination
+network name is specified using the spooler option SP_NETWORK followed
+by the name (a null-terminated string).
+For debugging purposes, the network can be specified as ``local'',
+in which case the messages sent will be treated exactly as for long-haul 
+communication, but
+delivered on the same network as that of the sender.
+Eventually, our intent is to change ISIS to infer
+that remote communication is desired by examination of the group name,
+a change that will conceal the SP_NETWORK argument.
+.PP
+The spooler can be contrasted with the ISIS logging facility, which is
+concerned with the recovery of individual processes (associated with
+specific nodes in the network) into the state that they held at the time of
+a failure.  Spooling is used when the destination is an entire process group,
+and when the group may be offline at the time a message is sent.
+By communicating through the intermediary of the spool, the sender
+need not be concerned with whether or not the destination group is
+operational.
+The spooler is thus visible directly to the sender of a message.
+Logging is used in a manner transparent to the caller, which would 
+be coded to deal only with ``operational'' process groups.
+.PP
+The standard use for a spool in ISIS involves a collection of processes
+that send messages to a destination process group via the spooler, without
+waiting for replies.  During periods when the destination group is operational,
+these messages are spooled and promptly forwarded
+in the order that they were spooled.
+During periods when the destination group is down, messages are spooled but
+not forwarded.
+Upon recovery, a process group initiated replay of spooled messages.
+When the replay terminates, new arriving messages and any messages that had not
+previously been fully executed are delivered in spool order.
+.PP
+The spooler has no way to know when execution for a given spooled
+message is completed, and this raises the issue of how it can distinguish
+between \fIreplay\fR of a message that has already been executed and
+\fIfirst time delivery\fR of a message that may, in fact, have been
+delivered previously but which has not yet been ``executed''.
+In practical terms, the spooler provides a variable that
+can be tested at runtime, \fIspool_in_replay\fR; it will be 
+true while replay is occuring.
+The method used to distinguish these types of messages in the spool
+itself, however, is to
+associate a \fIspool pointer\fR with each spool.
+The pointer is under control of
+the application program, which must
+call spool_set_replay_pointer to assign it a value.
+The value supplied in a call to the 
+.I spool_set_replay_pointer()
+routine should be a spooler sequence number, obtained by calling
+.I spool_getseqn().
+It is illegal to set the spool pointer back; it can only be advanced.
+.PP
+Many applications will store checkpoints in spools, but may wish
+to retain information that was in the spool prior to making
+the checkpoint, as a sort of audit trail.
+Accordingly, spools also have a \fIcheckpoint pointer\fR
+associated with them.
+When asked to replay the contents of the spool, the spooler actually
+examines only those messages between the
+checkpoint pointer and the spool pointer, inclusive.
+In contrast to the spool pointer, which must always be
+set explicitly, the spooler will automatically
+set the checkpoint pointer when the spool_and_discard
+or prepend_and_discard operation is invoked, leaving it
+pointing to the checkpoint message.
+The checkpoint pointer can be explicitly modified
+by calling spool_set_ckpt_pointer giving the sequence
+number as an argument.
+.PP
+A spool thus has the following structure:
+.in +1in
+.nf
+(start; small seqn numbers)
+old messages
+checkpoint
+portion that can be replayed
+new messages
+(end; large seqn numbers)
+.fi
+.in -1in
+The checkpoint pointer has as its value the sequence number of the current
+checkpoint.  The replay pointer can have any value; it points to the last
+message in the portion of the spool that has already been processed.
+The ``old'' messages will only be replayed if the
+checkpoint pointer is moved first.
+The replayed portion of the spool consists of the checkpoint itself
+plus a series of
+``incremental updates'' to it.
+Any spooled messages subsequent to the spool pointer
+may be new -- or may be
+ones that were seen before, but where there was a crash
+before the spool was moved forward.
+.PP
+The spooler interface is as follows:
+.PP
+.I spool
+puts a message in the \fIspool\fR for a named process group.  Normally, this
+group would be one that is believed to not be operational.
+The 
+.I spool_m
+varients allow the message to be spooled to be precomputed and are analogous to
+calling bcast_l and specifying the `m' option.
+.PP
+On recovery, a group triggers spool replay either by invoking
+.I spool_replay
+or by specifying the 
+.I PG_REPLAYSPOOL
+argument to pg_join.
+Notice that spool replay is not automatic in ISIS; it must
+be activated explicitly.
+During replay, the flag \fIspool_in_replay\fR will be non-zero.
+Only messages with spooler sequence numbers greater than or
+equal to the checkpoint pointer and smaller than or equal to the current
+spool pointer will be replayed.
+Moreover, replay allows messages to be replayed selectively, using a replay pattern.
+For example, say that an application spools all types of messages, but that
+only some messages are needed to recover after a failure.
+A replay pattern can be specified that will supress replay of the ``irrelevant''
+messages.  On the other hand, their presense in the spool may be useful in other
+ways, for example to exactly recreate a scenerio that has been causing a process to crash. 
+After replay has finished, any additional spooled messages in the spool
+or any new messages that are received by the spooler are ``played through''
+immediately upon
+reception, and this continues
+so long as the process group remains operational.
+Play through can be disabled by calling 
+.I spool_play_through(),
+but is activated by default.
+Unlike messages being replayed, play-through
+messages are NOT subject to any sort of pattern-matching process.
+.PP
+When 
+.I spool_play_through()
+is used to disable play-through, the procedure must
+be called \fIbefore\fP calling
+.I spool_replay()
+(or \fIpg_join\fR).
+Otherwise, some play-through may occur during the interval after the replay
+completes and before your program is informed of it.
+Play-through messages are not delivered until after 
+.I isis_start_done()
+is
+called in cases where replay is initiated during startup.
+.PP
+Programs must explicitly discard the contents of a spool.
+This is done using 
+.I
+spool_discard.
+.PP
+Finally, the procedure 
+.I
+spool_and_discard
+atomically discards some of the messages in a spool and appends a new
+message (normally a checkpoint) to the end of the spool.
+(A varient form, prepend_and_discard, is also available but is rarely used;
+this places the checkpoint at the start of the spool).
+The checkpoint pointer is simulataneously updated to
+point to this new checkpoint.
+.PP
+The following additional spooler functions are not yet implemented.
+.I spool_cancel(id)
+provides a way to cancel a pending request.
+.I spool_wait(id)
+blocks until a specified request has been replayed.
+.I spool_inquire(id)
+returns 0 if the request is still spooled and 1 if it has been replayed.
+.I spool_advise(sname, options, 0)
+provides an interface with which the caller can create spools
+having special characteristics (non-standard resilience, size limits, etc).
+Currently, all spools have the same degree of resiliency to failures and
+no size limit is enforced.
+.SH INSTALLATION HINTS
+.PP
+The spooler program itself is normally run as part of the isis.rc startup
+sequence.
+It is usual to run the spooler only on machines with local disks, and to
+run 3 to 5 copies of the spooler for an entire LAN.
+The spooler program has three optional arguments, which can be given in
+any order.
+(In future releases of the spooler, it may make sense to run
+more than 5 copies of the spooler if possible.)
+.B -v
+places the program in \fIverbose\fR mode; it prints a description of essentially
+every operation it performs on the console.
+This is intended for debugging only.
+.B -l long_haul_conf
+is used to specify a long-haul configuration file, as discussed below.
+.B portno
+is a port-number for connecting to ISIS, and need only be specified if you wish to
+override the default value found in /etc/services or /yp/etc/services.
+.SH DESCRIPTIONS
+.I spool
+puts a message in the \fIspool\fR for a named process group and delivers it
+promptly (``plays it through'') if the process group is operational.
+The 
+.I sname
+argument is the name under which the group will run when it restarts.
+The 
+.I entry 
+argument tells what entry point this message should be delivered to upon replay.
+The
+.I fmt
+is a format from which the message should be create; the arguments are
+as for \fImsg_put\fR.
+.PP
+A zero-terminated series of optional keywords describing this message follow. 
+Each keyword in the series consists of a name \-- we define a basic set,
+but you can extend it \-- and perhaps arguments associated with that name.
+There are currently three sorts of keywords: numeric ones, which have an
+integer value, timer keywords, which take a long integer argument of the
+sort returned in the \fIseconds\fR (tv_sec) field of the timeval structure by
+gettimeofday(2), and SP_KEYWORDS
+which takes a null-terminated list of strings as its argument.
+.PP
+The type of broadcast used for actually transmitting to the group will
+normally be \fIcbcast\fR.  This is certain to work correctly if all messages to the group
+are sent via the spooler.  However, if a group receives some of its messages directly,
+you may need to specify the broadcast
+type.  This is done by including the key SP_FBCAST, SP_CBCAST, SP_ABCAST or SP_GBCAST,
+with no argument.
+.PP
+The spooler currently does not predefine any numeric message keys.
+Instead, the user is permitted to define up to 9 such keys.
+This should be done using \fIdefine\fR and specifying values in the range 1-9
+inclusive.
+A numeric key should be immediately followed by its value in the call to spool.
+.PP
+There is currently only one timer key that the user would explicitly specify
+in a call to spool: SP_EXPIRES.  The argument to SP_EXPIRES is an absolute time
+at which this message ``expires''.
+The argument should be computed by calling gettimeofday(&now) and then 
+computing now.tv_sec+delay, where delay is a delay in seconds
+between the time of the call and the time when the message expires.
+An expired message will never be delivered to a client, but neither will it
+actually be deleted from the spool  
+until the next time that spool_discard call is called.
+.PP
+A spooled message can also have a list of ascii strings associated with it.
+Such a list, null-terminated, should follow the keyword SP_KEYWORDS.
+.PP
+The following illustrates a very complex call to the spool routine as it might
+be done from C; the corresponding interface is also supported from FORTRAN and LISP.
+.PP
+.nf
+#define SP_ID            1
+#define SP_EPOCH      2
+.PP
+       ....
+       sid = spool(``dbserver'', ADD_RECORD, ``%s,%d'', ``Richard Nixon'', 68,
+         SP_ID, db_idno++,
+         SP_EPOCH, current_epoch,
+         SP_EXPIRES, now.tv_sec+60*60*12, 
+         SP_KEYWORDS, ``add'', 0,
+         0);
+.fi
+.PP
+The above example uses an ``id'' number and
+an ``epoch'' number, but the reader should be aware  that
+these have no special meaning to the spooler.
+On the other hand,
+the spooler \fIdoes\fR assign all
+spooled messages a sequence number on a per-spool basis, which is incremented
+for each received message.
+The spooler 
+delivers messages sequentially in order of increasing sequence number,
+except during replay when messages from the start of the spool up to and
+including the current spool pointer are subject to a pattern and will not be
+replayed unless the pattern matches.
+.PP
+The spool request returns the spooler sequence number that was assigned to the
+message.
+Given a message that was sent via the spooler, its
+sequence number can be obtained directly by calling
+.I spool_getseqn(mp).
+This function returns 0 when applied to a message that was never spooled.
+The special keyword SP_SPSEQN can be used to specify limits on
+the sequence number as part of a replay or discard pattern.
+For any given spool, sequence numbers are strictly increasing.
+.PP
+.I spool_replay
+triggers replay of a spool.
+Replay can be selective; for example, one can replay just the
+messages from a particular sender or just the messages with spooler sequence
+numbers larger than a specified value.
+A pattern is specified very much as the set of keys for a message,
+but where a key typically specifies a value, a replay pattern
+typically specifies a rule that the value must satisfy for the message
+to be replayed.  If several replay constraints (patterns) are given,
+all must be satisfied for a given message to be replayed.
+.PP
+In the case of a numeric key, a low and high bound are given (either can be
+SP_INFINITY, however).
+Only messages that included the designated key and have a value greater
+than or equal to the low bound and less than or equal to the high bound.
+For example, spool_replay(sname, SP_ID, 55, SP_INFINITY, 0); replays
+all messages in the spool \fIsname\fR with the user-defined numeric
+key SP_ID in the message and having a value of 55 or greater, inclusive.
+.PP
+As noted above, the 
+spooler's internal sequence number can be treated as a numeric pattern using the predefined
+keyword SP_SPSEQN.  Note, however, that
+replay will only be applied to messages betwen the checkpoint pointer
+of the spool and the
+current spool pointer.
+.PP
+The time at which a message was spooled can be used as part of a pattern.
+SP_ATIME places bounds on this time in absolute time units.
+SP_RTIME places bounds on this time relative to the time at which
+spool_replay was called.
+.PP
+The process that sent or spooled a message can also be part of the pattern.
+SP_SENDER takes a single address which is the address of the sender whose
+messages are to be replayed.
+SP_SPOOLER works the same way, but takes the address of the process that invoked
+spool.  Note that unless spool_m is being used, the sender is by definition the
+same process as the spooler.  In the case of spool_m, however, the
+message could be one that was received from some other source.
+.PP
+If string keywords were specified, the pattern SP_KEYWORDS can be used to
+enforce a 1-1 exact match.  The number of strings and their values must
+match for the message to be replayed.
+.PP
+To replay all the messages in a spool, one would call spool_replay(0).
+.PP
+After a spool_replay is done, the spooler plays through any
+messages that are received and that match the ``current'' replay
+pattern, with the single exception of any message received from a
+spool_and_discard request (in this case, the spooled message normally is a checkpoint,
+and hence playing it through would cause confusion).
+It will also spool these messages upon reception.
+This play-through behavior continues 
+so long as the destination process group remains accessible, or
+until spool_play_through is called to inhibit further playthrough.
+.PP
+.I spool_discard
+is called just like 
+.I spool_replay.
+It deletes any spooled messages between the start of
+the spool and the current spool replay pointer
+that \fImatch\fR the specified pattern,
+retaining in the spool any messages that \fIdo not\fR match the pattern.
+If an empty pattern is specified, all messages will ``match''
+and be discarded.
+.PP
+\fINOTE:\fR if the spool pointer has not been
+set and a call to
+.I spool_discard
+is issued,
+the discard
+operation will retain \fIall\fR messages that were
+in the spool.
+This is because the discard pattern is applied only to
+messages in that portion of the spool up through (and including)
+the message with sequence number equal to the spool replay pointer value.
+.PP
+.I spool_and_discard
+combines a call to
+.I spool
+and a call to
+.I spool_discard
+into one atomic operation.
+In the arguments associated with the message to be spooled one may specify
+SP_PREPEND, in which case the new message will be stored at the front of the spool.
+Otherwise, the new message is appended to the end of the spool, which normally the appropriate
+place to store a checkpoint.
+The checkpoint pointer is changed to point to the new message.
+.PP
+For example, say that one wishes to make a checkpoint, and that the
+application has just received spooled message
+for which spooler_getseqn(mp) returned 66.
+A good way to do this would be to issue the sequence of calls: 
+.ti 1i
+spool_set_replay_pointer(spname, 66);
+.ti 1i
+spool_m_and_discard(spname, chpt-msg, 0);
+.br
+The first of these tells the spooler that messages
+up through 66 have already been ``consumed''.
+The second call 
+atomically modifies the spool by appending the checkpoint message to it and
+deleting all messages up the this point -- \fIall\fR because no pattern was
+specified, and an empty pattern matches all messages.
+Any other messages in the spool with sequence numbers greater than
+66 are retained.
+.SH LONG-HAUL COMMUNICATION
+.PP
+ISIS spools are also used for communication with remote networks.
+A network is a set of ISIS sites isolated from the rest of the ISIS word.
+The only way for remote networks to communicate is through the 
+long-haul communication package. Each network has a name.
+A network's name looks like a group's name and has the same size limit as
+the group's one.
+.PP
+The static description of networks is in a file.
+This file contains the default tcp port number (first information
+available in the file), and
+a set of entries, each describing one specific network.
+Each entry is composed of
+the described network's name, and a null-terminating
+list of its hosts  descriptors.
+Each host is specified either by its internet host name (in which case
+this name is prefixed by ``N:''), or by its internet address (in which case
+this address is prefixed by ``A:'').
+A host's descriptor contains also the tcp port number. A host's name (or address)
+is separated from the reserved port number by the slash (`/') character.
+If the port number is zero, the long-haul package uses the
+default value.
+.PP
+The following illustrates a long-haul network configuration file:
+.nf
+    2200
+    norway N:thor.cs.cornell.edu/0  N:hymir.cs.cornell.edu/0 0
+    sweden N:sif.cs.cornell.edu/1800 N:sigyn.cs.cornell.edu/1800 0
+    usa N:utgard.cs.cornell.edu/0 A:128.64.27.3/0 0
+.fi
+This defines three ISIS networks, one in Sweden, one in norway, and one in
+the United States.
+Each network has a set of designated ``contact points'' -- normally, a few of the
+file servers, because one normally runs copies of the spooler only on file
+servers (anything else wouldn't make sense).
+For example, regardless of how many machines reside in the Norway LAN, only thor and
+hymir are declared as running the spooler and will be used for connections
+from Sweden and the USA.
+The port number used for connections will be 2200 except when communicating with
+Sweden.
+One host in the United States is declared using its
+internet host address.
+Each list of contact machines is zero terminated.
+.SH DESCRIPTION
+.PP
+The long-haul package
+establishes connections between the local and remote networks.
+For each remote network described in the networks configuration file,
+one of the running hosts is designated as the manager of the connection
+with this partner.
+Each designated manager tries to connect to one of the remote
+network's host. The designated manager tries successively different hosts
+until one accepts the connection request.
+.PP
+Each long-haul process may be in charge of more than one long-haul connections.
+The long-haul package ensures automatic reconnection in the case
+of failure of an existing connection.
+It also preserves the state of a failed connection and makes it available
+to the new manager.
+This allows the 
+.I at most once delivery semantic
+in presence of connections failures and hosts crashes.
+.PP
+To enable long-haul communication, you must first inform the spooler
+for this by calling the spooler command with the option
+.I -l yourNetFileName.
+For example, if the file ``/usr/spool/isis/long_haul.rc'' contains the configuration file
+shown above, your isis.rc file might contain a line:
+.ti 1i
+.B bin/spooler <isis-spooler> -l /usr/spool/isis/long_haul.rc
+.PP
+You  trigger the long-haul communication by specifying the remote network name using
+the SP_NETWORK option when you issue a call to 
+.I spool
+or
+.I spool_m
+procedures.
+For example:
+.ti 1i
+.I spool_m(``rule-checker'', QUICKCHECK, msg-to-spool, SP_NETWORK, ``sweden'', 0);
+.ti 1i
+.I spool_m(``rule-checker'', QUICKCHECK, msg-to-spool, SP_NETWORK, ``local'', 0);
+.SH CONSTANTS
+.PP
+The number of networks you can define is limited to MAXNETS,
+and number of sites in a network is limited to MAXSITES.  Both of
+these constants are defined in util/long_haul.c.
+.SH WARNINGS
+.PP
+The long-haul package uses tcp ports to realize inter-LAN communication.
+One consequence of this is that, when a long-haul process fails, restating this
+process before a certain delay (lets say about 45 secondes), makes this process
+unreachable by the rest of the system.
+.PP
+This version does yet implement recovery from a total network failure (if all
+spoolers on one network fail, long-haul communication state and messages spooled
+are lost). This lack will no longer be present in the next version.
+.SH BUGS
+.SH "SEE ALSO"
+isis_logentry(3), gettimeofday(2),
+ISIS(3)

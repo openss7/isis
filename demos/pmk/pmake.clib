@@ -1,0 +1,92 @@
+#  $RCSfile: pmake.clib,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:28 $
+MCHTYPE=SUN3
+CFLAGS = -I/usr/u/isis/include -D$(MCHTYPE) -O
+CPPFLAGS = -I/usr/u/isis/include -D$(MCHTYPE)
+S = /usr/u/isis/clib
+
+CLOFILES = cl_isis.o cl_pgroup.o cl_bcast.o cl_task.o cl_queues.o cl_dump.o \
+	cl_alloc.o cl_sview.o cl_news.o cl_groups.o cl_join.o cl_coord.o \
+	cl_watch.o cl_print.o cl_fio.o tk_init.o g_parse.o g_eval.o cl_lmgr.o \
+	cl_setjmp.o tk_rmgr.o
+
+TKOFILES = tk_rexec.o tk_authen.o tk_token.o
+
+DUOFILES = cl_failed.o 
+
+all:	lib1.a lib2.a
+
+lib1.a: $(TKOFILES)
+	|rm -f lib1.a; \
+	ar ruv lib1.a $(TKOFILES); \
+	ranlib lib1.a
+
+lib2.a: $(CLOFILES) $(DUOFILES)
+	|rm -f lib2.a; \
+	ar ruv lib2.a $(CLOFILES) $(DUOFILES); \
+	ranlib lib2.a
+
+cl_isis.o:	$(S)/cl_isis.c
+	|cc -c $(CFLAGS) $(S)/cl_isis.c
+cl_pgroup.o:	$(S)/cl_pgroup.c
+	|cc -c $(CFLAGS) $(S)/cl_pgroup.c
+cl_bcast.o:	$(S)/cl_bcast.c
+	|cc -c $(CFLAGS) $(S)/cl_bcast.c
+cl_task.o:	$(S)/cl_task.c
+	|cc -c $(CFLAGS) $(S)/cl_task.c
+cl_queues.o:	$(S)/cl_queues.c
+	|cc -c $(CFLAGS) $(S)/cl_queues.c
+cl_dump.o:	$(S)/cl_dump.c
+	|cc -c $(CFLAGS) $(S)/cl_dump.c
+cl_alloc.o:	$(S)/cl_alloc.c
+	|cc -c $(CFLAGS) $(S)/cl_alloc.c
+cl_sview.o:	$(S)/cl_sview.c
+	|cc -c $(CFLAGS) $(S)/cl_sview.c
+cl_news.o:	$(S)/cl_news.c
+	|cc -c $(CFLAGS) $(S)/cl_news.c
+cl_groups.o:	$(S)/cl_groups.c
+	|cc -c $(CFLAGS) $(S)/cl_groups.c
+cl_join.o:	$(S)/cl_join.c
+	|cc -c $(CFLAGS) $(S)/cl_join.c
+cl_coord.o:	$(S)/cl_coord.c
+	|cc -c $(CFLAGS) $(S)/cl_coord.c
+cl_watch.o:	$(S)/cl_watch.c
+	|cc -c $(CFLAGS) $(S)/cl_watch.c
+cl_print.o:	$(S)/cl_print.c
+	|cc -c $(CFLAGS) $(S)/cl_print.c
+cl_fio.o:	$(S)/cl_fio.c
+	|cc -c $(CFLAGS) $(S)/cl_fio.c
+tk_rmgr.o:	$(S)/tk_rmgr.c
+	|cc -c $(CFLAGS) $(S)/tk_rmgr.c
+tk_rexec.o:	$(S)/tk_rexec.c
+	|cc -c $(CFLAGS) $(S)/tk_rexec.c
+tk_authen.o:	$(S)/tk_authen.c
+	|cc -c $(CFLAGS) $(S)/tk_authen.c
+cl_failed.o:	$(S)/cl_failed.c
+	|cc -c $(CFLAGS) $(S)/cl_failed.c
+cl_lmgr.o: $(S)/cl_lmgr.c
+	|cc -c $(CFLAGS) $(S)/cl_lmgr.c
+cl_setjmp.o: cl_setjmp.i
+	|as -o cl_setjmp.o cl_setjmp.i
+cl_setjmp.i: $(S)/cl_setjmp.s
+	|/lib/cpp $(CPPFLAGS) $(S)/cl_setjmp.s > x; mv x cl_setjmp.i
+
+tk_token.o:	$(S)/tk_token.c
+	|cc -c $(CFLAGS) $(S)/tk_token.c
+tk_init.o:	$(S)/tk_init.c
+	|cc -c $(CFLAGS) $(S)/tk_init.c
+g_eval.o:	$(S)/g_eval.c
+	|cc -c $(CFLAGS) $(S)/g_eval.c
+g_parse.o:	g_parse.c
+	|cc -c $(CFLAGS) g_parse.c
+g_parse.c:	$(S)/g_parse.y
+	|yacc $(S)/g_parse.y; mv y.tab.c g_parse.c
+
+
+clean:
+	rm -f $(CLOFILES) $(TKOFILES) $(DUOFILES) lib1.a lib2.a
+
+
+
+
+
+

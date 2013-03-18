@@ -1,0 +1,45 @@
+******************************************************************
+This is ISIS release V2.1 official release. Sept 15, 1990.
+
+The source files in this release are subject to copyright,
+and may be used only in unmodified form and with the copyright
+notice preserved in all cases.  Development of derivative
+versions of the ISIS system may be subject to restriction.
+Contact the ISIS Project for details or for explicit permission
+to include modified versions of this system into products.
+******************************************************************
+
+ISIS V2.1 is basically ISIS V2.0 with a number of bug fixes and few
+actual code extensions.
+
+BYPASS mechanisms now work but the new pg_client versions of BYPASS
+are not yet available, and this limits the scale on which BYPASS can
+be used.  If using BYPASS communication in systems with many overlapping
+groups, contact us regarding possible use of the flag ISIS_OPTIMISTIC.
+It should now be possible to run all of ISIS with BYPASS enabled.
+However, this is not yet the default configuration of the system
+(we want a bit more experience with it before we automatically run
+this way).
+
+One new feature is the ability to enqueue messages on entry points.
+The interface is through the system call msg_rcv().  Also new is a
+way to do timeouts in isis_accept_events.  Suggested main loops for
+X11 have also changed; see demos/display11.c for an example of one
+style that works.  Contact us for ideas on how to code other sorts
+of X main loops.
+
+We also want to direct your attention to the new spreadsheet demo
+program, which is quite sexy.
+
+To build ISIS for your machine architecture, run "make ARCH", i.e.
+"make SUN4" (or "make help" for help)... subsequently, you should
+cd to the ARCH directory and run make.
+
+Make "install" installs the files for general use.  You will still
+need to make symbolic links, etc, on your own.
+
+Ken Birman
+
+
+
+

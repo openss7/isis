@@ -1,0 +1,21 @@
+guess	color	size	price	make	model
+car	red	small	5	wonka	toy fire engine
+car	yellow	tiny	6	matel	toy taxi
+car	black	compact	5500	yugo	hornet
+car	tan	wagon	7000	nissan	sentra
+car	blue	compact	8500	honda	civic
+car	green	sedan	11000	ford	taurus
+car	white	wagon	13500	ford	taurus
+car	blue	sport	18000	nissan	280ZX
+car	blue	sport	55000	porche	turbo
+car	white	sport	35000	bmw	320S
+plane	white	2	100000	cessna	240-S prop
+plane	white	6	150000	cessna	321-B prop
+plane	white	12	175000	cessna	357-B prop
+plane	white	12	350000	lear	1-B jet
+plane	white	40	520000	boeing	737 jet
+plane	white	60	18000000	concord	supersonic
+plane	white	120	1900000	douglas	MD34 jet
+plane	white	250	3200000	boeing	767 jet
+plane	white	400	11400000	boeing	747 jet
+plane	white	120	85000000	nasa	orient express

@@ -1,0 +1,67 @@
+.TH SITE_ID 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+site_id, SITE_NO, SITE_INCARN, MAKE_SITE_ID, SITE_IS_UP, my_site_no, my_site_incarn, my_site_id \- ISIS site_id type, functions, and global variables
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B int SITE_NO(sid)
+.br
+.B int SITE_INCARN(sid)
+.br
+.B site_id MAKE_SITE_ID(site_no, site_incarn)
+.br
+.B int SITE_IS_UP(site_no, site_ncarn)
+.RS
+.B site_id sid;
+.br
+.B int site_no, site_incarn;
+.RE
+.PP
+.B int 	my_site_no;
+.br
+.B int 	my_site_incarn;
+.br
+.B site_id 	my_site_id;
+.br
+.B char my_host[64];
+.PP
+.B sview *site_getview()
+.SH DESCRIPTION
+An ISIS
+.I site_id
+is a 16 bit quantity 
+identifying a machine that has ISIS running on it.
+A site_id consists of two components: a
+.I site number
+between 1 and 127 which uniquely identifies a physical machine;
+and a 
+.IR "incarnation number" ,
+initially 0, which is incremented each time that machine crashes
+and comes back up.
+A zero site_id can serve as null value to terminate a site_id list.
+
+site_ids are constructed using the macro
+.IR MAKE_SITE_ID ,
+and the site number and incarnation number can be extracted using 
+the macros
+.IR SITE_NO " and " SITE_INCARN
+respectively.
+
+The global variable 
+.I my_site_id
+contains the site_id of the this machine, while
+.IR my_site_no " and " my_incarn
+contain the corresponding site and incarnation numbers.
+.I my_host
+contains the full host name of this site.
+
+The ISIS system keeps track of which sites are currently active.
+This information is stored in an
+.I sview
+structure, and can be obtained by calling
+.IR site_getview .
+Details on the contents of sview are contained in the ISIS
+Manual (see ISIS(3)).
+
+.SH "SEE ALSO"
+ISIS(3), address(3), sites(5)

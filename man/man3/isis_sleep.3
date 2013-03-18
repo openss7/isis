@@ -1,0 +1,49 @@
+.TH SLEEP 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+
+sleep, isis_sleep, isis_sleep_ms \- block the calling task
+.br
+isis_timeout, isis_timeout_reschedule, isis_timeout_cancel \- timers
+
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.br
+.B #define sleep(n)    isis_sleep(n)
+.br
+.B void  isis_sleep(int secs);
+.br
+.B void  isis_sleep_ms(int msecs);
+.br
+.B int  tid = isis_timeout(int msecs, vfunc *routine, void *arg);
+.br
+.B void isis_timeout_reschedule(int tid, int msecs, vfunc *routine, void *arg);
+.br
+.B void isis_timeout_cancel(int tid);
+
+.SH DESCRIPTION
+ISIS provides a per-task interface to the UNIX sleep system call,
+by remapping the sleep call into an internal routine 
+.B isis_sleep
+The calling task is delayed until the specified amount of time has
+elapsed.  A finer-grained clock is also available.
+
+.B isis_sleep
+is is implemented using a timer-based callback function,
+.B isis_timeout.
+After the specified delay, a call to (*routine)(arg) is performed.
+No new thread is created.
+
+A pending timer can be rescheduled or cancelled in the obvious way.
+
+ISIS may delay for longer than the specified time, because it
+does its callbacks only when the ISIS scheduler runs.
+This is in part because the UNIX SIGALRM signal doesn't "stack"
+(i.e. it won't support multiple independent callers, like ISIS and
+X11), and in part because ISIS runs non-preemptively.
+ISIS actually implements its timers using timed delays in calls
+to select(2) and calls to gettimeofday(2).  
+
+
+.SH "SEE ALSO"
+ISIS(3), t_fork(3), signal(2), gettimeofday(2), select(2)

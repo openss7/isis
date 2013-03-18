@@ -1,0 +1,32 @@
+#  $RCSfile: make_grid,v $ $Revision: 2.0 $ $Date: 90/05/04 15:24:32 $  
+SHELL=/bin/sh
+S = ../../demos
+CFLAGS = $(MCHDEPCFLAGS) -D$(MCHTYPE) -I../../include -I$(S) -c $(OPTIM)
+LDFLAGS = $(MCHDEPCFLAGS)
+LIBS = ../clib/libisis1.a ../clib/libisis2.a ../mlib/libisism.a
+
+display11.o:	$(S)/display11.c; $(CC) $(CFLAGS) $(S)/display11.c
+grid.o:		$(S)/grid.c;      $(CC) $(CFLAGS) $(S)/grid.c
+sun_grid.o:	$(S)/sun_grid.c;
+	cc $(MCHDEPCFLAGS) -D$(MCHTYPE) -I../../include -I$(S) -c $(S)/sun_grid.c
+#               sun_grid.c won't compile easily with gcc since the
+#               sun_tools include files are non-standard.
+#               "gcc -traditional -w" does work however.
+
+spreadparse.c:  $(S)/spreadparse.y $(S)/spread.h
+		yacc -d $(S)/spreadparse.y; mv -f y.tab.c spreadparse.c
+spreadparse.o:  spreadparse.c; $(CC) $(CFLAGS) spreadparse.c
+spread.o:	$(S)/spread.c $(S)/spread.h
+		$(CC) $(CFLAGS) $(S)/spread.c
+
+
+grid:	grid.o display11.o $(LIBS)
+	$(CC) $(LDFLAGS) -o grid grid.o display11.o -lX11 $(LIBS) $(OPLIBS);
+sun_grid:    sun_grid.o $(LIBS)
+	$(CC) $(LDFLAGS) -o sun_grid sun_grid.o -lsuntool -lsunwindow \
+	   -lpixrect -lm $(LIBS) $(OPLIBS)
+
+
+spread:	spreadparse.o spread.o $(LIBS)
+	$(CC) $(LDFLAGS) -o spread spreadparse.o spread.o -lm -lX11 $(LIBS) $(OPLIBS)
+

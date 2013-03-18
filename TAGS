@@ -1,0 +1,3028 @@
+
+clib/ap_dummy.c,25
+ISIS_fork_execve(23,827
+
+clib/cl_bcast.c,559
+#define BASIC_BCAST(73,2879
+BASIC_BCAST(101,4665
+BASIC_BCAST(103,4724
+BASIC_BCAST(105,4784
+BCAST(309,10260
+#define BCAST_L(87,3772
+BCAST_L(107,4844
+BCAST_L(109,4899
+BCAST_L(111,4955
+BCAST_L(113,5011
+abortreply(569,17661
+abortreply_l(576,17736
+#define bc_alloc(46,1372
+bc_cancel(294,9872
+#define bc_free(56,1980
+bc_getevent(275,9532
+bc_poll(259,9188
+bc_wait(231,8471
+do_bcast(126,5332
+do_reply(605,18340
+do_reply_l(649,19434
+eid_sender(287,9795
+flush(534,16831
+forward(723,21752
+nullreply(550,17164
+reply(595,18216
+reply_l(639,19306
+
+clib/cl_bcast.h,0
+
+clib/cl_bypass.c,1399
+static void ab_flushorder(768,21302
+static void ab_setorder(781,21577
+#define	bc_alloc(36,1123
+bc_countdown(414,11664
+bc_dump(446,12401
+bc_free(39,1177
+by_dump(1718,46422
+by_dump(1831,49222
+by_flush(393,11305
+by_flush(1839,49269
+by_flushfirst(1288,35502
+by_flushfirst(1843,49292
+by_makeactive(862,24003
+void bypass_aborder(792,21911
+bypass_aborder(1862,49512
+bypass_checkview(1234,34067
+bypass_checkview(1801,48923
+bypass_del_pgroup(1142,31645
+bypass_del_pgroup(1850,49375
+bypass_flush(1548,42353
+bypass_flush(1818,49100
+bypass_flushgroup(1324,36261
+bypass_gcollect(841,23429
+bypass_inactivate(1011,27904
+bypass_inactivate(1867,49557
+bypass_inactive(1117,30809
+bypass_inactive(1808,49009
+void bypass_init(67,2104
+bypass_init(1780,48645
+bypass_precheck(1185,32814
+bypass_precheck(1795,48856
+bypass_probe(1540,42248
+bypass_recv(478,13319
+bypass_recv(1824,49144
+bypass_send(162,4620
+bypass_send(1784,48675
+bypass_sendterminate(1069,29341
+bypass_sendterminate(1858,49475
+bypass_unblock(1526,41970
+bypass_unblock(1813,49055
+collect_replies(1596,43775
+do_check_pbuf(885,24616
+done_flush(133,3921
+isis_querydead(1693,45927
+isis_transport(98,3085
+make_active(901,24993
+make_inactive(1030,28308
+ms_countdown(467,13104
+pbuf_dirty(113,3538
+pbuf_dirty(1835,49244
+pg_ismemb(399,11348
+start_flush(120,3628
+transport_lookup(88,2910
+transport_lookup(1854,49428
+
+clib/cl_bypass.h,94
+#define  MAY_REPLY(79,2333
+typedef struct by_info  by_info;17,683
+#define byi_size(41,1207
+
+clib/cl_cmd.h,24
+#define getargs(19,689
+
+clib/cl_coord.c,290
+cc_panic(231,6945
+cc_refuse(417,12115
+cc_result(202,6155
+cc_terminate(348,10415
+cc_terminate_l(358,10565
+cc_terminate_msg(370,10756
+cc_watching(318,9412
+cohort(308,9216
+coord_cohort(40,1197
+coord_cohort_l(51,1444
+coord_init(24,835
+coordinator(256,7594
+do_ccterminate(387,11260
+
+clib/cl_coord.h,0
+
+clib/cl_dump.c,281
+atoaddr(220,6343
+callername 468,13366
+cl_dump(43,1313
+dump_cond(428,12115
+dump_sid(421,12005
+dump_sview(435,12199
+dump_task(329,9004
+dump_tasks(317,8713
+isis_dump(34,1149
+isis_logging(300,8402
+paddr(135,4072
+paddrs(122,3878
+peid(203,5952
+pmsg(277,7725
+psid(260,7417
+
+clib/cl_dump.h,0
+
+clib/cl_failed.c,20
+isis_failed(17,683
+
+clib/cl_groups.c,245
+add_gname(132,3904
+add_group(152,4289
+gi_alloc(22,767
+gi_free(60,2004
+group_unmap(176,4962
+#define	gv_allocate(196,5430
+#define	gv_deallocate(197,5485
+isis_gv_alloc(200,5555
+isis_gv_free(210,5684
+map_gaddr(118,3593
+map_gname(100,3209
+
+clib/cl_groupview.h,0
+
+clib/cl_hashtab.c,293
+hash_tab_add(164,4587
+hash_tab_delete(182,4866
+hash_tab_destroy(88,2656
+hash_tab_entries(62,1976
+hash_tab_lookup(222,5860
+hash_tab_replace(173,4725
+hash_tab_search(246,6359
+hash_tab_stats(276,7101
+hash_tab_update(115,3253
+typedef struct ht_link ht_link;17,559
+make_hash_tab(43,1295
+
+clib/cl_hashtab.h,130
+typedef struct hash_tab hash_tab;2,80
+void hash_tab_entries 10,386
+void *hash_tab_search 18,796
+hash_tab *make_hash_tab(6,130
+
+clib/cl_inter.c,1348
+#define DEC(87,3215
+#define INC(86,3181
+INRANGE(91,3313
+#define SEQN(85,3143
+check_nacks(936,28001
+dump_interclient(1447,42848
+force_lazy(1997,58923
+fragman(507,14675
+get_addr_by_site(150,4920
+ic_dump(1579,47522
+ic_newmsg(693,20495
+intercl_accept(849,24830
+intercl_delete(411,11897
+intercl_deliver(1002,29926
+intercl_dequeue(1811,53679
+intercl_died(1274,37940
+intercl_do_input(818,24259
+intercl_drain(559,16266
+intercl_drain_any_input(807,23914
+intercl_drain_one_input(830,24445
+intercl_flushacks(1256,37550
+intercl_gotmsg(1711,50937
+intercl_init(104,3550
+intercl_isalive(195,6161
+intercl_ismother(290,8915
+intercl_lookup(180,5838
+intercl_newview(1379,40887
+intercl_output(702,20734
+intercl_quiet(1128,34024
+intercl_sweep(1159,34719
+intercl_trysend(303,9204
+intercl_trytosend(596,17271
+intercl_unblock(1831,54137
+intercl_wantflush(1661,49737
+intercl_xmit(737,21854
+#define io_alloc(130,4408
+io_free(133,4461
+ioq_dump(1466,43278
+isis_fragment(421,12090
+isis_rcvmsg(1890,55874
+isis_receipt(1694,50646
+isis_sendmsg(1975,58285
+lazy_flush(1142,34297
+#define mdalloc(81,2999
+#define mdfree(82,3055
+msg_tank_create(1610,48500
+msg_tank_dequeue(1631,49071
+msg_tank_dump(1649,49478
+msg_tank_set_max(1621,48825
+net_send(331,9979
+#define   sendmsg(30,1016
+#define set_tank_status(69,2347
+udp_rpc(1929,56968
+
+clib/cl_inter.h,43
+typedef struct msg_tank msg_tank;163,7402
+
+clib/cl_isis.c,2873
+static int Bcmp(671,21951
+Bvec(663,21850
+MSG_ENQUEUE(2098,56543
+_ADDRESS(2839,76427
+_PRO(2763,74611
+_cmp(2861,76754
+_isnull(2854,76669
+_pg_rank(2634,70940
+_pg_rank_all(2653,71410
+act_begin(1819,49150
+act_block(1971,53344
+act_end(1832,49454
+act_ev(1875,50518
+act_restart(2017,54715
+act_scan(1858,50024
+act_start(1839,49537
+addr_isequal(3119,82860
+addr_ismine(3126,82946
+aptr_isnull(3112,82769
+cc_gotres(1884,50635
+check_cl_watch_queue(599,19831
+cl_del_pgroup(2518,68147
+cl_do_del_pgroup(2526,68319
+cl_getrname(2233,59568
+cl_local_delivery(2280,60655
+cl_new_view(2340,62490
+cl_rcv_reply(2734,73739
+cl_register(1460,40048
+cl_rname(2218,59286
+cl_setscope(2395,63902
+cl_watch_cancel(568,18971
+cl_watch_for(553,18576
+#define clw_alloc(543,18419
+clw_free(546,18481
+collect_reply(2327,62160
+void do_cl_dump(196,7294
+dump_act(1891,50736
+dump_cl_watch_queue(579,19209
+find_act(168,6814
+fork_sighandlers(1012,28740
+gop_lookup(2251,59939
+isis(1479,40629
+isis_accept_events(1320,36441
+isis_accept_timeout(191,7249
+isis_decon_wait(1601,43884
+isis_disconnect(520,17943
+isis_do_select(700,22322
+isis_dosend(1558,42942
+isis_entry(2153,57590
+isis_fork_execve(3250,86000
+isis_fork_execve(3294,86938
+isis_gotmsg(1716,46326
+isis_gotsig(694,22267
+isis_has_crashed(2071,55866
+isis_init(467,16714
+isis_init_l(212,7728
+isis_input_drain(1579,43514
+isis_invoke(2268,60402
+isis_logentry(2172,58218
+isis_mainloop(1047,29656
+isis_ondrain(1357,37226
+void isis_overflow(183,7130
+isis_perror(2944,78702
+isis_pg_copy(2676,72116
+isis_probe(494,17415
+isis_pseudo_io(994,28476
+isis_pseudo_io_cancel(1004,28627
+isis_read(1615,44171
+isis_runtasks(1373,37519
+static void isis_sdispatch(686,22167
+isis_select(863,25887
+isis_select_from_lisp(3202,84745
+isis_send(1541,42521
+isis_send_hello(484,17254
+vfunc *isis_setfilter(2056,55586
+isis_setmax(638,21390
+isis_sleep(2958,78999
+isis_sleep_ms(2970,79233
+isis_start_done(509,17741
+isis_sys_accept(1633,44556
+isis_task(2201,58940
+isis_timeout(3010,80129
+isis_timeout_cancel(3055,81417
+isis_timeout_reschedule(3019,80307
+isis_wait(854,25687
+isis_wait_cancel(798,24535
+isis_work_to_do(1346,37040
+#define iw_alloc(124,5523
+typedef struct  iw_desc iw_desc;95,4749
+#define iw_free(125,5577
+lisp_exit(2824,76122
+lisp_select(3141,83219
+make_address(3098,82476
+mother_add_fields(473,16839
+msg_rcv(2115,56887
+msg_ready(2131,57210
+panic(2777,74878
+pentry(2183,58493
+pg_getlocalview(2588,69819
+pg_getview(2606,70214
+pg_local_lookup(2575,69563
+pgroups_dump(2414,64509
+pr_dump(2888,77620
+pr_makedump(2920,78205
+pr_rescan(2901,77867
+pr_shutdown(2910,78024
+protos_despool(1682,45602
+protos_gotmsg(1695,45890
+protos_rpc(1519,41827
+run_isis(1071,30117
+run_tasks(1063,30031
+save_address(3075,81802
+set_entry(2933,78518
+set_isis_time(2991,79757
+t_printable_name(2143,57410
+
+clib/cl_join.c,770
+allow_xfers_xd(737,21006
+cc_pick_oldest(460,13702
+do_xfer_out(701,20181
+#define  is_ifunc(76,2284
+#define  is_ifunc(78,2393
+join_block(450,13572
+join_init(45,1288
+log_coldstart(84,2483
+log_ignoreold(89,2545
+pg_addmemb(860,24415
+pg_client(884,25181
+pg_client_action(913,25902
+pg_client_req(902,25632
+pg_client_verifier(775,21977
+pg_create(828,23306
+pg_dojoin(95,2617
+pg_dup(785,22189
+pg_join(63,2007
+pg_join_action(524,15295
+pg_join_inhibit(429,13102
+pg_join_req(485,14308
+pg_join_verifier(766,21823
+pg_subgroup(798,22487
+} x_where;30,926
+xf_where(374,11559
+xfer_flush(718,20593
+xfer_out(685,19894
+xfer_rcv_small(410,12724
+xfer_rcv_unpack(382,11737
+xfer_refuse(678,19803
+xfer_send(622,18179
+xfer_to_checkpoint(592,17353
+} xinfo;520,15235
+
+clib/cl_pgroup.c,414
+leaving_check(120,3649
+pg_addclient(199,5579
+pg_delclient(227,6425
+pg_delete(90,2766
+pg_leave(158,4430
+pg_list(79,2509
+pg_lookup(37,1151
+pg_monitor(300,8106
+pg_monitor_act(349,9584
+pg_monitor_cancel(396,10823
+pg_monitor_dump(455,12435
+pg_new_view(431,11659
+pg_pwatch_invoke(415,11240
+pg_signal(252,7113
+pg_unmonitor(385,10643
+#define pw_alloc(285,7871
+pw_free(288,7935
+refresh_gaddr_cache(21,830
+
+clib/cl_plist.c,118
+pl_add(128,3262
+pl_create(46,1281
+pl_delete(168,4213
+pl_makegroup(118,3004
+pl_monitor(28,889
+pl_remove(152,3865
+
+clib/cl_plist.h,53
+#define  pl_getview(25,848
+#define  pl_rank(26,901
+
+clib/cl_print.c,19
+isis_print(18,669
+
+clib/cl_queues.c,225
+pg_add(169,3652
+pg_alloc(155,3347
+pg_find(184,3973
+qu_add(48,1278
+qu_add_cb(74,1754
+qu_add_pg(61,1512
+qu_add_sid(86,2001
+qu_alloc(24,822
+qu_alloc_pg(36,1052
+qu_find(138,3003
+qu_freeall(120,2713
+qu_resort(100,2297
+
+clib/cl_queues.h,1262
+#define         pg_add_ioq(255,12727
+#define         pg_add_mp(253,12585
+#define         pg_add_pgroup(250,12361
+#define         pg_add_pw(254,12656
+#define         pg_add_qu(251,12432
+#define         pg_add_wp(252,12514
+#define qalloc(131,4898
+#define         qu_add_bc(245,12000
+#define         qu_add_clw(247,12144
+#define         qu_add_cond(233,11139
+#define         qu_add_eid(242,11785
+#define         qu_add_et(241,11714
+#define         qu_add_gip(243,11856
+#define         qu_add_gp(238,11497
+#define         qu_add_gw(239,11570
+#define         qu_add_ioq(246,12071
+#define         qu_add_md(235,11282
+#define         qu_add_mp(234,11211
+#define         qu_add_nd(240,11641
+#define         qu_add_proc(236,11353
+#define         qu_add_qu(232,11057
+#define         qu_add_svm(244,11929
+#define         qu_add_tp(237,11424
+#define qu_alloc1(142,5408
+#define qu_alloc3(154,6154
+#define         qu_alloc_int(248,12215
+#define         qu_alloc_qu(231,10986
+#define         qu_alloc_tp(249,12288
+#define qu_append(181,7867
+#define qu_free(190,8293
+#define qu_free(209,9566
+#define qu_head(140,5329
+#define         qu_null(230,10914
+#define qu_remove(133,4954
+#define qu_tnull(168,7048
+#define         wsid_add_wp(256,12798
+
+clib/cl_setjmp.c,0
+
+clib/cl_spool1.c,39
+sp_init(27,834
+sp_rcv_replay(37,1041
+
+clib/cl_sundummy.c,31
+notify_set_itimer_func(20,809
+
+clib/cl_sunlwp_fix.c,98
+_cv_destroy(58,1367
+_cv_notify(51,1295
+_cv_wait(44,1227
+_mon_enter(30,1077
+_mon_exit(37,1153
+
+clib/cl_sview.c,266
+site_getview(27,931
+site_monitor_dump(276,7809
+#define sv_alloc(73,1985
+sv_doecall(156,3683
+sv_dovcall(138,3210
+sv_free(76,2048
+sv_init(49,1497
+sv_monitor(86,2191
+sv_monitor_cancel(94,2314
+sv_new_sview(169,4049
+sv_watch(101,2402
+sv_watch_cancel(124,2977
+
+clib/cl_sview.h,0
+
+clib/cl_task.c,905
+#define T_scheck(282,7439
+#define T_scheck(289,7820
+_ISISCALL1(134,3926
+_ISISCALL1(144,4042
+call_allegro(113,3408
+do_task_dequeue(202,5930
+#define	esize(71,2513
+invoke(568,15832
+isis_accept_events_loop(346,9034
+isis_entry_stacksize(248,6761
+isis_fork(309,8202
+isis_fork_urgent(293,7860
+isis_init_lisp_funs 106,3295
+#     define   isis_longjmp(62,2293
+#     define   isis_setjmp(61,2258
+spanic(273,7203
+# define        st_alloc(76,2637
+# define        st_free(77,2696
+t_final(84,2790
+t_init(158,4199
+t_on_sys_stack(328,8588
+t_scheck(263,7030
+t_set_stacksize(225,6331
+t_sig(665,18765
+t_sig_all(693,19407
+t_sig_urgent(702,19529
+t_wait(724,20050
+t_wait_l(732,20143
+t_yield(757,20798
+#define task_enqueue(184,4928
+task_swtch(361,9327
+thread_isis_cleanup(925,25995
+thread_isis_enter(778,21266
+thread_isis_enter(945,26384
+thread_isis_exit(901,25188
+thread_isis_exit(951,26450
+
+clib/cl_task.h,2654
+#define ISISCALL0(168,6165
+#define ISISCALL0(420,15908
+#define ISISCALL1(169,6247
+#define ISISCALL1(422,16028
+#define ISISCALL2(170,6332
+#define ISISCALL2(424,16149
+#define ISISCALL3(171,6424
+#define ISISCALL3(426,16273
+#define ISISCALL4(172,6522
+#define ISISCALL4(428,16400
+# define        ISIS_ENTER(520,21952
+# define	ISIS_ENTER(543,23215
+# define        ISIS_ENTER_L(521,22012
+# define        ISIS_EXIT(528,22496
+# define 	ISIS_EXIT(545,23264
+#define ISIS_MONITOR_ENTER(514,21659
+#define ISIS_MONITOR_EXIT(515,21778
+# define        ISIS_RETURN(532,22753
+#define MUTEX_ALLOC(187,6841
+#define MUTEX_ALLOC(244,8952
+#define MUTEX_ALLOC(273,9998
+#define MUTEX_ALLOC(320,11733
+#define MUTEX_ALLOC(379,14130
+#define MUTEX_LOCK(188,6890
+#define MUTEX_LOCK(245,8999
+#define MUTEX_LOCK(274,10048
+#define MUTEX_UNLOCK(189,6936
+#define MUTEX_UNLOCK(246,9044
+#define MUTEX_UNLOCK(276,10184
+#define MUTEX_UNLOCK(322,11816
+#define MUTEX_UNLOCK(381,14201
+#define SELECT(162,6006
+#define SELECT(346,13006
+#define SELECT(405,15312
+#define THREAD_ALLOC(195,7263
+#define THREAD_ALLOC(255,9462
+#define THREAD_ALLOC(284,10578
+#define THREAD_ALLOC(325,11907
+#define THREAD_ALLOC(384,14282
+# define        THREAD_ENTER_ISIS(539,23145
+#define THREAD_FORK(193,7162
+#define THREAD_FORK(252,9353
+#define THREAD_FORK(281,10407
+#define THREAD_FORK(338,12695
+#define THREAD_FORK(397,15019
+#define THREAD_FREE(198,7696
+#define THREAD_FREE(258,9658
+#define THREAD_FREE(286,10716
+#define THREAD_FREE(326,11976
+#define THREAD_FREE(385,14354
+# define        THREAD_LEAVE_ISIS(538,23088
+#define THREAD_SELF(192,7111
+#define THREAD_SELF(251,9274
+#define THREAD_SELF(280,10352
+#define THREAD_SELF(334,12466
+#define THREAD_SELF(393,14817
+#define THREAD_SIGNAL(197,7578
+#define THREAD_SIGNAL(257,9597
+#define THREAD_SIGNAL(290,10980
+#define THREAD_SIGNAL(328,12134
+#define THREAD_SIGNAL(387,14486
+#define THREAD_WAIT(196,7373
+#define THREAD_WAIT(256,9538
+#define THREAD_WAIT(287,10780
+#define THREAD_WAIT(327,12055
+#define THREAD_WAIT(386,14420
+#define THREAD_YIELD(190,6984
+#define THREAD_YIELD(247,9088
+#define THREAD_YIELD(277,10236
+#define THREAD_YIELD(329,12215
+#define THREAD_YIELD(388,14554
+} clisp_funs;314,11575
+#define cv_destroy(220,8358
+#define cv_notify(219,8318
+#define cv_wait(218,8282
+# define        db_print(87,2385
+# define        db_print(89,2449
+#define mon_enter(216,8197
+#define mon_exit(217,8240
+# define t_fork(495,20483
+# define t_fork_msg(497,20634
+# define t_fork_urgent(496,20555
+# define t_fork_urgent_msg(498,20701
+# define t_waiting(500,20776
+#define task_dequeue(512,21587
+
+clib/cl_token.c,353
+do_send_token(321,9264
+dump_tokens(130,3925
+static void ignore(316,9208
+map_token(62,2117
+send_token(231,6610
+#define t_alloc(40,1403
+t_failed(332,9436
+#define t_free(41,1454
+t_holder(304,8967
+t_newholder(343,9683
+t_pass(212,6201
+t_request(165,5033
+tk_init(49,1666
+tk_rcv(105,3266
+tk_send(88,2779
+token_pass(265,7741
+token_req(194,5730
+
+clib/cl_token.h,0
+
+clib/cl_typedefs.h,1886
+58,1498
+104,2671
+106,2679
+typedef struct bc_args bc_args;85,2298
+typedef struct bc_node bc_node;79,2110
+typedef struct bitvec bitvec;77,2048
+typedef struct cl_watch cl_watch;83,2236
+typedef struct qnode *condition;91,2459
+#  define 56,1413
+# define 99,2611
+# define 102,2648
+typedef struct etree etree;66,1712
+typedef struct event_id event_id;68,1768
+typedef struct fraghdr fraghdr;73,1934
+typedef struct ginfo ginfo;70,1838
+typedef struct gl_desc gl_desc;78,2078
+typedef struct gnode gnode;67,1740
+typedef struct groupview groupview;69,1802
+typedef struct iclpkt iclpkt;75,1990
+55,1390
+101,2635
+typedef int    ifunc(93,2520
+typedef unsigned int 96,2569
+typedef struct interclient interclient;71,1866
+typedef struct intersite intersite;80,2142
+typedef struct ioq ioq;74,1966
+typedef struct iovec iovec;76,2020
+typedef struct mdesc mdesc;72,1906
+typedef struct pwatch pwatch;81,2178
+typedef struct qnode qnode;61,1556
+typedef struct sockaddr_in saddr;90,2425
+typedef short  site_id;94,2544
+struct 26,953
+struct 27,967
+struct 28,980
+struct 29,1002
+struct 30,1017
+struct 31,1031
+struct 32,1045
+struct 33,1059
+struct 34,1076
+struct 35,1094
+struct 36,1108
+struct 37,1128
+struct 38,1142
+struct 39,1158
+struct 40,1170
+struct 41,1185
+struct 42,1199
+struct 43,1214
+struct 44,1230
+struct 45,1248
+struct 46,1263
+struct 47,1277
+struct 48,1291
+struct 49,1307
+struct 50,1324
+struct 51,1339
+struct 52,1354
+struct 53,1368
+typedef struct sview sview;65,1684
+typedef struct svmon svmon;84,2270
+typedef struct sys_groupview sys_groupview;63,1610
+typedef struct task task;62,1584
+typedef struct token token;88,2390
+typedef struct verify verify;64,1654
+typedef  void    vfunc(25,927
+typedef struct wnode wnode;82,2208
+typedef union address x_id;92,2492
+typedef struct x_info x_info;87,2360
+typedef struct x_part x_part;86,2330
+60,1530
+
+clib/cl_watch.c,504
+cl_pmonitor(473,13279
+cl_proc_failed(485,13576
+do_cl_proc_failed(492,13711
+do_pmonitor(253,7043
+pg_detect_failure(146,4330
+void pg_detect_pfailure(123,3816
+pg_detected_failure(217,6166
+pg_failed_first(229,6366
+pg_watch(72,2316
+pg_watch_cancel(329,9029
+pg_watching(186,5391
+proc_monitor_dump(513,14352
+proc_watch(265,7280
+proc_watch_cancel(359,9970
+pwatch_call(291,7988
+#define w_alloc(35,1070
+w_free(38,1127
+w_init(54,1528
+w_new_sl(310,8540
+w_new_view(395,10890
+watch_call(374,10300
+
+clib/fisis.h,45
+#define sleep(23,692
+#define t_wait(24,738
+
+clib/flib.c,484
+abcast_(27,888
+abortreply_(55,1336
+address_(197,3236
+bcast_(41,1112
+bclr_(183,3115
+bis_(175,3035
+bit_(167,2956
+btst_(190,3172
+cbcast_(62,1399
+fbcast_(92,1999
+forward_(83,1860
+gbcast_(106,2223
+#define is_ifunc(77,1716
+#define is_ifunc(79,1821
+void newspost_(254,4110
+nulladdress_(210,3538
+nullreply_(120,2447
+paddr_(127,2523
+paddrs_(134,2590
+pclients_(223,3684
+peid_(141,2659
+pmembers_(216,3601
+pmsg_(148,2721
+reply_(155,2780
+spool_(231,3768
+spoolm_(243,3936
+
+clib/flib1.c,4077
+abcastl_(27,848
+addrcmp_(55,1329
+addrentry_(90,1721
+addrincarn_(104,1869
+addrisequal_(76,1560
+addrismine_(62,1410
+addrisnull_(69,1485
+addrprocess_(83,1642
+addrsite_(97,1796
+alistlen_(111,1946
+bcastl_(41,1089
+bccancel_(118,2027
+bcgetevent_(125,2102
+bcpoll_(133,2219
+bcwait_(140,2290
+cbcastl_(147,2361
+ccrefuse_(187,3051
+ccterminate_(175,2849
+ccterminatel_(161,2603
+coordcohort_(200,3326
+eidsender_(212,3587
+fbcastl_(220,3696
+gbcastl_(234,3937
+gvclient_(1456,21963
+gvdeparted_(1471,22176
+gvflag_(1412,21378
+gvgaddr_(1419,21461
+gvincarn_(1405,21291
+gvjoined_(1464,22083
+gvmember_(1448,21843
+gvname_(1426,21553
+gvnclient_(1441,21754
+gvnmemb_(1434,21669
+gvviewid_(1398,21204
+#define is_ifunc(194,3183
+#define is_ifunc(196,3288
+isisacceptevents_(248,4179
+isisdefinetype_(255,4264
+isisdir_(1367,20907
+isisdisconnect_(264,4469
+isisentry_(270,4528
+isisentrystacksize_(282,4727
+isiserrno_(1361,20853
+isisexcept_(306,5085
+isisexceptsig_(359,5923
+isisinit_(289,4839
+isisinput_(296,4933
+isisinputsig_(341,5639
+isislogentry_(468,7675
+isislogging_(368,6067
+isismainloop_(375,6142
+isisnreplies_(1380,21037
+isisnsent_(1374,20984
+isisoutput_(331,5478
+isisoutputsig_(350,5780
+isisperror_(383,6275
+isisrexec_(390,6344
+isissignal_(400,6621
+isissignalsig_(410,6785
+isissleep_(419,6925
+isissleepms_(426,6993
+isissocket_(1386,21096
+isisstartdone_(433,7070
+isisstate_(1392,21151
+isistask_(439,7128
+isistimeout_(448,7255
+isistimeoutreschedule_(458,7441
+isiswait_(316,5238
+isiswaitcancel_(324,5407
+logcheckpoint_(476,7788
+logflush_(483,7876
+loghasckpt_(490,7959
+logrecovered_(497,8042
+logwrite_(504,8133
+msgdelete_(512,8242
+msgdests_(620,10037
+msgfread_(534,8490
+msgfwrite_(541,8570
+msggen_(549,8672
+msgget_(569,9074
+msggetfld_(585,9392
+msggetforwarder_(641,10292
+msggetlen_(606,9889
+msggettype_(648,10386
+msgincrefcount_(656,10514
+msgisforwarded_(613,9958
+msgmakelazy_(663,10595
+msgnewmsg_(671,10704
+msgput_(677,10765
+msgputfld_(693,11072
+msgread_(519,8312
+msgreplyto_(627,10120
+msgrewind_(710,11420
+msgsender_(634,10207
+msgwrite_(526,8390
+myaddress_(1340,20619
+myhost_(1346,20679
+mypid_(1334,20567
+mysid_(1328,20518
+mysincarn_(1322,20461
+mysno_(1316,20412
+newsapost_(717,11497
+newscancel_(727,11650
+newsclear_(734,11730
+newsclearall_(742,11839
+newssubscribe_(750,11954
+pgclient_(757,12087
+pgclientverifier_(765,12223
+pgdelete_(774,12367
+pggetlocalview_(781,12450
+pggetview_(788,12550
+pgjoin_(795,12640
+pgjoininhibit_(841,13354
+pgleave_(848,13434
+pglookup_(855,13508
+pgmonitor_(862,13591
+pgmonitorcancel_(876,13848
+pgrank_(883,13938
+pgrankall_(890,14035
+pgsignal_(897,14139
+pgsubgroup_(905,14251
+pgwatch_(915,14487
+pgwatchcancel_(930,14787
+procwatch_(937,14870
+procwatchcancel_(951,15127
+replyl_(958,15215
+rmgrcreate_(970,15394
+rmgrgetinfo_(977,15480
+rmgrjoin_(985,15607
+rmgrlasttofail_(992,15689
+rmgrregister_(1000,15870
+rmgrrestart_(1007,15950
+rmgrstartlog_(1014,16042
+rmgrstoplog_(1022,16151
+rmgrunregister_(1030,16258
+rmgrupdate_(1036,16323
+sitegetview_(1043,16467
+sitenames_(1353,20755
+spoolanddiscard_(1503,22661
+spoolcancel_(1524,22946
+spooldiscard_(1491,22474
+spoolinquire_(1515,22843
+spoolplaythrough_(1542,23149
+spoolreplay_(1478,22274
+spoolsetckptpointer_(1568,23602
+spoolsetreplaypointer_(1555,23373
+spoolwait_(1533,23048
+svfailed_(1072,16783
+svincarn_(1064,16687
+svmonitor_(1086,16949
+svmonitorcancel_(1099,17172
+svrecovered_(1079,16863
+svslist_(1056,16598
+svviewid_(1049,16531
+svwatch_(1106,17262
+svwatchcancel_(1121,17537
+tfork_(1169,18197
+tforkurgent_(1179,18359
+tholder_(1128,17623
+tonsysstack_(1137,17757
+tpass_(1146,17895
+trequest_(1154,17998
+tscheck_(1163,18152
+tsig_(1189,18525
+tsigall_(1197,18613
+tsigurgent_(1205,18708
+twait_(1219,18863
+twaitl_(1226,18934
+tyield_(1213,18811
+xabort_(1234,19028
+xbegin_(1240,19077
+xcommit_(1246,19126
+xferflush_(829,13268
+xferout_(809,12878
+xferrefuse_(835,13310
+xgetid_(1253,19208
+xidcmp_(1260,19282
+xoutcomes_(1267,19360
+xoutcomesflush_(1278,19605
+xterm_(1286,19738
+
+clib/flib2.c,4285
+abcast_l_(27,874
+addr_cmp_(55,1357
+addr_entry_(90,1754
+addr_incarn_(104,1904
+addr_isequal_(76,1591
+addr_ismine_(62,1439
+addr_isnull_(69,1515
+addr_process_(83,1674
+addr_site_(97,1830
+alist_len_(111,1982
+bc_cancel_(118,2064
+bc_getevent_(125,2140
+bc_poll_(133,2258
+bc_wait_(140,2330
+bcast_l_(41,1116
+cbcast_l_(147,2402
+cc_refuse_(187,3096
+cc_terminate_(175,2893
+cc_terminate_l_(161,2645
+coord_cohort_(200,3372
+eid_sender_(212,3634
+fbcast_l_(220,3744
+gbcast_l_(234,3986
+gv_client_(1456,22178
+gv_departed_(1471,22393
+gv_flag_(1412,21587
+gv_gaddr_(1419,21671
+gv_incarn_(1405,21499
+gv_joined_(1464,22299
+gv_member_(1448,22057
+gv_name_(1426,21764
+gv_nclient_(1441,21967
+gv_nmemb_(1434,21881
+gv_viewid_(1398,21411
+#define is_ifunc(194,3229
+#define is_ifunc(196,3334
+isis_accept_events_(248,4229
+isis_define_type_(255,4316
+isis_dir_(1367,21109
+isis_disconnect_(264,4523
+isis_entry_(270,4583
+isis_entrystacksize_(282,4783
+isis_errno_(1361,21054
+isis_except_(306,5144
+isis_except_sig_(359,5990
+isis_init_(289,4896
+isis_input_(296,4991
+isis_input_sig_(341,5702
+isis_logentry_(468,7758
+isis_logging_(368,6136
+isis_mainloop_(375,6212
+isis_nreplies_(1380,21241
+isis_nsent_(1374,21187
+isis_output_(331,5540
+isis_output_sig_(350,5845
+isis_perror_(383,6346
+isis_rexec_(390,6416
+isis_signal_(400,6694
+isis_signal_sig_(410,6859
+isis_sleep_(419,7001
+isis_sleepms_(426,7070
+isis_socket_(1386,21301
+isis_startdone_(433,7148
+isis_state_(1392,21357
+isis_task_(439,7207
+isis_timeout_(448,7335
+isis_timeout_reschedule_(458,7522
+isis_wait_(316,5298
+isis_waitcancel_(324,5468
+log_checkpoint_(476,7872
+log_flush_(483,7961
+log_hasckpt_(490,8045
+log_recovered_(497,8129
+log_write_(504,8221
+msg_delete_(512,8331
+msg_dests_(620,10136
+msg_fread_(534,8582
+msg_fwrite_(541,8663
+msg_gen_(549,8766
+msg_get_(569,9169
+msg_getfld_(585,9488
+msg_getforwarder_(641,10394
+msg_getlen_(606,9986
+msg_gettype_(648,10489
+msg_increfcount_(656,10618
+msg_isforwarded_(613,10056
+msg_makelazy_(663,10700
+msg_newmsg_(671,10810
+msg_put_(677,10872
+msg_putfld_(693,11180
+msg_read_(519,8402
+msg_replyto_(627,10220
+msg_rewind_(710,11529
+msg_sender_(634,10308
+msg_write_(526,8481
+my_address_(1340,20817
+my_host_(1346,20878
+my_pid_(1334,20764
+my_sid_(1328,20714
+my_sincarn_(1322,20656
+my_sno_(1316,20606
+news_apost_(717,11607
+news_cancel_(727,11761
+news_clear_(734,11842
+news_clear_all_(742,11952
+news_subscribe_(750,12069
+pg_client_(757,12203
+pg_client_verifier_(765,12340
+pg_delete_(774,12486
+pg_getlocalview_(781,12570
+pg_getview_(788,12671
+pg_join_(795,12762
+pg_join_inhibit_(841,13480
+pg_leave_(848,13562
+pg_lookup_(855,13637
+pg_monitor_(862,13721
+pg_monitor_cancel_(876,13979
+pg_rank_(883,14071
+pg_rank_all_(890,14169
+pg_signal_(897,14275
+pg_subgroup_(905,14388
+pg_watch_(915,14625
+pg_watchcancel_(930,14926
+proc_watch_(937,15010
+proc_watch_cancel_(951,15268
+reply_l_(958,15358
+rmgr_create_(970,15538
+rmgr_getinfo_(977,15625
+rmgr_join_(985,15753
+rmgr_lasttofail_(992,15836
+rmgr_register_(1000,16018
+rmgr_restart_(1007,16099
+rmgr_start_log_(1014,16192
+rmgr_stop_log_(1022,16303
+rmgr_unregister_(1030,16412
+rmgr_update_(1036,16478
+site_getview_(1043,16623
+site_names_(1353,20955
+spool_and_discard_(1503,22881
+spool_cancel_(1524,23169
+spool_discard_(1491,22693
+spool_inquire_(1515,23065
+spool_play_through_(1542,23374
+spool_replay_(1478,22492
+spool_set_ckpt_pointer_(1568,23832
+spool_set_replay_pointer_(1555,23600
+spool_wait_(1533,23272
+sv_failed_(1072,16943
+sv_incarn_(1064,16846
+sv_monitor_(1086,17111
+sv_monitor_cancel_(1099,17335
+sv_recovered_(1079,17024
+sv_slist_(1056,16756
+sv_viewid_(1049,16688
+sv_watch_(1106,17427
+sv_watch_cancel_(1121,17703
+t_fork_(1169,18372
+t_fork_urgent_(1179,18535
+t_holder_(1128,17791
+t_on_sys_stack_(1137,17926
+t_pass_(1146,18067
+t_request_(1154,18171
+t_scheck_(1163,18326
+t_sig_(1189,18703
+t_sigall_(1197,18792
+t_sigurgent_(1205,18888
+t_wait_(1219,19045
+t_wait_l_(1226,19117
+t_yield_(1213,18992
+x_abort_(1234,19213
+x_begin_(1240,19263
+x_commit_(1246,19313
+x_getid_(1253,19396
+x_outcomes_(1267,19550
+x_outcomes_flush_(1278,19796
+x_term_(1286,19931
+xfer_flush_(829,13392
+xfer_out_(809,13001
+xfer_refuse_(835,13435
+xid_cmp_(1260,19471
+
+clib/history.c,0
+
+clib/isis.h,2251
+136,3169
+84,2185
+#define ACT_VALID(392,16005
+#define ADDRESS(616,22892
+#define PRO(617,22936
+address 230,6894
+        address 322,11897
+typedef address* afunc(316,11795
+# define 70,1933
+# define 74,1990
+#  define 78,2046
+#      define 82,2135
+#      define 85,2203
+# define 94,2364
+# define 95,2395
+# define 99,2469
+# define 103,2526
+# define 104,2556
+# define 108,2613
+# define 112,2692
+# define 113,2723
+# define 117,2802
+# define 118,2832
+#define 129,3007
+#define 130,3042
+#   define 134,3128
+#define 139,3244
+#define 140,3271
+#define 176,4070
+#       define 179,4139
+#       define 180,4161
+#       define 183,4241
+#       define 184,4333
+#       define 185,4406
+#       define 186,4497
+#       define 189,4687
+#       define 190,4741
+#define 192,4841
+#define 193,4868
+#define 196,4918
+#define 197,4996
+#define 198,5077
+#define 199,5161
+#define 200,5240
+#define 202,5363
+#define 203,5458
+#define 204,5537
+#define 205,5602
+#define 206,5675
+#define 207,5743
+#define 208,5837
+#define 209,5907
+#define 211,5979
+#define 212,6021
+#define 213,6063
+#define 214,6105
+#define 215,6147
+#define 216,6189
+#define 217,6231
+#define 219,6274
+#define 220,6310
+#define 221,6374
+#define 222,6432
+#define 318,11822
+89,2309
+extern	201,5312
+extern 224,6477
+extern 225,6544
+extern 226,6611
+extern 227,6675
+extern 228,6742
+extern 229,6820
+        ginfo 323,11957
+321,11895
+        ginfo 323,11957
+  typedef int (*i_routine_vs)65,1837
+#define isis_chwait(659,24479
+#define isis_chwait_sig(664,24946
+#define isis_except(657,24275
+#define isis_except_sig(662,24746
+#define isis_inhibit_joins(414,16580
+#define isis_init_suntools(619,22971
+#define isis_input(655,24067
+#define isis_input_sig(660,24542
+#define isis_output(656,24171
+#define isis_output_sig(661,24644
+#define isis_signal(658,24379
+#define isis_signal_sig(663,24848
+#define map_act(405,16315
+address 230,6894
+#define pg_rank(422,16817
+#define pg_rank_all(423,16888
+67,1882
+#define sleep(413,16492
+struct 320,11881
+#define t_wait(417,16680
+#define t_wait(419,16748
+  typedef void (*v_routine)63,1767
+typedef void (*v_routine_msgs)171,3977
+  typedef void (*v_routine_vs)64,1798
+       volatile 87,2263
+173,4028
+
+clib/isis_c_refs.c,20
+isis_c_refs(19,919
+
+clib/jmp_pragmas.h,0
+
+clib/lisp_lib.c,970
+addr_cmp_fun(158,2475
+addr_isnull_fun(151,2405
+get_gv_clients(293,4018
+get_gv_departed(279,3837
+get_gv_flag(237,3336
+get_gv_gaddr(244,3419
+get_gv_incarn(230,3255
+get_gv_joined(272,3749
+get_gv_members(286,3929
+get_gv_name(251,3502
+get_gv_nclient(265,3660
+get_gv_nmemb(258,3579
+get_gv_viewid(223,3174
+get_my_host(174,2697
+get_site_name(180,2744
+get_sv_failed(209,3025
+get_sv_incarn(201,2951
+get_sv_recovered(216,3099
+get_sv_slist(194,2880
+get_sv_viewid(187,2806
+get_x_list_items_id(300,4107
+isis_chwait_fun(108,1819
+isis_chwait_sig_fun(143,2294
+isis_except_fun(90,1591
+isis_input_fun(72,1365
+isis_input_sig_fun(116,1917
+isis_output_fun(81,1477
+isis_output_sig_fun(125,2041
+isis_signal_fun(99,1705
+isis_signal_sig_fun(134,2167
+make_condition(165,2563
+msg_getdests_fun(23,777
+msg_getlen_fun(44,1009
+msg_getreplyto_fun(51,1085
+msg_getsender_fun(37,932
+msg_gettruesender_fun(58,1179
+msg_increfcount_fun(30,853
+msg_isforwarded_fun(65,1270
+
+clib/lmgr_dummy.c,407
+log_action(30,916
+log_checkpoint(59,1225
+log_cntthresh(121,1861
+log_end_log_msg(89,1556
+log_flush(95,1606
+log_has_ckpt(52,1158
+*log_init(20,697
+log_lenthresh(131,1966
+log_recovered(102,1673
+log_remove(45,1092
+log_replay_ckpt(115,1795
+log_replay_msgs(109,1745
+log_reqsthresh(126,1913
+log_start_recovery(38,1018
+log_timer(136,2018
+log_write(75,1411
+log_write_msg(66,1295
+logging_out(83,1510
+
+clib/rmgr_dummy.c,23
+rmgr_start_log(20,693
+
+clib/spool_dummy.c,21
+spool_replay(20,701
+
+clib/spooler.h,106
+#define get_fname_and_holder(95,3245
+#define lh_get_error_report(99,3406
+#define spool_getseqn(92,3087
+
+clib/sview_init.c,16
+sv_init(15,646
+
+clib/tk_authen.c,87
+au_filter(34,958
+au_permit(53,1260
+au_request_verify(25,792
+au_revoke_perm(63,1472
+
+clib/tk_cdummy.c,26
+isis_connect_init(20,744
+
+clib/tk_connect.c,159
+isis_conn_accept(82,2043
+isis_conn_inquiry(125,3096
+isis_connect(171,4327
+isis_connect_init(133,3227
+isis_connect_register(70,1829
+isis_handshake(27,965
+
+clib/tk_connect.h,0
+
+clib/tk_lmgr.c,735
+l_create_log(775,26459
+l_endlogreplay(1226,44846
+l_flush_reqs(1017,36043
+l_lookup_log_reqs(851,29159
+l_next_replay_req(1158,42063
+l_open_log(726,24647
+l_rec_flush(1072,38433
+l_replay_reset(1117,40170
+l_take_ckpt(931,32739
+l_timer(1249,45698
+log_action(301,9874
+log_checkpoint(427,14026
+log_cntthresh(147,5763
+log_disable_ckpt(241,8128
+log_enable_ckpt(264,8667
+log_end_log_msg(557,18734
+log_flush(587,19994
+log_has_ckpt(406,13486
+*log_init(63,2876
+log_lenthresh(193,6925
+log_recovered(616,21061
+log_remove(365,12147
+log_replay_ckpt(678,22979
+log_replay_msgs(638,21733
+log_reqsthresh(170,6353
+log_start_recovery(341,11477
+log_timer(217,7567
+log_write(512,17363
+log_write_msg(454,14995
+logging_out(542,18213
+
+clib/tk_lmgr.h,159
+typedef struct log_hdr  log_hdr;30,1196
+extern log_nod  *log_init 136,5482
+typedef struct log_nod  log_nod;29,1163
+typedef struct req_nod  req_nod;28,1130
+
+clib/tk_long_haul.c,412
+dirfilename(29,840
+do_pc_bcast(112,2881
+do_pc_file_xfer(180,4642
+giveConvID(68,1664
+lh_abcast_m(161,4203
+lh_cbcast_m(142,3764
+lh_file_copy(272,7129
+void lh_file_dsterr_handler(262,6930
+lh_file_move(283,7415
+void lh_file_srcerr_handler(254,6736
+void lh_file_xfer_dstdir(250,6654
+lh_file_xfer_l(234,6211
+void lh_file_xfer_srcdir(246,6573
+pc_abcast_m(170,4410
+pc_cbcast_m(151,3971
+wset_join(49,1167
+
+clib/tk_news.c,203
+static  address  *make_alist(76,2228
+void  news_apost(112,3134
+int  news_cancel(56,1732
+void  news_clear(127,3508
+void  news_clear_all(142,3839
+void  news_post(98,2762
+int  news_subscribe(40,1330
+
+clib/tk_news.h,0
+
+clib/tk_remote.c,20
+isis_remote(27,819
+
+clib/tk_rexec.c,34
+isis_rexec(33,947
+joined(24,777
+
+clib/tk_rmgr.c,467
+address *rmgr_create(470,13657
+rmgr_info  *rmgr_getinfo(215,6211
+address *rmgr_join(508,14777
+int  rmgr_lasttofail(428,12592
+void  rmgr_mh_rmnews(539,15755
+void  rmgr_mh_rmup(201,5966
+static  void  rmgr_monitor(326,9685
+int  rmgr_register(164,5007
+address  *rmgr_restart(553,15982
+int  rmgr_start_log(364,10816
+int  rmgr_stop_log(403,11985
+int  rmgr_unregister(177,5346
+int  rmgr_update(74,2054
+rmgrbuf_init(587,16923
+static  void  write_entry(49,1430
+
+clib/tk_rmgr.h,61
+        } rmgr_info;58,1834
+        } rmgr_viewlog;63,1984
+
+clib/tk_spool2.c,467
+do_spool(205,5105
+do_spool_and_discard(318,7084
+do_spool_discard(280,6434
+do_spool_replay(249,5871
+gen_spmsg(97,2576
+sp_control_send(73,2103
+sp_send(29,942
+spool(185,4866
+spool_and_discard(298,6808
+spool_cancel(365,8034
+spool_discard(270,6301
+spool_inquire(356,7931
+spool_m(195,4979
+spool_m_and_discard(308,6945
+spool_play_through(383,8237
+spool_replay(239,5761
+spool_set_ckpt_pointer(409,8689
+spool_set_replay_pointer(396,8460
+spool_wait(374,8136
+
+clib/tk_xaction.c,2276
+                                  If 106,4880
+                                  If 108,5038
+                                  If 111,5251
+                                  X_FINISHED.105,4833
+    address 99,4346
+                                  and 112,5335
+                                  any 113,5418
+                                  been 114,5497
+typedef bool bfunc(59,2823
+                    bool 77,3634
+                    bool 78,3698
+                    bool 79,3761
+    bool 100,4425
+                                  but 107,4960
+char 92,4233
+cleanup(531,17723
+do_abort(576,18621
+do_commit(559,18233
+            do_finish(84,3950
+do_finish(591,19139
+do_part_action(1002,33456
+do_prepare(543,17874
+dump_trans(1468,47361
+*getid(356,12455
+group_mon(1311,43129
+handle_x_phase(860,29021
+int 90,4146
+    int 101,4500
+    int 103,4667
+                                  keyed 117,5681
+                                  may 110,5198
+                    message 80,3823
+                                  of 102,4586
+                                  one 104,4747
+82,3865
+96,4271
+    qnode 116,5604
+qu_add_xinfo(184,7789
+#define qu_add_xpart(280,10141
+qu_find_string(264,9813
+qu_find_xinfo(169,7520
+#define qu_find_xpart(279,10084
+qu_isnull(162,7433
+static 64,2985
+static 65,3045
+static 66,3087
+static 67,3132
+static 68,3180
+static 69,3227
+static 70,3273
+static 71,3320
+static 72,3393
+static 73,3444
+static 74,3486
+static 75,3549
+static 76,3590
+static 83,3866
+static 86,4026
+static 87,4070
+static 88,4102
+struct 98,4330
+                                  the 109,5117
+void 91,4220
+wait_for_term(1321,43290
+x_abort(497,16772
+x_add(215,8406
+x_add_participant(300,10617
+x_append_log(1094,36624
+x_begin(389,13519
+x_commit(432,14628
+x_compact_log(1231,40878
+x_doterm(809,27630
+x_find(199,8072
+x_find_participant(284,10243
+x_free(236,8985
+*x_getid(334,11826
+x_group_change(603,19467
+x_init(151,7052
+x_log_in_progress(1262,41804
+x_log_outcome(1281,42279
+x_open_log(1057,35736
+x_outcomes(1344,43901
+x_outcomes_flush(1407,45835
+x_pstate(1453,46900
+x_read_log(1121,37515
+x_remember_commit(1423,46139
+x_term(732,24326
+x_term_msg(798,27338
+x_write_log_item(1206,40292
+xid_to_groupname(373,12925
+
+clib/tk_xaction.h,60
+} x_item;44,2020
+} x_list;52,2254
+#define xid_cmp(18,735
+
+clib/unix_lib.h,0
+
+clib/x_dummy.c,34
+dump_trans(24,705
+x_init(19,682
+
+mlib/history.c,0
+
+mlib/isis_alloc.h,82
+typedef    struct adesc    adesc;20,750
+typedef    struct chunk    chunk;24,829
+
+mlib/mlib-l.c,1768
+typedef struct intersite intersite;207,4334
+isis_define_type(99,2180
+msg_accessalloc 104,2295
+msg_addfield 17,669
+msg_addmsg 129,2846
+msg_blockalloc 107,2332
+msg_blockcheck 113,2452
+msg_blockdouble 116,2518
+msg_blockfree 110,2387
+msg_callertrace 295,5961
+msg_convertaddress 186,3950
+msg_convertbitv 189,4008
+msg_convertevent 204,4282
+msg_convertfield 173,3666
+msg_convertgldesc 201,4232
+msg_convertgroupview 198,4167
+msg_convertheader 215,4517
+msg_convertinterclient 212,4457
+msg_convertintersite 209,4399
+msg_convertlong 183,3895
+msg_convertpgroup 192,4056
+msg_convertshort 180,3837
+msg_convertverify 195,4115
+msg_copy 170,3630
+msg_definetype 218,4570
+msg_delete 163,3529
+msg_deletefield 39,1217
+msg_dogetf(91,2040
+msg_doputf(81,1912
+msg_dumpblocks(290,5901
+msg_dumpmsgs 287,5862
+msg_fread(62,1689
+msg_fwrite(57,1615
+msg_gen(72,1813
+msg_genmsg 155,3397
+msg_get(85,1973
+msg_getdests 239,4952
+msg_getfld(88,2005
+msg_getmsg 140,3091
+msg_getreplyto 243,5009
+msg_getsender 247,5068
+msg_gettruesender 251,5125
+msg_gettype 265,5424
+msg_increfcount 255,5250
+msg_insertfield 25,853
+msg_insertmsg 134,2962
+msg_ismsg 258,5301
+msg_makekey 177,3767
+msg_makelazy 261,5338
+msg_msgcheck 292,5921
+msg_newmsg 152,3370
+msg_printaccess 270,5537
+msg_printblkdesc 119,2580
+msg_printfield 276,5639
+msg_printheader 273,5588
+msg_put(75,1845
+msg_putfld(78,1877
+msg_read(69,1783
+msg_reconstruct 159,3442
+msg_recordalloc 122,2648
+msg_recordfree 125,2715
+msg_recordmsgalloc 281,5755
+msg_recordmsgfree 284,5809
+msg_replacefield 45,1341
+msg_rewind(96,2136
+msg_setdest 229,4770
+msg_setdests 234,4859
+msg_split 166,3575
+msg_typename 225,4712
+msg_unpkfields 32,1033
+msg_unpkmsgs 145,3203
+msg_write(65,1724
+static writev(52,1522
+
+mlib/msg.c,1058
+MSG_DELETE(228,6670
+alist_len(1290,32991
+void blk_free(187,5833
+fref_countdown(892,23385
+fref_register(908,23740
+#define iov_free(104,4123
+msg_active(119,4699
+msg_callertrace(623,16687
+msg_copy(156,5297
+msg_deallocate(236,6766
+msg_deleteall(316,8866
+msg_deletefield(329,9143
+msg_doreconstruct(1053,27018
+msg_dumpmsgs(140,5068
+msg_dumpmsgs(149,5229
+#define msg_free(92,3551
+msg_genmsg(636,16832
+msg_getfield(347,9559
+msg_getfields(384,10414
+msg_getiovec(423,11250
+msg_getiovlen(414,11108
+msg_getmsg(540,14719
+msg_getmsgs(561,15205
+msg_getscantype 584,15814
+msg_gettype(595,16002
+#define msg_init(72,2623
+msg_insertfield(691,18037
+msg_inserthdr(649,17108
+msg_insertmsg(768,19950
+msg_insertref(745,19242
+msg_makereal(936,24435
+msg_malloc(999,25940
+msg_msgcheck(630,16779
+msg_newmsg(976,25515
+msg_printaccess(806,20970
+msg_printheader(781,20246
+msg_reconstruct(1211,31103
+msg_replacefield(1227,31475
+msg_setdests(1260,32348
+static void pblks(854,22293
+static void pfld(832,21571
+typedef struct	reflist reflist;877,23155
+
+mlib/msg.h,1971
+#define     PADDED_LEN(85,2568
+#define     _docmp(121,3633
+#define     act_isequal(136,4691
+#define     addr_cmp(122,3772
+#define     addr_isact(135,4628
+#define     addr_isequal(126,4028
+#define     addr_isgid(131,4360
+#define     addr_isgroup(134,4554
+#define     addr_islgid(133,4489
+#define     addr_islocal(128,4151
+#define     addr_ismine(127,4084
+#define     addr_isnull(125,3960
+#define     addr_ispid(130,4301
+#define     addr_isplist(132,4424
+#define     addr_isrclient(129,4210
+typedef union address address;88,2659
+#define     aptr_isnull(124,3905
+#define     bcopy(63,2095
+typedef     struct block_desc      block_desc;153,5265
+#define     bzero(64,2141
+typedef struct field_ref field_ref;242,8826
+#define	is_field_ref(260,9360
+#define	is_msg_ref(261,9413
+#define isis_define_type(291,11196
+typedef     struct message      message;197,6983
+#define msg_addfield(270,9772
+#define msg_addmsg(271,9859
+#define msg_body(292,11255
+#define msg_convertchar(265,9500
+#define msg_delete(302,11971
+typedef     struct msg_fld      msg_fld;139,4825
+#define msg_getact(296,11377
+#define msg_getalist(300,11768
+#define msg_getbyi(297,11425
+#define msg_getdests(295,11327
+#define msg_getforwarder(289,10985
+#define msg_getlen(269,9726
+#define msg_getpbflag(282,10560
+#define msg_getreplyto(281,10498
+#define msg_getsender(284,10715
+#define msg_gettruesender(285,10776
+typedef     struct msg_hdr      msg_hdr;171,5797
+#define msg_increfcount(272,9934
+#define msg_isforwarded(268,9658
+#define msg_makelazy(301,11855
+#define msg_setact(298,11483
+#define msg_setbyi(299,11630
+#define msg_setdest(273,10010
+#define msg_setforwarder(290,11039
+#define msg_setid(267,9584
+#define msg_setpbflag(283,10631
+#define msg_setreplyto(279,10341
+#define msg_setsender(280,10420
+#define     paddr_cmp(123,3838
+#    define va_arg(233,8587
+#    define va_end(235,8708
+     typedef double *va_list;229,8446
+#    define va_start(231,8510
+
+mlib/msg_alloc.c,163
+void chunk_init(80,3286
+chunker* chunk_more(93,3521
+} chunker;37,1460
+void chunks_init(73,3104
+malloc_dump(127,4469
+mallocate(139,4801
+mdeallocate(203,6698
+
+mlib/msg_fio.c,120
+#define min(29,830
+msg_fread(94,2443
+msg_fwrite(45,1177
+msg_read(194,5055
+msg_write(140,3587
+static writev(31,874
+
+mlib/msg_fmt.c,256
+_msg_dogetf(373,10450
+_msg_doputf(127,4018
+} format_item;26,848
+isis_do_define_type(590,16785
+msg_dogetf(355,9943
+msg_doputf(117,3833
+msg_gen(72,2995
+msg_get(325,9294
+msg_getfld(339,9579
+msg_put(88,3313
+msg_putfld(102,3558
+msg_rewind(582,16665
+
+mlib/msg_sa.c,239
+callername(128,3162
+isis_has_crashed(135,3232
+isis_sleep(144,3297
+paddr(164,3544
+paddrs(151,3350
+panic(103,2685
+pmsg(114,2921
+print(119,2958
+qu_add(55,1845
+qu_alloc(43,1621
+qu_find(87,2385
+qu_freeall(69,2095
+t_scheck(140,3276
+
+mlib/msg_types.c,795
+#define     MSG_KEY(56,2078
+msg_convertaddress(225,6185
+msg_convertbitv(234,6400
+msg_convertbypass(365,9752
+msg_convertdouble(208,5904
+msg_convertevent(332,8913
+msg_convertfield(92,2913
+msg_convertfloat(201,5795
+msg_convertgldesc(321,8636
+msg_convertgroupview(282,7558
+msg_converthdr(79,2576
+msg_convertinterclient(354,9467
+msg_convertintersite(341,9101
+msg_convertlong(194,5700
+msg_convertpgroup(254,6863
+msg_convertshort(187,5599
+msg_convertsview(306,8298
+msg_convertverify(273,7370
+msg_definetype(388,10294
+#define     msg_doconvertaddress(45,1648
+#define     msg_doconvertlong(36,1229
+#define     msg_doconvertshort(30,950
+msg_makekey(160,4920
+typedef     struct msg_tdesc    msg_tdesc;59,2232
+msg_tinit(459,12969
+msg_typename(421,11180
+#define ty_alloc(385,10234
+
+mlib/sysfields.h,0
+
+protos/OPT_LEVEL_1.h,0
+
+protos/bits.h,236
+#  define bandv(41,1471
+#  define bclr(64,2748
+#  define bic(33,929
+#  define bicv(47,1843
+#  define bis(32,846
+#  define bisv(35,1099
+#  define bit(34,1015
+#  define bitv(57,2375
+#  define bset(65,2812
+#  define btst(54,2216
+
+protos/generic.h,0
+
+protos/history.c,0
+
+protos/isis_errno.h,0
+
+protos/pr.h,350
+typedef	int		IFUNC(192,5275
+#define INCR_PRIO(89,2035
+#define W_INIT(203,5470
+#define W_WAIT(205,5573
+extern 196,5368
+#define bcopy(151,3990
+#define bzero(152,4028
+#define 193,5297
+#   define exit(45,1300
+# define exit(57,1528
+extern 196,5368
+int 195,5334
+extern 196,5368
+int 195,5334
+#define random(149,3926
+#define srandom(150,3957
+
+protos/pr_abcast.c,361
+ab_addtoqueues 378,10973
+ab_deliver 423,12141
+ab_init 614,16252
+ab_makeplist 354,10387
+ab_makeslist 327,9741
+ab_recv1 141,4282
+ab_recv2 209,6449
+ab_resort 593,15897
+ab_send1 74,2192
+ab_send2 111,3262
+ab_takeover 300,9063
+abq_changeprops 540,14778
+abq_find 489,13661
+abq_free 478,13562
+abq_remove 502,13929
+pr_abcast 24,795
+prio_is_gt 569,15414
+
+protos/pr_abcast.h,26
+#define abq_alloc(33,857
+
+protos/pr_addr.c,799
+ADDRESS(610,25215
+#define   Addr_cmp(586,24657
+BCAST_SL(341,15930
+DO_DIRECT(53,2099
+#define GENERIC(227,8248
+                GENERIC 328,15299
+                GENERIC 330,15407
+                GENERIC 332,15507
+#define GENERIC_GROW(263,10769
+#define GENERIC_V(299,13290
+                GENERIC_V 334,15606
+                GENERIC_V 336,15708
+#define NONINTERATED(62,2280
+NONINTERATED(70,2673
+NONINTERATED(72,2749
+NONINTERATED(74,2825
+SENDMSG(82,3124
+#define SEND_MSG(225,8147
+#define   _Docmp(585,24524
+_addr_cmp(622,25428
+_msg_deleteall(650,26267
+#define add_ent(362,16503
+#define add_ent(375,17244
+aexpr_expand(392,18185
+cmp_addr(587,24725
+cmp_sid(644,26186
+dl_compact(593,24814
+pg_changesview(549,23522
+pg_isgrow(543,23409
+pg_readsview(555,23641
+v_expand(561,23756
+
+protos/pr_address.h,0
+
+protos/pr_astore.c,343
+ab_dofree(186,4471
+ab_free(181,4415
+cb_free(119,2613
+cb_idfree(31,937
+did_delete(267,6825
+enqueue_cbid(37,995
+flush_cbids(44,1108
+gb_free(111,2508
+st_abort(96,2247
+st_add(54,1285
+st_deleteable(290,7511
+st_find(88,2048
+st_flush(301,7752
+st_gparticipant(417,11867
+st_newview(226,5641
+st_on_cb_idlist(76,1835
+st_timeout(256,6547
+
+protos/pr_astore.h,88
+#define st_add_bitvec(48,1686
+#define st_add_int(46,1543
+#define st_find_int(47,1623
+
+protos/pr_cbcast.c,620
+cb_addtopbuf 523,18660
+cb_callback 606,20977
+cb_cleanup 734,24704
+cb_createpbitem 472,17132
+cb_deliver 426,15881
+cb_dosendpkt 186,5872
+cb_flushall 924,29351
+cb_idlisted 793,26230
+cb_init 1060,32062
+cb_makelist 717,24453
+cb_makeplist 693,23852
+cb_piggylist_add 994,30852
+cb_procflush 857,27597
+cb_recvpkt 355,13441
+cb_sendpkt 107,2853
+cb_siteflush 884,28191
+cb_splitdests 660,22908
+cb_updatepbitem 543,19175
+idlist_add 974,30472
+idlist_find 1010,31190
+msg_islazy 1034,31498
+pb_checkempty 1070,32185
+pbuf_find 954,30119
+pbuf_free 1025,31404
+pr_cbcast 33,891
+pr_docbcast 43,1012
+pr_fbcast 24,812
+
+protos/pr_cbcast.h,28
+#define pbuf_alloc(36,1160
+
+protos/pr_clentry.c,297
+alength(240,6630
+#define bcast(253,6819
+bcast(261,7148
+bcast(263,7198
+bcast(265,7248
+cl_create(26,839
+cl_echo(179,4980
+cl_fdrestart(169,4600
+cl_pglist(51,1525
+cl_pglookup(40,1268
+cl_prdump(148,4123
+cl_wantdump(121,3407
+cl_wantflush(114,3272
+do_clbcast(190,5195
+pr_wantdump(138,3900
+
+protos/pr_client.c,843
+check_proc_status(764,22999
+cl_died(581,18010
+cl_hello(569,17783
+cl_learned_incarn(640,19320
+cl_pmonitor(678,20266
+cl_probe(611,18715
+cl_register(500,16046
+cl_restart_io(424,13842
+cl_send_all(648,19511
+cl_xfered(454,14863
+} cldesc;55,2312
+client_accept(154,5666
+client_crashed(907,27112
+client_enqueue(940,28180
+client_failed(862,25908
+client_init(86,3249
+client_kill(930,27952
+client_lookup(814,24467
+client_newview(833,24825
+do_cl_probe(550,17444
+dump_clients(968,29114
+} failinfo;79,3087
+#define fi_alloc(83,3142
+#define fi_free(84,3194
+#define iov_alloc(333,11369
+#define iov_free(334,11422
+is_proc_alive(703,21040
+#define	min(338,11500
+pclient(1047,31997
+pr_is_alive(739,22145
+pr_local_rcv(195,7134
+pr_local_send(279,9838
+proc_has_failed(793,23712
+} remote;60,2383
+tcp_write(359,11966
+writev(340,11530
+
+protos/pr_client.h,62
+#define GEN_MSGID(50,1271
+typedef struct cinfo cinfo;27,824
+
+protos/pr_dlist.c,38
+dltosl(61,2038
+pr_splitdests 26,897
+
+protos/pr_dump.c,989
+#define SI(496,13408
+callername 933,26679
+check_glock 837,23650
+dump_abq(558,16004
+dump_addr(375,10218
+dump_addrq 678,18998
+dump_array 602,17543
+dump_astore(130,4062
+dump_bitqp(381,10286
+dump_bitv(388,10384
+dump_cbcast(705,19589
+dump_cond(472,12816
+dump_fdect(498,13451
+dump_gbcast(761,21283
+dump_glocks 803,22680
+dump_hex(369,10148
+dump_hexaddrq 686,19189
+dump_hexlist 620,17814
+dump_idq 694,19383
+dump_int(363,10078
+dump_list 611,17682
+dump_pbitem 744,20832
+dump_pgqueue(275,7578
+dump_qhexnames 646,18265
+dump_qnames 638,18093
+dump_qnode(341,9511
+dump_qnodes 654,18440
+dump_queue(147,4446
+dump_shorthexlist 629,17949
+dump_sid(466,12711
+dump_str(460,12643
+dump_sview 784,22061
+dump_task(405,10660
+dump_taskq(399,10582
+dump_wqueue(321,8966
+isis_rname(891,25816
+msg_trace_dump(915,26277
+paddr(174,4901
+paddrs(162,4709
+pmsg(242,6623
+pr_dump(37,1162
+print(478,12895
+print_rname(901,26017
+psid(225,6283
+} qnode_info;126,4017
+vdump_addrq 662,18630
+
+protos/pr_errors.h,0
+
+protos/pr_fdect.c,637
+#define      SI(46,1550
+fd_computechanges 456,15434
+fd_growslist 1048,32719
+fd_iamdead 1038,32589
+fd_init 1208,37087
+fd_localcommit 695,22385
+fd_newview 199,6158
+fd_recvack 579,19364
+fd_recvcommit 662,21519
+fd_recvdeadlist 975,30939
+fd_recvincarn 165,5300
+fd_recvnegack 151,5004
+fd_recvnewview 332,10853
+fd_recvrestart 108,3722
+fd_restart 48,1613
+fd_seemdead 864,27186
+fd_seemsalive 830,26610
+fd_seemsdead 851,27000
+fd_sendcommit 620,20523
+fd_senddead 940,29825
+fd_setincarn 186,5920
+fd_shrinkslist 1101,34032
+fd_siteflush 1137,34897
+fd_strangeviewid 1119,34366
+fd_takeover 1000,31601
+fd_ungrowslist 1078,33475
+
+protos/pr_fdect.h,284
+#define     INCARN_DECR(27,1107
+#define     INCARN_INCR(25,980
+#define     INCR_VIEWID(46,1868
+#define     MAKE_SITE_ID(20,681
+#define     SITE_INCARN(24,928
+#define     SITE_IS_UP(42,1638
+#define     SITE_NO(23,858
+#define     VIEW_IS_GT(45,1800
+#define     VIEW_NO(44,1752
+
+protos/pr_gbcast.c,387
+gb_abort(652,23080
+gb_callback(210,7007
+gb_init(889,30307
+gb_lock(897,30477
+gb_recv1(220,7164
+gb_recv2(457,16134
+gb_recvabort(585,20783
+gb_recvconfirm(667,23389
+gb_send1(79,2516
+gb_send2(148,4956
+gb_sendabort(176,5973
+gb_takeover(765,27067
+gb_unlock(916,31002
+pr_allocinit(881,30179
+pr_assign(851,29368
+pr_gbcast(29,852
+pr_waitq_add(827,28818
+pr_waitq_remove(802,28195
+
+protos/pr_gbcast.h,0
+
+protos/pr_global.h,0
+
+protos/pr_glocks.c,173
+abort_glock 204,5423
+ex_glock 126,3461
+ex_gunlock 156,4241
+glock_delete 276,7341
+glock_find 258,6999
+register_shrglock 65,1971
+shr_glock 27,1094
+shr_gunlock 84,2374
+
+protos/pr_glocks.h,0
+
+protos/pr_gmgr.c,594
+cache_get(1023,34594
+cache_refresh(1198,40763
+cl_getview(635,21114
+cview_refresh(1069,36063
+gmgr_spy(732,24299
+address make_gid(37,1152
+pg_add_groupview(373,12209
+#define pg_alloc(24,817
+pg_create(248,8481
+pg_failed(501,16367
+pg_free(26,879
+pg_gottrueview(346,11483
+address pg_local_lookup(485,15798
+address pg_lookup(431,14314
+pg_newview(572,18638
+pg_sig_all(984,33531
+pg_update_pgviews(580,18796
+pg_verify(52,1547
+pg_verify_view(107,3416
+pg_wait(681,22617
+pgcreate_chk(405,13443
+pglist_rcv(173,5707
+pglookup_rcv(471,15402
+pgwantview_rcv(1179,40090
+view_get(996,33848
+
+protos/pr_init.c,139
+_doexit(111,3792
+_doexit(116,3827
+isis_entries(217,7312
+pr_dostats(63,1702
+pr_initialize(25,824
+pr_stats(56,1572
+save_stats(41,1151
+
+protos/pr_inter.c,830
+#define DEC(70,2602
+#define INC(69,2568
+INRANGE(73,2689
+#define SEQN(68,2530
+dump_intersite(1291,42747
+flush_urgent(324,10611
+fragman(415,13349
+ioq_dump(1305,43094
+is_dump(1390,46689
+is_newmsg(579,18891
+lazy_flush(1104,36959
+#define mdalloc(61,2256
+#define mdfree(62,2312
+net_death_reset(274,9168
+net_deliver(770,24528
+net_drain(456,14726
+net_drain_any_input(690,22256
+net_drain_input(700,22516
+net_drain_one_input(726,23111
+net_fragment(332,10809
+net_hello(1128,37536
+net_init(83,2900
+net_isalive(136,4575
+net_isdead(198,6772
+net_learned_incarn(1083,36382
+net_newview(1270,42095
+net_output(587,19115
+net_quiet(1091,36695
+net_send(288,9524
+net_sweep(1139,37726
+net_timewarp(1245,41343
+net_trytosend(482,15487
+net_xmit(620,20252
+peek_ack(965,31863
+#define   sendmsg(28,960
+tank_status(715,22908
+
+protos/pr_inter.h,0
+
+protos/pr_intersite.h,0
+
+protos/pr_local.c,158
+do_local_delivery(53,1413
+isis_entry(139,4441
+pentry(155,4901
+pr_local_delivery(43,1207
+pr_local_delivery_immed(35,1033
+pr_local_delivery_urgent(27,856
+
+protos/pr_main.c,415
+Gettime(730,21875
+void done(438,12496
+void dump(433,12432
+dump_scopes(332,9047
+main(45,1462
+main_loop(448,12698
+#define must_wait(444,12571
+panic(702,20937
+pr_doscansfile(257,7051
+pr_rescansfile(248,6816
+static restartchk(39,1310
+scan_sfile(347,9428
+set_scope(265,7160
+sl_scope(285,7704
+time_warp(745,22250
+timeout(636,19151
+timeout_cancel(686,20558
+timeout_reschedule(643,19302
+tsleep(678,20385
+
+protos/pr_mcast.c,451
+REPLY(426,13997
+abortreply(366,12262
+collect_answ(275,9602
+collect_msgs(312,10686
+collect_replies(97,3064
+#define dl_alloc(32,1121
+#define dl_free(33,1199
+multi_newview(332,11119
+#define p_alloc(58,1877
+#define p_free(59,1923
+pr_bcast(38,1316
+pr_clfailed(502,16444
+pr_send(65,2159
+rcv_reply(479,15750
+reply(356,11989
+reply_addfield(374,12454
+reply_as(383,12696
+reply_client(399,13105
+#define s_alloc(61,1975
+#define s_free(62,2025
+
+protos/pr_msgfields.h,0
+
+protos/pr_msgflags.h,0
+
+protos/pr_msgtank.c,145
+msg_tank *msg_tank_create(34,1534
+message *msg_tank_dequeue(73,2785
+msg_tank_dump(89,3123
+msg_tank_enqueue(53,2178
+msg_tank_set_max(46,2013
+
+protos/pr_msgtank.h,137
+#define 39,1367
+extern 42,1441
+extern 44,1501
+extern 45,1532
+int 37,1304
+message 43,1472
+msg_tank 41,1412
+} 35,1291
+int 37,1304
+
+protos/pr_pgroups.h,26
+#define pglength(54,2593
+
+protos/pr_qnode.h,0
+
+protos/pr_queues.c,205
+pg_add(154,3439
+pg_alloc(142,3200
+pg_find(169,3708
+qu_add(37,1032
+qu_add_bits(78,1906
+qu_add_cb(54,1428
+qu_add_sid(66,1674
+qu_alloc(26,826
+qu_find(126,2865
+qu_freeall(108,2575
+qu_resort(89,2164
+
+protos/pr_queues.h,786
+#define         pg_add_qu(243,12293
+#define         pg_add_sys_groupview(242,12223
+#define qalloc(98,3261
+#define         qu_add_cond(234,11669
+#define         qu_add_ioq(239,12004
+#define         qu_add_md(236,11805
+#define         qu_add_mp(235,11742
+#define         qu_add_proc(237,11868
+#define         qu_add_qu(233,11597
+#define         qu_add_tp(238,11931
+#define qu_alloc1(109,3774
+#define qu_alloc3(126,4817
+#define         qu_alloc_int(240,12077
+#define         qu_alloc_qu(232,11534
+#define         qu_alloc_tp(241,12150
+#define qu_allocpg(145,6008
+#define qu_append(176,8018
+#define qu_free(187,8594
+#define qu_free(207,9937
+#define qu_head(107,3692
+#define         qu_null(231,11461
+#define qu_remove(100,3317
+#define qu_tnull(162,7124
+} qun;23,739
+
+protos/pr_setjmp.c,0
+
+protos/pr_stats.h,96
+#define CEVENT(86,3427
+#define CEVENTV(87,3494
+#define EVENT(69,2832
+#define EVENTV(70,2894
+
+protos/pr_task.c,559
+static delayedcall(165,4707
+static invoke(349,10111
+#     define   isis_longjmp(44,1388
+#     define   isis_setjmp(43,1353
+run_tasks(114,3632
+# define        st_alloc(50,1530
+# define        st_free(51,1589
+static swtch(199,5385
+t_fork(153,4468
+t_fork_immed(141,4223
+t_fork_urgent(125,3854
+t_init(103,3416
+t_scheck(176,4969
+#define	t_scheck(186,5146
+t_sdump(385,11070
+t_sig(413,11830
+t_sig_all(406,11727
+t_sig_immed(438,12373
+t_sig_urgent(425,12088
+t_suspend(465,12996
+t_wait(451,12638
+task_dequeue(83,3024
+#define task_enqueue(65,2022
+
+protos/pr_task.h,857
+#define CONDITION_ALLOC(29,923
+#define CONDITION_ALLOC(54,1876
+#define CONDITION_ALLOC(82,2893
+#define CONDITION_FREE(30,977
+#define CONDITION_FREE(55,1933
+#define CONDITION_FREE(83,2960
+#define CONDITION_SIGNAL(35,1227
+#define CONDITION_SIGNAL(60,2151
+#define CONDITION_SIGNAL(85,3109
+#define CONDITION_WAIT(34,1165
+#define CONDITION_WAIT(59,2108
+#define CONDITION_WAIT(84,3008
+#define MUTEX_ALLOC(27,829
+#define MUTEX_ALLOC(52,1792
+#define MUTEX_ALLOC(78,2649
+#define MUTEX_LOCK(32,1069
+#define MUTEX_LOCK(57,2019
+#define MUTEX_LOCK(79,2697
+#define MUTEX_UNLOCK(33,1116
+#define MUTEX_UNLOCK(58,2064
+#define MUTEX_UNLOCK(80,2793
+#define THREAD_FORK(37,1331
+#define THREAD_FORK(62,2275
+#define THREAD_FORK(87,3217
+#define THREAD_SELF(36,1280
+#define THREAD_SELF(61,2196
+#define THREAD_SELF(86,3162
+#define     mon_create(48,1636
+
+protos/pr_typedefs.h,378
+typedef struct abq_item abq_item;17,653
+typedef struct gb_answer gb_answer;20,761
+typedef struct glock glock;25,940
+typedef struct mlist_item mlist_item;19,723
+typedef struct packet packet;23,869
+typedef struct pbuf_item pbuf_item;22,833
+typedef struct st_idlist st_idlist;18,687
+typedef struct wait_item wait_item;21,797
+typedef struct wait_struct  wait_struct;24,899
+
+protos/pr_viewlocks.c,101
+acquire_view_r_lock 21,715
+fd_lockview 55,1493
+fd_unlockview 71,1857
+release_view_r_lock 37,1086
+
+protos/pr_watch.c,93
+qu_dofree(22,720
+watch_newview(60,1453
+watch_off(47,1254
+watch_on 28,786
+wmagic 89,2130
+
+protos/pr_wqueues.h,0
+
+util/cmd.c,474
+CmdDump(587,16759
+CmdGroup(504,14250
+CmdHelp(648,17848
+CmdList(460,13009
+CmdPrdump(628,17709
+CmdPrsnap(633,17742
+CmdQuit(684,18946
+CmdRescan(638,17776
+CmdSend(538,15425
+CmdShutdown(643,17810
+CmdSites(447,12677
+CmdStatus(678,18817
+MakeAlist(76,2256
+cmd_task(419,12200
+static int getport(696,19135
+#define index(48,1410
+main(724,19750
+make_group_alist(160,4585
+make_system_alist(125,3522
+notrunable(607,17177
+int  pattern_match(354,10721
+phelp(345,10618
+
+util/cmdy.h,0
+
+util/history.c,0
+
+util/isis.c,448
+ISIS_fork_execve(1066,33177
+NEXTC(914,30283
+bc_drain(727,24878
+bc_query(770,25712
+fd_restart(637,21631
+get_host_alarm(943,30784
+get_host_with_timeout(949,30849
+getin(977,31526
+inhib(70,2139
+is_alive(753,25317
+isis_exec(1051,32961
+isis_failed(869,29086
+isis_forker(988,31726
+main(87,2317
+notify_set_itimer_func(1084,33499
+reaper(621,21305
+typedef struct remote_proc remote_proc;736,25045
+#define rp_alloc(747,25228
+term(904,30160
+
+util/lmgr.c,38
+lmgr_check_done(26,939
+main(33,1009
+
+util/long_haul.c,2223
+PDESCBUF_converter(1119,32530
+acceptProc(348,11708
+addNewAppli(1352,38488
+addPDESCBUF(1503,42185
+allConReady(1091,31770
+messDesc *allocDescTab(1246,35642
+void appliCrashed(1471,41277
+int connectTo(402,13300
+deliver_any(1785,49043
+dispatcherProc(597,18288
+do_lh_send(931,27534
+do_lh_spool(2083,56990
+do_send_file(2128,58072
+establishier(647,19698
+void freeEntry(1303,37211
+void freeLIEN(1234,35404
+garbage(1711,47363
+getPred(1554,43308
+giveConvID(1480,41500
+int h_spool_set_replay_pointer(2418,66097
+initializer(223,9131
+LIEN *isAppli(1370,38991
+isClusterName(1101,31944
+lh_abcast(1984,54564
+void lh_append(1186,34364
+lh_cb_deliver(1746,48195
+lh_cbcast(1586,44001
+lh_rcv_abcast(2031,55817
+lh_rcv_cbcast(1820,49862
+void lh_rcv_failure(2331,64009
+void lh_rcv_join(1427,40330
+lh_rcv_remote_file(2312,63588
+lh_receive(979,28878
+lh_remote_file_xfer(2116,57892
+void lh_remove(1206,34901
+lh_send(906,26992
+void lh_setdsterr(2067,56686
+void lh_setsrcerr(2055,56481
+void lh_snd_failure(2340,64194
+lh_spool(2354,64569
+lhmsg_isValid(804,24312
+localjoin(1409,39979
+int localreplay(2412,65998
+long_haul_init(62,3033
+messDesc *newDesc(1156,33595
+appliEntry *newEntry(1276,36534
+LIEN *newLien(1134,32957
+LISTE *newListe(1146,33229
+localMessDesc *newLocalDesc(1165,33838
+PDESCBUF_item *newPDESCBUF(1175,34085
+printDesc(1266,36130
+rcvAffectation(280,10256
+rcvApplList(330,11290
+rcvBackupList(240,9430
+rcvComState(301,10686
+rcvFileHdr(2178,59375
+rcvFragment(2229,60919
+rcvSpoolReq(503,16010
+rcvWeightTab(260,9858
+receiveStartup(585,18066
+registerCon(531,16636
+int respool(2424,66210
+sendAffectation(270,10080
+sendApplList(313,10947
+sendBackupList(229,9219
+sendComState(290,10437
+sendInitialMess(819,24674
+sendStartup(577,17884
+sendWeightTab(250,9647
+void set_join(1385,39306
+signalConFailure(843,25135
+int spool(2415,66060
+int spool_set_chkpt_pointer(2421,66155
+startReplay(2374,64995
+void stopReplay(2385,65195
+void terminatedAppl(1439,40544
+void treatApplMgrFailure(1445,40672
+treatPartnerFailure(773,23331
+updateComState(445,14764
+updateGView(731,22209
+updateLoad(555,17293
+updateLowerBound(470,15429
+updateOldestInMess(486,15718
+wantedMessage(1684,46638
+
+util/long_haul.h,365
+typedef struct lien LIEN;145,6027
+typedef struct queueDesc LISTE;151,6212
+typedef struct  PDESCBUF_item PDESCBUF_item;165,6742
+typedef struct appliEntry appliEntry;196,8526
+typedef struct localMessDesc localMessDesc;173,7103
+typedef struct messDesc messDesc;159,6551
+typedef struct rcvFileDesc rcvFileDesc;208,9175
+typedef struct waitDesc waitDesc;179,7324
+
+util/news.c,383
+main(457,12591
+void main_task(119,3254
+static  void  mh_cancel(261,7289
+static  void  mh_clear(383,10677
+static  void  mh_clearall(420,11670
+static  void  mh_command(127,3380
+static  void  mh_post(306,8411
+static  void  mh_subscribe(193,5229
+void subj_del(77,2330
+static  struct st  *subj_find(87,2521
+static  int  subj_finds(99,2780
+static  struct st  *subj_new(59,1971
+
+util/prstat.c,103
+main(29,905
+main_loop(51,1409
+#define pgtok(27,862
+phdr(80,2753
+pr_stats(162,5347
+pstats(85,2916
+
+util/rexec.c,203
+struct passwd *authenticate(299,7650
+inpath_runable(237,6388
+isis_fork_su_execve(339,8552
+main(55,1368
+make_dup(42,1209
+makepathlist(114,2965
+reaper(106,2787
+rexec_req(140,3449
+runable(278,7121
+
+util/rexec.h,0
+
+util/rmgr.c,462
+static  int  fork_exec(221,5593
+main(610,15719
+void main_task(237,5947
+static  void  mh_command(324,8283
+static  void  mh_lastview(570,14719
+static  void  mh_register(501,13007
+static  void  mh_unregister(538,13945
+static  int  read_entry(132,3269
+reaper(310,8033
+void  reg_del(91,2325
+static  struct rt  *reg_find(102,2470
+static  struct rt  *reg_new(72,1952
+static  void  restart(385,9949
+restart_child(478,12431
+static  void  wh_proc(459,11962
+
+util/rmgr.h,0
+
+util/rmgr_cmd.c,34
+main(33,1088
+void  usage(26,962
+
+util/spooler.c,1027
+advise(662,18636
+cached_pg_lookup(848,23416
+cancel(650,18503
+discard(370,11619
+dolookup(294,10022
+doreplay(452,13538
+dospool(335,10669
+h_do_spool_and_discard(410,12456
+h_spool_play_through(587,17047
+h_spool_set_replay_pointer(606,17394
+h_spool_wait(658,18588
+have_copy(218,8414
+inquire(654,18545
+localreplay(482,14179
+lookup(314,10415
+main(78,3296
+main_task(165,7148
+new_sp(757,21266
+newview(180,7475
+pickcoordinator(503,14604
+prepend_and_discard(404,12367
+replay(556,16201
+respool(328,10600
+sp_close(1021,28794
+sp_copy(770,21650
+sp_flush(1067,29712
+sp_getmsg(1059,29563
+typedef	struct sp_info sp_info;40,1653
+sp_lock(275,9726
+sp_lookup(237,8810
+sp_open(988,27997
+sp_replay(784,22035
+sp_rewind(1034,29017
+sp_scan(863,23739
+sp_swap(796,22301
+sp_unlock(283,9872
+sp_unpack(672,18788
+sp_write(1043,29166
+spool_and_discard_msg(398,12276
+spool_msg(322,10536
+spool_set_chkpt_pointer(629,18055
+spooler_group_failed(263,9486
+spooler_rcv(200,7902
+spooler_send(185,7522
+write_client(810,22613
+
+util/tabex.c,13
+main(17,724
+
+util/xmgr.c,284
+add_to_list(59,2525
+handle_get_outcome(229,6668
+handle_save_outcome(193,5723
+} idlist;52,2331
+init_lists(121,3899
+lmgr_check_done(135,4194
+lmgr_check_timeout(144,4349
+main 259,7395
+receive_state(100,3385
+search_list(73,2894
+send_state(91,3228
+transaction_service(151,4423
+
+demos/bank.c,918
+} account;32,1272
+add_account(96,3293
+add_trans(191,5187
+bank_abort(318,8074
+bank_commit(286,7378
+bank_control(658,17416
+bank_prepare(248,6479
+complete_updates(265,6894
+do_recovery(549,14237
+find_account(108,3547
+find_outcome(530,13756
+find_trans_for_account(207,5505
+first_trans(169,4890
+forget_updates(298,7634
+free_account(121,3793
+free_trans(232,6038
+handle_deposit(359,9428
+handle_inquiry(432,11029
+handle_withdraw(377,9771
+join_transaction(327,8181
+log_outcome(505,13174
+log_prepare(485,12714
+main(684,18007
+next_trans(183,5082
+} outcome_rec;475,12518
+} prepare_rec;482,12686
+#define qu_add_account(93,3187
+qu_add_trans(154,4601
+#define qu_find_account(92,3128
+qu_find_string(77,2857
+qu_find_trans(139,4320
+qu_free_trans(222,5815
+char   branch_name[sizeof(65,2443
+char   log_file_name[sizeof(66,2509
+this_trans(176,4975
+} trans;43,1623
+#define trim(57,2197
+update(395,10115
+
+demos/bank.h,0
+
+demos/display10.c,125
+display 79,2508
+display_all(109,3176
+display_input(157,4755
+display_title(125,3604
+init_display(38,1189
+start(191,5818
+
+demos/display11.c,173
+XInputFlush(120,3614
+display 127,3701
+display_all(166,4584
+display_input(239,6743
+display_mainloop(48,1537
+display_title(184,5087
+forkupdate(231,6683
+start(280,7963
+
+demos/grid.c,148
+change 213,5196
+do_xfer 228,5480
+error 277,6487
+get_xfer 239,5725
+join(81,2270
+main 34,1092
+pick 252,5993
+receive 173,4460
+update(101,2720
+
+demos/grid.h,0
+
+demos/history.c,0
+
+demos/lh_sp_test.c,534
+checkpoint(372,9537
+clMenu(141,4244
+clientMenu(155,4594
+keyed_check(393,10289
+keyed_selected_check(405,10659
+main(673,17047
+menu(649,16616
+printGroupViews(638,16340
+printNetView(626,16089
+printPrompt(614,15935
+rcvCheckpoint(360,9256
+rcvMess(260,6891
+replayAll(328,8698
+replayKeyedMess(335,8777
+replayKeyedSelectedMess(352,9042
+replaySelectedMess(344,8905
+selected_check(382,9882
+sendKeyedMess(103,3248
+sendNumberedMess(84,2795
+sendSimpleMess(66,2393
+send_K_N_mess(122,3727
+serverMenu(439,11922
+svMenu(417,11071
+
+demos/lh_xfer_client.c,85
+client_main_proc(79,1902
+main(34,1042
+printPrompt(71,1811
+test_send_file(60,1521
+
+demos/lh_xfer_server.c,99
+main(29,833
+rcvMess(73,1747
+rcv_lh_cbcast(120,2958
+rcv_remote_file(102,2471
+replayAll(57,1444
+
+demos/lisp_test.c,133
+handle_m1(96,2159
+handle_m2(106,2296
+handle_m3(116,2435
+handle_m4(133,2746
+handle_m5(151,3060
+main 180,3612
+main_service(7,75
+
+demos/qa.c,36
+ask_questions(63,1759
+main(26,810
+
+demos/selftest.c,103
+changed(92,2163
+inc(119,2904
+init_state(56,1423
+main(32,896
+rcv_state(81,1896
+send_state(63,1467
+
+demos/silentjoins.c,146
+change 185,4481
+do_xfer 201,4826
+error 256,5934
+get_xfer 214,5129
+join(80,2196
+main 31,978
+pick 231,5459
+receive 149,3806
+update(97,2566
+
+demos/spread.c,1228
+ChangeFont(709,24302
+access_new_spd(1324,45310
+add_to_global 133,4292
+change 440,15214
+change_display_level(871,29816
+check_for_resize(1635,55828
+check_forward_dependencies(1253,43068
+check_in_global(1384,47171
+clear_demo_list(1154,39487
+compute_dependency(557,18599
+create_global(184,5951
+create_group 501,17034
+disp_inverse_text(930,31751
+display_all(642,21564
+display_demo_list(1109,37686
+display_error 992,33976
+display_input(800,27230
+display_title(721,24556
+draw_inverse_text(1910,67806
+dsearch(1290,44391
+error 541,18248
+find(1234,42351
+get_all_spreads(1342,45743
+get_join_group(144,4596
+get_menu(1765,60520
+get_spdsht_depth(1308,44946
+global_receive(319,10620
+inform(333,11069
+inform_group_change(260,8600
+init_display(599,20122
+init_menus(1514,51200
+init_var(1451,49204
+join(114,3768
+join_spd(218,6864
+main 31,1008
+merge_receive 292,9620
+open_menu(1653,56625
+proc_key_down(954,32482
+proc_mouse_down(904,30871
+read_new_spd(1400,47518
+receive 352,11924
+receive_data 476,16157
+receive_global(206,6454
+recompute(1063,35833
+run_demof(1169,40032
+save_file(1591,54160
+send_data 453,15529
+send_global(192,6132
+start(776,26474
+switch_receive 281,9290
+update_display(1016,34575
+
+demos/spread.h,90
+#define ctl(106,4410
+#define makeNaN(130,5212
+#define max(53,1457
+#define min(54,1499
+
+demos/sun_grid.c,469
+CLIP_OFF(154,3534
+CLIP_ON(143,3282
+bcast_proc(284,7239
+blat(454,10762
+typedef struct button_info button_info;164,3847
+change 472,11308
+control_panel_layout(186,4289
+disp_proc(293,7347
+display_title(246,6389
+do_xfer 501,11993
+draw_grid(129,2947
+get_xfer 514,12292
+go_proc(305,7527
+static join(359,8683
+main(49,1056
+pick 531,12676
+print_value(271,6907
+static quit_proc(326,7963
+receive 417,10008
+sgprint(120,2779
+show_speed(333,8036
+update(379,9171
+
+demos/teller.c,340
+alpha(300,7561
+bank_error(36,1047
+com_equal(356,8590
+command(372,8871
+complete(86,2115
+connect_to_bank(462,11318
+deposit(142,3580
+get_name(320,7907
+get_number(337,8235
+help(18,302
+inquire(247,6259
+main(497,11932
+number(283,7304
+start(71,1833
+teller_control(483,11783
+test_point(59,1610
+transfer(199,4946
+withdraw(164,4052
+
+demos/testjoins.c,188
+change 209,4974
+do_xfer 241,5768
+get_xfer 255,6086
+join(82,2213
+main 33,1055
+ndests(194,4744
+pick 273,6431
+print_value(226,5329
+receive 151,3835
+tjprint(295,6861
+update(99,2588
+
+demos/testtasks.c,216
+#define	THREAD_ENTER(121,2695
+#define	THREAD_ENTER(126,2813
+#define THREAD_EXIT(122,2746
+TSIG(100,2183
+TWAIT(85,1927
+do_t_sig(55,1467
+do_t_sig_urg(70,1690
+do_t_wait(43,1260
+main(162,4040
+test_task(132,2880
+
+demos/twenty.c,248
+client_check(235,5868
+compare(411,10625
+hello(226,5727
+ignore(38,1062
+init_proc(176,4656
+main(43,1085
+main_task(246,6130
+monitor_group(92,2431
+query(305,7591
+recv_db(218,5610
+send_db(211,5510
+start_one(143,3758
+work_partition(283,7042
+
+demos/twenty.h,0
+
+demos/wanClient.c,204
+clhelp(133,3539
+do_nothing_at_all(37,1114
+interactive_test(145,3775
+main(42,1199
+printPrompt(122,3379
+test_copy_file(111,3099
+test_lh_cbcast(85,2381
+test_lh_spool(74,1993
+test_send_file(100,2819
+
+demos/wanServer.c,145
+void dst_err(127,3291
+main(33,946
+rcvMess(75,1963
+rcv_lh_cbcast(139,3597
+rcv_remote_file(104,2689
+replayAll(64,1734
+void src_err(117,3053

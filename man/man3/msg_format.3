@@ -1,0 +1,269 @@
+.TH MSG_FORMAT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+msg_format \- ISIS format string syntax
+
+.SH DESCRIPTION
+
+Format strings are used to denote the number and type of the 
+variable number of arguments following the format string
+in calls to 
+.IR msg_put (3), 
+.IR msg_get (3), 
+.IR bcast(3),
+.IR xfer_out(3),
+etc.
+The use of format strings is similar to 
+.IR fprintf (3)
+and 
+.IR fscanf (3).
+The format string is a null terminated string
+containing zero or more format items described below.
+The format string may include other printable characters,
+to improve readability or documentation, having 
+the status of comments.
+
+.B Predefined format items:
+.ta 5n
+.br
+%A	address structure pointer or vector
+.br
+%B      bitvec (vector of 128 bits) pointer or vector
+.br
+%c	char
+.br
+%C	char pointer or vector 
+.br
+%d	long int  (4-byte)
+.br
+%D	long int pointer or vector
+.br
+%E	event_id structure pointer or vector
+.br
+%f	single-precision (32-bit) float.  
+.br
+%F	float pointer or vector.
+.br
+%g	double-precision (64-bit) float.  
+.br
+%G	double pointer or vector.
+.br
+%h	short int  (2-byte)
+.br
+%H	short pointer or vector 
+.br
+%l	long int  (4-byte); syn. for %d
+.br
+%L	long pointer or vector, syn. for %D
+.br
+%m	message pointer
+.br
+%P	groupview structure pointer or vector
+.br
+%s	character array  (null-terminated character string)
+
+.B User defined format items 
+may be created using
+.IR isis_define_type (3).
+
+.B Storing data
+in a message occurs with msg_put or msg_gen, or with the
+out-arguments to bcast or xfer_out.
+Each format item in the format string must have a corresponding 
+argument, following the format string, of the type specified in the
+table above.
+As always great care must be taken when using routines with a variable
+number of arguments since type errors will not be detected
+at compile time.
+
+.B Retrieving values 
+occurs with msg_get and with the reply arguments
+to bcast.
+With msg_get each format item must have a corresponding argument
+which is a pointer to a variable, of the type specified above,
+into which ISIS will copy the data item.
+In the case of a message pointer (%m), ISIS assigns the corresponding
+variable a pointer to the contained message and 
+performs a .IR msg_incref (3) on the that message.
+This new message must be explicitly deleted by calling
+.IR msg_delete (3). 
+
+.B Broadcast reply arguments
+are different from those for msg_get 
+because replies from multiple processes must be retrieved.
+In msg_get the arguments are pointers to variables of the type specified 
+in the format string.
+In bcast the arguments are pointers to 
+.B arrays
+of such variables, the size of each being at least 
+as large as the number of replies requested in the bcast call.
+The number of replies will never exceed MAX_PROCS, currently 128,
+which is the internal limit on the number of destinations to which
+a single broadcast can be sent.
+
+.B Capitalized forms 
+(%A, %C...) 
+are used for storing or retrieving arrays of (or pointers to) the
+corresponding base type. 
+Normally two arguments are required, the pointer and the 
+length of the array in units of array elements.
+When storing data, the length
+is an integer value which must be supplied by the caller.
+When retrieving data 
+this is the address of an integer variable into which
+ISIS will put the length of the array retrieved,
+or a null pointer if the caller is not interested in the number of elements.
+The length argument may be omitted if
+the length of the vector is known at compile-time. 
+Instead the length is specified in the format item in square brackets
+following the format letter, e.g. "%A[10]".
+Arrays of strings or messages are
+.I not
+supported.
+(When retrieving an array as a reply to a bcast, a two dimensional
+array is required, the first dimension being the number of replies desired, 
+and the second dimension being the maximum expected size of the arrays.
+In addition an array of integers to hold the lengths of each of the reply
+arrays is required.)
+
+.B By storing indirect references to data
+you can avoid the overhead of copying and is recommended for large
+data objects (> 256 bytes).
+This option is supported in msg_put and msg_gen, and
+extends the pointer or vector format modes (capital letter)
+as follows. The format itself is specified using the notation
+%*, as in %*D.  However, in addition to the object pointer
+and length, a third argument is required: the \fIfree routine\fR.
+This routine will be called by ISIS when the last copy of the message
+containing an indirect reference is freed.  After storing an
+indirect reference in a message and before the free routine is
+called, you must not change the data in the indirectly referenced
+by the message; doing so gives unpredictable results.
+After the free routine is called, you may reuse the object for
+other purposes.
+
+.I Example:
+.nf
+main()
+  {
+        bp = get_buffer();
+        fill_buffer(bp);
+        msg_put(mp, "%*C[1024]", bp, buf_free);
+        ....
+  }
+
+/* Called when bp may be re-cycled */
+buf_free(bp)
+  buffer *bp;
+  {
+	bp->buf_next = buf_freelist;
+        buf_freelist = bp;
+  }
+.fi
+
+.B Storage allocation 
+for arrays and structures is supported.
+On a msg_get, the default is to copy from the
+message into the place specified by the argument, 
+which must have large enough to hold the largest array 
+to be stored in the message.
+The notation %+X indicates that ISIS should
+.IR malloc (3) 
+space for the new object and return a pointer to the space;
+the user must 
+.IR free (3) 
+this later.
+The notation %-X yields a pointer directly into the message,
+avoiding a copy. However the object pointed to must not be
+modified, and will cease to exist after the message
+in which it is contained is deleted.
+The %-X notation is not supported for bcast reply arguments.
+Although arrays of strings are not supported,
+the notation %+s returns a pointer to a malloc'ed copy of the string
+and %-s returns a pointer to the string in the message.
+The message formats %-m and %+m are allowed, but behave identically
+to %m.
+
+.SH EXAMPLES
+
+.ta 30n
+.B Putting values into a message
+.br
+msg_put(m, "%d", i); 	stores integer i
+.br
+msg_put(m, "%s", s); 	stores string s
+.br
+msg_put(m, "%D", i_a, n); 	stores array of n integers
+.br
+msg_put(m, "%F[200]", f_a); 	stores array of 200 floats
+.br
+msg_put(m, "%*F[200]", f_a, free);  indirect ref; ISIS calls free(f_a) when done
+.br
+msg_put(m, "%A[1]", &a); 	stores address a
+.br
+msg_put(m, "%A", a_a, n); 	stores array on n addresses
+
+.B Retrieving values from a message
+.br
+msg_get(m, "%d", &i); 	retrieves integer into i
+.br
+msg_get(m, "%s", s_a); 	copies string into s_a
+.br
+msg_get(m, "%A[1]", &a); 	copies address into a
+.br
+msg_get(m, "%A", a_a, &n); 	copies array into a, len into n
+.br
+msg_get(m, "%D", i_a, &n); 	copies array into i_a, len into n
+.br
+msg_get(m, "%-D", &i_p, &n);	sets pointer to array in message
+.br
+msg_get(m, "%-A", a_a, &n); 	sets pointer to array in message
+.br
+msg_get(m, "%-s", &s); 	sets pointer to string in message
+.br
+msg_get(m, "%+D", &i_p, &n); 	sets pointer to malloc'ed array.
+.br
+msg_get(m, "%+A", &a_p, &n); 	sets pointer to malloc'ed array.
+.br
+msg_get(m, "%+s", &s); 	sets pointer to malloc'ed string.
+
+.B Collecting broadcast replies
+.br
+bcast(..., "%d", i_a); 	collect values in array 
+.br
+bcast(..., "%D", i_aa, &n_a); 	collect arrays into i_aa, len into n_a
+.br
+bcast(..., "%-D", ...); 	NOT ALLOWED
+.br
+bcast(..., "%+D", i_pa, &n_a);	collect pointers to
+.br
+	malloc'ed arrays.
+.br
+.RS
+    int  i, i_a[], i_aa[][], *i_p, *i_pa[];
+    int  n, n_a[];
+    char *s, s_a[];
+    address a, a_a[], *a_p, *a_pa[];
+.RE
+
+.SH DIAGNOSTICS
+
+Data must be retrieved from a message using the same sequence
+of format items with which the data was stored.
+This is checked by msg_get and bcast which will give the error
+IE_MISMATCH if the supplied format string does not match the
+data types in the message.
+
+.SH "BUGS"
+ISIS assumes that floating point is in the IEEE standard format (it
+usually is), and hence that only byte-order will differ from machine
+to machine.
+
+.SH "SEE ALSO"
+msg_put(3),
+msg_putfld(3),
+msg_delete(3),
+bcast(3),
+xfer_out(3),
+isis_define_type(3),
+ISIS(3),
+malloc(3), free(3)

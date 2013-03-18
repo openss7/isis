@@ -1,0 +1,5 @@
+../protos/protos <isis-protos> -d#.logdir
+../util/rexec <isis-rexec>
+../util/news <isis-news>
+../util/lmgr <isis-lmgr>
+../util/xmgr <isis-xmgr>

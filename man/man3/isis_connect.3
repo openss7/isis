@@ -1,0 +1,80 @@
+.TH ISIS_CONNECT 3  "11 February 1990" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_connect \- Make a TCP steam connection to another ISIS process
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B int isis_connect (who_p)
+.br
+.B void isis_connect_register (fun)
+.RS
+.B address *who_p;
+.br
+.B void fun(address *addr)
+.RE
+
+.SH DESCRIPTION
+
+isis_connect provides a way for a pair of cooperating processes to construct
+a high bandwidth channel for stream or message communication.
+Both processes call isis_connect, each specifying the address of the other.
+The calls block until a rendezvous occurs, at which time a TCP connection
+is made, an exchange of data occurs to verify correct functioning of the
+channel (this also ensures that both calls return more or less at the same
+time), and the file descriptors created are returned to the callers.
+
+The file descriptors obtained from isis_connect can be used within calls
+to msg_read and msg_write, or directly in calls to read(3) and write(3).
+Performance will generally be substantially better than for transmissions
+that pass through ISIS.
+
+The overhead of making a channel in this way is high.  Use of a
+dedicated channel is consequently recommended only in cases where the
+channel will subsequently be used over a long period of time or for
+large volumes of data.  The routines isis_input and isis_input_sig can
+be used to monitor such a channel for data if necessary.
+
+isis_connect_register is used to establish a handler for incoming
+connection attempts.  If "isis_connect_register(fun)" is called by
+site A, "fun" will be called when another site is using isis_connect
+to connect to A.  The argument of "fun" is the address of the site
+attempting connection.
+
+.SH DIAGNOSTICS
+
+If an error occurs, -1 is returned and the UNIX error code (in the
+global errno variable) may be examined by the caller or printed using
+`perror'.
+
+.SH NOTE
+
+Calls to isis_connect will block the calling task
+until the connection is established or the
+remote process fails.  In the latter case, ECONNABORTED is returned.
+
+.SH ORDERING PROPERTIES
+
+isis_connect creates channels that lack the virtual synchrony
+properties on which all of ISIS is based.  Effective use of such
+channels thus raises serious questions and they pose the risk of
+observing ``ordering problems'' that could never arise when messages
+are transmitted using CBCAST.  In ISIS V2.0, CBCAST should perform as
+well or better than TCP in all modes of use and for all sizes of
+message.  At that time, the need for channels such as are created by
+isis_connect should be greatly diminished.
+
+Meanwhile, the only safe way to use these sorts of channels is to
+transmit messages using CBCAST that ``reference'' data in the TCP
+channels, and to only read such a channel when a message referencing
+it is received.  Obviously, this is clumsy, and many applications will
+chose not to adopt this approach.  However, care should then be taken
+to analyze the characteristics of the application and convince
+yourself that nothing clearly incorrect can result.  In general, this
+means that you should convince yourself that no CBCAST that might have
+preceded the transmission of a message on a TCP channel could have a
+destination that might witness the contents of the TCP channel before
+receiving the CBCAST -- or that if this does occur, nothing will go
+wrong.
+
+.SH "SEE ALSO"
+isis_input(3), ISIS(3)

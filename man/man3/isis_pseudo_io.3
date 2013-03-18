@@ -1,0 +1,52 @@
+.TH ISIS_INPUT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_pseudo_io, isis_pseudo_io_cancel \- ISIS pseudo-input checking functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int isis_pseudo_io(routine)
+.br
+.B
+void isis_pseudo_io_cancel(id)
+.br
+.SH DESCRIPTION
+A problem with the ISIS main loop is that it does a select(2) system
+call when there are no tasks to run and no messages left to deliver.
+A program that has some other criteria under which work must be done will
+tend to block in this select call because ISIS won't recognize other
+application-specific ``work to do'' criteria.
+
+For example, the X-windows toolkit sometimes peeks at its input stream
+by reading ahead and then enqueuing any data it finds to be re-read 
+later.
+If ISIS is being told to monitor the X-windows input file descriptors
+it won't notice this secondary input queue and hence would block on
+the select(2) call instead of waking up X to re-read its input token.
+
+The ability to specifify a ``pseudo-io'' checking routine overcomes this
+potential problem.
+The user posts a check routine by calling isis_pseudo_io; an id
+is returned that can later be used to 
+cancel the request.
+Prior to calling select, but only if the select might block, ISIS
+will call the check routine with a zero as an argument.
+The routine should take no action, but return 1 if there is pseudo-work
+to be done and 0 if not.
+
+Later, when ISIS finds it convenient, it will call your routine again
+with a 1 as an argument.  Your routine can now take any necessary action.
+It should return 1 (as before) if there was work to be done, and 0 otherwise.
+
+In the case of X, the check routine would never actually take any
+action; it would merely return 1 if the X pseudo-event queue is non-empty
+(ignoring its argument).
+This prevents ISIS from blocking and also causes isis_accept_events()
+to wake up, which enables the system to invoke X and thus process the queued
+input events.
+
+.SH DIAGNOSTICS
+None.
+
+.SH "SEE ALSO"
+t_wait(3), ISIS(3).

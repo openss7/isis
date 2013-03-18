@@ -1,0 +1,134 @@
+.TH T_ON_SYS_STACK 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+t_on_sys_stack, t_set_stacksize, isis_entry_stacksize, t_scheck \- ISIS stack size
+isis_task, isis_entry \- ISIS task declarations
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int t_on_sys_stack (routine, arg);
+.br
+.B
+int t_set_stacksize (size);
+.br
+.B
+int isis_entry_stacksize (entry, size);
+.br
+.B
+int t_scheck ();
+.RS
+.B int (*routine)(arg);
+.br
+.B int arg;
+.br
+.B int entry;
+.br
+.B int size;
+.RE
+
+.SH DESCRIPTION
+Stack overflow is a potential problem when using the ISIS task mechanism.
+Although stack overflow cannot occur from your main procedure, or any
+procedure it calls, it can easily occur in any procedure called
+by ISIS in an ISIS-created lightweight task.
+The functions described here
+provide ways to check for stack overflow, set stack sizes,
+or execute "on the system stack" to avoid stack overflow problems.
+
+The \fIsystem stack\fR is the normal stack which a sequential Unix process uses
+(i.e. that executing ``main'').
+In most Unix systems this stack is extended automatically when the end of
+the stack is reached up to some very large system defined limit.
+Tasks that ISIS creates dynamically run on \fIfixed size stacks\fR.
+
+When porting an existing program into ISIS, it is recommended that
+.IR isis_accept_events(3)
+be used rather than 
+.IR isis_mainloop(3).
+This is because
+isis_mainloop imposes a stack limit on the routine it calls,
+whereas isis_accept_events(3)
+imposes a stack limit only on routines ISIS invokes via callbacks.
+Thus, if you use isis_mainloop, all of your program is potentially
+subject to stack limits, whereas a structure that uses
+isis_accept_events leaves your main procedure on the system stack.
+Since you will rarely be sure exactly how old programs use their stacks,
+this is much safer.
+
+When a task running on a fixed size stack
+must do an operation that might not respect stack limit
+sizes (such as a call into an X-windows display routine),
+.I t_on_sys_stack 
+executes the call ``routine(arg)''
+not on the current task's stack but on the system stack.
+Although awkward, this avoids stack overflows that can go undetected until
+the routine in question returns... which may be too late.
+Only one routine at a time may be executed on the system stack;
+t_on_sys_stack blocks and waits on a queue if another routine is
+already executing in this manner.
+A routine called via t_on_sys_stack must not block using
+.I t_wait(3),
+or call any of the ISIS facilities.  If it does
+so, an error message will be printed and the program
+will be terminated.
+
+On many systems, the stacks of
+dynamically spawned ISIS tasks have a fixed limit imposed by the
+underlying tasking mechanism. 
+This limit can be changed by calling
+.I t_set_stacksize
+specifying the maximum number of bytes for all stacks created after this
+call, e.g. by 
+.IR t_fork (3).
+It may be that most tasks have modest stack requirements, but the handlers
+for some message types require large stacks.
+In this case you can set the stack size for a given message type using
+.I isis_entry_stacksize
+which uses the given stack size for task created to handle the given
+entry number.
+
+The behavior of t_set_stacksize and isis_entry_stacksize
+is different for different task mechanisms.
+
+On Sun OS 4.0 systems ISIS uses the Sun 
+lightweight processes package. Specifying a positive stack size causes ISIS
+to set the default stack size for newly created threads.
+Specifying a stack size of -1 causes ISIS to use
+.IR lwp_newstack (3)
+to obtain stacks. In this case the user should control stack size
+using the Sun LWP facilities.
+
+On MACH ISIS uses the CThreads package. 
+MACH automatically extends stacks which overflow, and ISIS does not attempt
+to control MACH thread stack sizes; t_set_stacksize is a no-op.
+
+On Apollo Domain/IX ISIS uses the Apollo task package. ISIS does 
+not attempt to control Apollo stack sizes.
+
+.I t_scheck
+checks, if possible, 
+that the currently executing function is not beyond the stack limit
+specified for this task. This check is not possible in the cases mentioned
+above where ISIS does not know the stack size in the underlying task
+package. Also, this cannot check whether the current task has 
+overflowed its stack at some previous point in its execution.
+
+.SH ORDERING
+
+.I t_on_sys_stack
+may block.
+.IR t_set_stacksize , 
+.I isis_entry_stacksize
+and
+.I t_scheck
+do not block.
+
+.SH DIAGNOSTICS
+
+.I t_scheck 
+will call print an error message and exit the program 
+if it detects a stack overflow.
+
+.SH "SEE ALSO"
+t_fork(3), lwp_create(3), lwp_newstk(3),
+ISIS(3)

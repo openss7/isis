@@ -1,0 +1,17 @@
+#!/bin/csh
+
+if ( $#argv != 1 ) then
+   exit 0
+endif
+
+set olddir = `pwd`
+
+cd $1
+mkdir {lucid_clib,allegro_clib}
+cd lucid_clib
+ln -s ../../clib/{isis,isis-c-load,isis-tools,isis-msg,isis-task,make-lucid}.lisp ../../clib/makefile .
+
+cd ../allegro_clib
+ln -s ../../clib/{isis,isis-c-load,isis-tools,isis-msg,isis-task,make-lucid}.cl ../../clib/makefile .
+
+cd $olddir

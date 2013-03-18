@@ -1,0 +1,122 @@
+.TH ISIS 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+ISIS \- A Reliable Distributed Programming Toolkit
+
+.SH DESCRIPTION
+
+The ISIS Distributed Programming Toolkit provides C and Fortran 
+and Lisp programmers
+with tools for developing reliable
+distributed applications.  
+ISIS implements a simple yet powerful model of distributed
+computation called 
+.I virtual synchrony
+in which complex distributed
+events appear to occur one-at-a-time, in synchrony.  In reality many events
+are happening concurrently, exploiting the parallelism of the distributed
+computing environment.
+
+ISIS consists of language libraries and utility software which uses
+the TCP/IP, UDP protocols by default, and can be extended to use
+other protocols (on MACH systems, ISIS uses MACH IPC for intra-machine
+message passing by default).
+ISIS is available on
+a wide range of Unix-compatible computers. 
+The ISIS toolkit is in the public
+domain.
+
+.SH LIBRARY FUNCTIONS
+
+The following are the ISIS manual pages included in section 3:
+.nf
+\bu ISIS    -- general introduction to ISIS
+\bu address -- address manipulation routines
+\bu bcast   -- basic broadcast interface
+\bu bcast_l -- extended broadcast interface
+\bu bypass  -- bypass broadcast interface
+\bu cl_dump -- making human-readible status dumps within ISIS
+\bu coord_cohort -- tool for fault-tolerant actions
+\bu flush   -- flush asynchronous broadcasts
+\bu isis_connect -- make a TCP channel for volume data/file transfers
+\bu isis_define_type -- define a new message data type
+\bu isis_init -- initial connection to ISIS
+\bu isis_remote -- remote connection to ISIS
+\bu isis_input -- block task waiting for IO condition to be true
+\bu isis_lmgr -- log manager
+\bu isis_perror -- print error messages
+\bu isis_task -- task facilities
+\bu long_haul  -- long-haul connection: file transfer facility
+\bu msg_format -- message formats
+\bu msg_getsender -- utilities for getting information about messages
+\bu msg_put -- making a message
+\bu msg_putfld -- making a message with secret fields
+\bu msg_read -- message IO interface
+\bu pg_getview -- get view of a process group
+\bu pg_join -- join or create a process group
+\bu pg_leave -- leave a process group
+\bu pg_lookup -- lookup a process group
+\bu pg_subgroup -- create a new group from an existing process group
+\bu pl_create -- create a process list
+\bu proc_watch -- watch individual process for failure
+\bu reply -- reply to a message
+\bu site_getview -- get list of sites in the system
+\bu site_id -- site-id data structure and manipulation
+\bu spool -- spooler interface
+\bu t_fork -- creating new tasks
+\bu t_on_sys_stack -- running tasks without stack limit sizes
+\bu t_wait -- task blocking/signalling interface
+\bu transport -- extending ISIS with new message transport facilities
+\bu xfer_out -- state transfer
+.fi
+
+To print the entire collection of ISIS manual pages you should use the command
+"man 3 isis_man".
+
+
+.SH COMPILING AND LINKING
+
+To compile and link a program under ISIS, it is necessary to determine the locations
+of 3 libraries of object files.  Ideally, these will be found in the normal
+library area on your system, but it may be necessary to check with an administrator
+in some cases.  Due to pecularities of the UNIX ``ranlib'' program, and also a
+desire to avoid automatically loading the entire ISIS runtime library into every
+program, we are not able to merge the 3 libraries into a single one at this time.
+The libraries are normally called clib/lib1.a, clib/lib2.a and mlib/mlib.a.
+
+In addition, you will need to know where the ISIS include files have been
+installed on your system.  If this has been done correctly, you should be able
+to include the entire collection of them by including <isis.h>, but on
+some systems you will need to specify the -I option to cc and designate a specific
+include file area.  Again, check with the person who installed ISIS on your system
+if the compiler can't find <isis.h> when the -I option is not given.
+
+Once compiled and linked, an ISIS program will not run unless the ISIS system
+has been started on your machine and the correct ``port number'' is specified for
+connecting to ISIS in the call to isis_init(port_no) done during startup.
+You can start isis manually, arrange for it to be started every time your
+machine reboots, or arrange for your application to run a start-up script
+if ISIS is not running when your program is started.
+Port numbers are usually specified as 0, in which case ISIS
+looks up the value to use in the system file /etc/services
+(or the yp equivalent).
+However, the port-number can be overridden, and in fact you may wish to do this
+if your goal is to test the way that some program reacts to site failures and
+recoveries.  This issue is covered in considerable detail in the section of the
+ISIS programming manual that covers system administration.
+
+Starting in ISIS V2.0, application programs can connect to an ISIS system
+that is running on a remote server.  This interface is accessible
+through the routine isis_init_remote(port_no, mother_machine) and can
+be used from UNIX workstations on which the basic ISIS ``protocols''
+server is not running.  If you use this approach and wish your application
+to tolerate failures of the mother machine (i.e. by rebinding to some
+alternative machine), you must define a routine called isis_failed()
+to actually perform the rebind.  This is discussed in the manual pages
+for isis_init(3) and isis_failed(3).
+
+.SH FILES
+
+The local configuration of ISIS on a machine is controlled through a
+file called \fBisis.rc\fR.  A second file, the ISIS \fBsites\fR file,
+lists machines on your network.  ISIS creates other files at runtime,
+in a directory specified during the startup sequence (in isis.rc).

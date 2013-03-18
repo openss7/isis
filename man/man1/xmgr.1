@@ -1,0 +1,43 @@
+.TH XMGR 1  "1 February 1986" XMGR "ISIS COMMANDS"
+.SH NAME
+xmgr \- ISIS transaction manager daemon.
+.SH SYNOPSIS
+.B rmgr 
+.SH DESCRIPTION
+The
+.I xmgr
+program  is run from within the isis.rc file and handles transactional commit.
+It is normally idle if transactions are not being used and need only be run on
+sites that intend to use the ISIS transactional tools.
+A typical restart sequence in which xmgr is started is illustrated below:
+.nf
+% isis
+Site 4 (fafnir.cs.cornell.edu): isis is restarting...
+Is anyone there?
+... found no operational sites, checking again just in case
+Is anyone there?
+site 4 (fafnir.cs.cornell.edu) doing a total restart
+../bin/protos <isis-protos> -d/usr/u/isis/DEVEL/SUN4/run_demos/#.logdir
+../bin/rexec <isis-rexec> 1653 
+../bin/rmgr <isis-rmgr> 1653 
+../bin/lmgr <isis-lmgr> 1653 
+../bin/xmgr <isis-xmgr> 1653 
+Site 4/0 is up!
+site view has viewid 4/1
+    fafnir.cs.cornell.edu         [site_no 4  site_incarn 0]
+Transaction Manager: checking that lmgr is initialized...
+Log Manager: Startup Completed (exiting normally)
+isis: detected termination of <../bin/lmgr>
+Transaction Manager: lmgr initialized, resuming xmgr startup seq...
+Transaction Manager (xmgr): initialization complete.
+.fi
+
+Note that the coresponding isis.rc file does not specify 1653 as an argument to 
+the xmgr command, this is added by the system when it runs the xmgr daemon.
+
+The xmgr program makes use of the lmgr program and should only be run if
+lmgr is being used, too.
+
+.SH "SEE ALSO"
+
+ISIS(3), isis(1)

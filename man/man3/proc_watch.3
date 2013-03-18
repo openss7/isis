@@ -1,0 +1,49 @@
+.TH PROC_WATCH 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+proc\_watch, proc\_watch\_cancel \- Monitor ISIS process
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B int wid = *proc\_watch(paddr\_p, routine, arg)
+.br
+.B address *paddr\_p;
+.br
+.B int (*routine)(paddr_p, what, arg);
+.br
+.B char *arg;
+.PP
+.B proc\_watch_cancel(wid)
+.br
+.B int wid;
+
+.SH DESCRIPTION
+.IR proc\_watch 
+sets up a callback which will be triggered if the
+specified process fails.
+The return code will be -1 if the process is already dead or
+the address is meaningless, and otherwise will be a code
+that can be used to cancel the watch.
+There are no restrictions on the use of this operation; in
+particular, the watcher and watchee need not belong to the same
+group and the watchee need not grant any special authorization
+to be watched.
+A process address would 
+normally be obtained from the process itself, by examining a
+message it has sent, or by examining a groupview of some
+group to which it belongs.
+
+.SH ORDERING
+.PP
+This facility provides no ordering guarantees.
+In fact, a proc\_watch might well trigger long before
+the failed process is deleted from process groups
+to which it belongs.
+In cases of software crashes where ISIS survived at the
+site of the crash, a proc\_watch would normally trigger
+at other remote sites within about 1/10th second.
+
+.SH DIAGNOSTICS
+proc\_watch may return -1 if the process watched has already
+failed at the time the watch is initiated.
+More often, however, it will return a watch-id only to trigger
+the callback a few milliseconds latter.

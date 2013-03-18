@@ -1,0 +1,37 @@
+#  $RCSfile: pmake.isis,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:33 $
+
+
+all: mlib clib protos util demos
+
+protos:	pr_action
+clib:	cl_action
+mlib:	ml_action
+util:	ut_action
+demos: de_action
+
+pr_action:
+	cd protos; /usr/u/isis/DEVEL/SUN/bin/pmake -G ../isis.gph -A ; cd ..
+cl_action: 
+	cd clib; /usr/u/isis/DEVEL/SUN/bin/pmake -G ../isis.gph -A ; cd ..
+ml_action: 
+	cd mlib; /usr/u/isis/DEVEL/SUN/bin/pmake -G ../isis.gph -A ; cd ..
+ut_action: 
+	cd util; /usr/u/isis/DEVEL/SUN/bin/pmake -G ../isis.gph -A ; cd ..
+de_action: 
+	cd demos; /usr/u/isis/DEVEL/SUN/bin/pmake -G ../isis.gph -A; cd ..
+
+clean:
+	cd protos; make clean
+	cd clib; make clean
+	cd mlib; make clean
+	cd util; make clean
+	cd demos; make clean
+
+
+check:
+	cd protos; make -n
+	cd clib; make -n
+	cd mlib; make -n
+	cd util; make -n
+	cd demos; make -n
+

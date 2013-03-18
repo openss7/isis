@@ -1,0 +1,202 @@
+.TH XFER_OUT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+xfer_out, xfer_flush, xfer_refused, allow_xfers_xd \- ISIS state transfer functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int xfer_out   (position, format [ , arg ] ...)
+.br
+.B
+int xfer_flush ()
+.RS
+.B    long     position;
+.br
+.B    char     *format;
+.RE
+.PP
+.B
+address pg_join (gname, ...
+.br
+.B
+                 PG_XFER, domain, send_func, receive_func,
+.br
+.B
+                 [ PG_BIGXFER, ]
+.br
+.B
+                 ..., 0)
+.br
+.B
+address allow_xfers_xd (gname, XD_USER+xd, send_func, 
+.br       
+.B
+                        NULLROUTINE)
+.RS
+.B char *gname;
+.br
+.B int domain;
+.br
+.B int      (*receive_func)(position, msg_p);
+.br
+.B int      (*send_func)(position, gaddr);
+.br
+.B int position;
+.br
+.B message *msgp;
+.br
+.B address *gaddr;
+.br
+.B int xd;
+
+.B xfer_refused();
+.RE
+.SH DESCRIPTION
+
+These functions allow a process joining an existing process group to
+obtain a copy of replicated group state from
+an existing member. In order to use the state transfer mechanism
+all group members should specify the 
+.I PG_XFER
+option of
+.IR pg_join (3),
+with the following arguments.
+
+The
+.I send_func
+is called at an existing group member during a join, and transmits
+the state to the joining process.
+The
+.I receive_func
+is called at the joining process to receive the state.
+.I domain
+is the state transfer domain number, between 0 and 5 inclusive.
+The user may divide the state into
+different independent domains, each with its own send and receive routines,
+by specifying multiple PG_XFER options.
+This promotes modular program structure and makes it easy to add new state.
+Normally ISIS transmits the state using normal ISIS messages.
+If there is a large amount of state to transfer, the
+.I PG_BIGXFER
+option to pg_join can be used which causes a TCP/IP stream
+to be created to transmit the state.
+
+The state for a given domain is further subdivided into a sequence of
+.IR pieces ,
+indexed by integer
+.IR locators,
+beginning at zero.
+
+.I send_func 
+is a user-supplied function which
+should transmit each piece of its domain
+in turn
+by calling 
+.IR xfer_out ,
+specifying the
+.I locator 
+for this piece.
+A message for this piece
+is constructed from the
+.I format
+string and its accompanying arguments, as described in
+.IR msg_format(3).
+The 
+.I gaddr
+argument to send_func identifies the group which the new process 
+is joining.
+
+If the process executing send_func fails, ISIS selects another
+group member to continue the transfer. ISIS remembers which domain
+was in the act of being transferred and continues the transfer from that
+point. This is the use of the 
+.I locator
+argument which is passed to the send_func.
+At the beginning of the transfer this is specified as -1, indicating
+that no part of the domain has yet been transferred.
+After a failure, the locator argument identifies the last piece of this
+domain to have been successfully transferred. Thus the send_func
+can continue with the locator+1'th piece (although it is also 
+correct for the send_func to simply start from zero again).
+
+Multiple calls to xfer_out are combined by ISIS into a smaller number
+of network packets.
+.I xfer_flush
+causes any any currently buffered messages to be transmitted to the joining
+process before it returns.
+xfer_flush is called automatically at the end of a state transfer.
+
+The 
+.I receive_func
+is a user defined function which 
+is called to handle each piece of
+a given domain.
+It is supplied with a message containing the piece
+and its locator value.
+
+.I allow_xfers_xd
+is used in conjunction with 
+.IR pg_subgroup (3)
+to enable subgroup members to support state transfer operations when
+other processes subsequently join using pg_join.
+.I gname
+is the name of the group and
+.I xd
+is the domain number.
+The constant
+.I XD_USER
+must be added to the domain number that would be supplied to 
+the PG_XFER option of pg_join.
+.I send_func
+is the same as in pg_join.
+The last argument must be specified as the constant
+.IR NULLROUTINE .
+
+.SH "INABILITY TO PROVIDE STATE"
+
+It may be the case that some group members are unable to 
+send the group state -- perhaps they only maintain part of it,
+or use a complex data structure that is inconvenient for transfers.
+In such cases, the routine \fIxfer_refused\fR should be
+specifed as the state sending routine.
+If the inability is a transient problem, xfer_refused() may be
+called directly from the state transfer routine, which
+should then return without calling 
+.IR xfer_flush
+or
+.IR xfer_out.
+
+.SH ORDERING
+
+To other group members the state transfer takes place
+atomically as part of the group join, and before a group change monitor
+routine is called.
+In order to preserve this atomicity
+the send and receive functions must 
+.I NOT send broadcasts or fork tasks.
+They may however notify other tasks via
+.IR t_sig .
+
+Although the xfer_out and xfer_flush functions perform I/O, task
+switches are prevented while the receive or send functions execute.
+Thus these functions are effectively non-blocking. 
+This guarantee ensure that an atomic copy of the state will be
+transferred.
+
+.SH BUGS
+
+The interface to allow_xfers_xd is unnecessarily arcane.
+Although there is an internal interface to control selection of the
+process that will send state, the scheme is too complex for general
+users.  A simplified version should be provided.
+
+.SH DIAGNOSTICS
+.IR isis_errno (3)
+will be set to
+.IR IE_BADARG,
+if an error is discovered in one of the format items.
+
+.SH "SEE ALSO"
+pg_join(3),
+msg_format(3),
+ISIS(3)

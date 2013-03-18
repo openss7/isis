@@ -1,0 +1,29 @@
+.so man3/isis_init.3
+.TH ISIS_PROBE 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_probe -- Actively monitor for client failure
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int isis_probe (freq, timeout);
+.RS
+.B int freq, timeout;
+.RE
+
+.SH DESCRIPTION
+.I isis_probe
+tells the ISIS system to periodically probe the calling process to
+test for liveness.
+An RPC will be issued to it every \fBfreq\fR seconds; the process
+will be considered to have failed if it does not reply within
+\fBtimeout\fR seconds.
+By default, this facility is disabled on clients running local
+to an ISIS protocols server.
+For a remote client of ISIS initial values are both set to 60
+seconds.
+
+.SH "SEE ALSO"
+isis_init(3), isis_remote(3),
+ISIS(3)
+

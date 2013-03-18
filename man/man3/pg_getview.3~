@@ -1,0 +1,207 @@
+.TH PG_GETVIEW 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pg_getview, pg_getlocalview, pg_watch, pg_watch_cancel, pg_monitor, pg_monitor_cancel, pg_detect_failure \- Obtain / monitor process-group views
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B groupview *pg_getview(gaddr_p)
+.br
+.B address *gaddr_p;
+.PP
+.B groupview *pg_getlocalview(gaddr_p)
+.br
+.B address *gaddr_p;
+.PP
+.B 
+int wid = pg_watch(gaddr_p, paddr_p, event, routine, arg)
+.br
+.B address *gaddr_p, *paddr_p;
+.br
+.B int event;
+.br
+.B int (*routine)(paddr_p, gaddr_p, event, arg);
+.br
+.B void *arg;
+.PP
+.B pg_watch_cancel(wid)
+.br
+.B int wid;
+.PP
+.B int mid = pg_monitor(gview_p, routine, arg)
+.br
+.B groupview *gview_p;
+.br
+.B int (*routine)(gview_p, arg);
+.br
+.B
+void *arg;
+.PP
+.B int mid = pg_detect_failure(gaddr_p, routine, arg)
+.br
+.B int (*routine)(gaddr_p, what, arg);
+.br
+.B int what;
+.br
+.B void *arg;
+.PP pg_monitor_cancel(mid)
+.br
+.B int mid;
+
+
+.SH DESCRIPTION
+.IR pg_getview 
+returns a pointer to a data structure containing the current
+process-group view for the specified
+group, which lists currently operational members of the group 
+and current ``authorized clients''.
+This data structure resides in a static location and will be
+changed, in place, as new processes and clients join and leave the group.
+The gaddr_p argument specifies the group, and can be obtained using
+pg_lookup(3), pg_join(3), or from some other process that
+knows the address.
+.IR pg_getlocalview
+is the same as pg_getview, but will fail if the caller is
+not a member of the group (pg_getview
+may go to considerable effort to track down the view in this case).
+.PP
+The format of the groupview structure is as follows:
+.nf
+
+struct groupview
+{
+    int         gv_viewid;             /* View number */
+    int         gv_incarn;             /* Incarnation number */
+    int         gv_flag;               /* Indicates if this is cached or not */
+    address     *gv_gaddr;             /* Pointer to group address structure */
+    char        gv_name[PG_GLEN];      /* Group name */
+    short       gv_nmemb;              /* Number of members */
+    short       gv_nclient;            /* Number of clients */
+    address     gv_members[PG_ALEN];   /* List of members */
+    address     gv_clients[PG_ALEN];   /* List of clients */
+    address     gv_joined;             /* New member, if any */
+    address     gv_departed;           /* Departed member, if any */
+};
+
+.fi
+.PP
+The fields have the following meanings:
+.I gv_viewid
+is a unique identifier for the view.
+It starts at 1 and increments for each new view that is installed.
+.I gv_incarn
+is a group incarnation number, used by the logging and
+recovery manager tools when the PG_LOGGING option is
+enabled for the group.
+.I gv_flag
+is a flag indicating whether the view is current or not (PG_VALID
+is set while the view remains current).
+In cases where a view pointer is passed as an argument to a monitor
+routine that blocks for some period of time, a new view could
+supercede the one that causes the monitor to trigger.
+In such cases, the valid flag of the stale view will be cleared.
+.I gv_gaddr
+points to the address of the group.  This is stored in
+a place what won't change even if your process joins and leaves
+the group repeatedly.
+.I gv_name
+contains the symbolic name of the group, as specified when the
+group was created.
+.I gv_nmemb
+gives the current number of members.
+A process becomes a member of a group using pg_join(3) or pg_subgroup(3).
+.I gv_nclient
+gives the current number of clients.
+A process need not be a client of a group to communicate with it,
+but becoming a client results in
+a substantial performance improvement on subsequent multicasts and
+avoids the need to repeatedly authenticate access in situations
+where security is an issue.
+.I gv_members
+is a null-terminated list of the addresses of group members, in
+the order that they became members.
+.I gv_clients
+is a null-terminated list of the addresses of clients, in
+the order that they became members.
+.I gv_joined
+is either NULLADDRESS or is the address of a process that was
+a member in the previous view and has just left the group (see
+pg_leave(3)) or failed.
+.I gv_joined
+is either NULLADDRESS or is the address of a process that was not
+a member in the previous view and has just joined.
+.PP
+.IR pg_monitor
+arranges for callback of a user-specified routine
+whenever the groupview for the designated group changes.
+The callback will be done as follows: (*routine)(newgv, arg),
+and will run as a new ISIS task.
+The caller must be a member or client of the group.
+An id is returned and can be used to cancel the monitor; -1 is
+returned on error.
+.PP
+.IR pg_detect_failure
+is used to monitor a group to detect the total failure of all
+of its members.
+If this occurs, the callback is done as follows: (*routine)(gaddr_p, W_FAIL, arg);
+.PP
+.IR pg_monitor_cancel
+cancels a previously enabled callback.
+.PP
+.IR pg_watch
+requests that the system perform a callback to a specified
+routine in the event that a given event occurs to a given member of
+the specified group.
+The callback will occur exactly once, and will be done using
+a call: (*routine)(gaddr_p, paddr_p, event, arg).
+The callback routine is run as an ISIS task.
+The event codes supported are W_LEAVE (callback if process leaves) and
+W_JOIN (callback if process joins).
+pg_watch will fail, returning -1, if the caller
+is not a member (or client) of the group, if the code is W_LEAVE but the
+process is not a member of the group, or if the code is W_JOIN and the
+process is already a member of the group (but see also proc_watch(3)).
+(Note that W_LEAVE and W_JOIN only apply to group members, not clients.)
+Note: in the case of W_JOIN, ISIS will verify that the designated
+process address is a legitimate address of a current isis process, and
+begin watching that process using proc_watch(3).
+In this case, if the process fails before joining, the callback routine
+will be invoked with the event specified as W_FAIL.
+If the paddr_p is NULLADDRESS, a callback occurs if \fIany\fR process joins
+or leaves the group.
+An id is returned and can be used to cancel the watch; -1 is
+returned on error.
+.PP
+.IR pg_watch_cancel
+cancels a previously enabled callback.
+
+.SH ORDERING
+.PP
+Changes in process-group views are carefully synchronized with ISIS broadcast
+deliveries.  This yields a number of useful properties.
+First, if the members of a process group run an algorithm that
+makes use of the receipt of multicast messages, group view changes,
+the current view when a message is received, and group watch callbacks,
+they will all observe these events in the same order.
+This permits a substantial degree of ``silent cooperation'',
+in which members coordinate their actions without communicating
+after each event to agree on how each process will react to it.
+Within any given process, if several events may be triggered
+by a single view change, the sequence of events will be
+strictly deterministic.
+Multiple watches are triggered in the order they were enabled.
+In addition, groupview membership and client lists change by only
+one element at a time, hence each new view corresponds to
+a single, specific event.
+This is in contrast to site-views, where a single view may reflect
+multiple site failures and recoveries.
+
+.SH DIAGNOSTICS
+pg_getview and pg_getlocalview both return null pointers if the
+group is unknown (globally in the former case, to the caller in the latter).
+pg_monitor will fail, returning -1, if the caller is not a member of the group.
+pg_watch will fail, returning -1, if the request event is W_JOIN and the
+process is already a member, or the event is W_LEAVE and the process
+is not a member.
+
+.SH "SEE ALSO"
+pg_lookup(3), proc_watch(3), ISIS(3)

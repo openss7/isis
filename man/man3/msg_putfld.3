@@ -1,0 +1,86 @@
+.TH MSG_PUTFLD 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+msg_putfld, msg_getfld, msg_gettype \- ISIS message field functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int msg_putfld(msg_p, field_id, format, [, arg ] ... )
+.br
+.B 
+int msg_getfld(msg_p, field_id, pos_p, format, [, arg ] ... )
+.br
+.B 
+int msg_gettype(msg_p, fname, pos_p)
+.PP
+.RS
+.B message *msgp;
+.br
+.B char *format;
+.br
+.B int field_id;
+.br
+.B int *pos_p;
+.RE
+
+.SH DESCRIPTION
+An ISIS 
+.I message 
+consists of a number of 
+.IR fields ;
+each field comprises a sequence of typed data items.
+The 
+.IR msg_put (3)
+and 
+.IR msg_get (3)
+functions store and retrieve data in just one of those fields.
+However user programs can store and retrieve data in many other fields using
+.I msg_putfld
+and 
+.IR msg_getfld ,
+respectively.
+Both functions take a 
+.I field_id 
+argument, a number between 1 and 127, which names the
+field to be used.
+The 
+.I format
+argument specifies the number and types of the following arguments 
+as described in 
+.IR msg_format (3).
+The
+.I pos_p
+argument to msg_getfld should be the address of an integer variable
+which msg_putfld will use to remember the current position in the
+message field between multiple calls.
+This variable should be initialized to 0 before the first call.
+The effect of a
+.IR msg_rewind (3)
+can be achieved by resetting this variable between calls.
+If only one call to msg_putfld is desired, pos_p can be specified
+as a 
+.I NULL
+pointer, and msg_putfld will retrieve the specified data items
+starting at the beginning of the field.
+
+The routine
+.I msg_gettype
+returns the data type of the designated instance of the designated
+field name.
+The type will be an alphabetic code.  msg_gettype returns 0 if the
+field/instance is not found.
+
+.SH DIAGNOSTICS
+
+msg_putfld returns 0 normally, and -1 if an error is detected, 
+leaving an indication of the error in 
+.IR isis_errno (3).
+msg_getfld returns the number (possibly zero) of data items retrieved
+which will be a prefix of the data items requested in the format string.
+If an error is detected, -1 is returned and isis_errno is set.
+
+.SH "SEE ALSO"
+msg_put(3),
+msg_format(3),
+msg_printaccess(3),
+ISIS(3)

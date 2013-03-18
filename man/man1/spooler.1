@@ -1,0 +1,22 @@
+.TH XMGR 1  "1 February 1986" XMGR "ISIS COMMANDS"
+.SH NAME
+spooler \- ISIS spooler
+.SH SYNOPSIS
+.B spooler 
+.SH DESCRIPTION
+The
+.I spooler
+program is run from within the isis.rc file and handles persistent spooling for ISIS
+applications that only run periodically as well as long-haul file transfor for ISIS
+applications that need to communicate from LAN to LAN.
+A file copy ability is also included.
+The program is described in detail in 
+.IR spool.3
+and
+.IR lh_file_xfer_m.3.
+The spooler is normally run on at most 3 or 4 sites, which typically should have
+independent local disks and indpendent failure modes.
+
+.SH "SEE ALSO"
+
+ISIS(3), isis(1), spool(3)

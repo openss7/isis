@@ -1,0 +1,102 @@
+.TH REPLY 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+reply, nullreply, abortreply, forward \- ISIS broadcast reply functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+reply (in_msgp, out_format, [ out_arg, ]... )
+.br
+nullreply (in_msgp)
+.br
+abortreply(in_msgp)
+.br
+forward(in_msgp, addr, entry, out_msgp)
+.br
+.B message *in_msgp, *out_msgp;
+.br
+.B char *out_format;
+.br
+.B address addr;
+.br
+.B int entry;
+
+.SH DESCRIPTION
+These functions are used to reply to or forward the message
+received by an entry task in response to a broadcast (
+.IR bcast (3)).
+The 
+.I in_msgp
+argument is a pointer to the received message.
+This is normally the message which was supplied as the argument to the entry 
+task (see
+.IR isis_entry (3)).
+.I reply 
+constructs a message containing the message arguments specified
+by 
+.I out_format
+and the following arguments ,, 
+This message is sent to 
+to the sender of in_msg 
+(given by 
+.IR msg_getsender (3)).
+There is a long form of reply,
+.IR reply_l (3),
+analogous to bcast_l.
+
+.I nullreply 
+informs ISIS that this process will not send a genuine reply to in_msg.
+This is useful to differentiate the crash of a destination process
+from its not wishing to reply.
+
+.I abortreply
+causes the client bcast to terminate with the error
+.I IE_ABORT
+without waiting for further replies.
+
+bcast waits after sending the message
+until one of the following three conditions holds:
+(1) the desired number of replies are received,
+(2) all the processes which received the message send a reply, send a 
+nullreply, 
+or terminate (crash),
+or (3) at least one process sends an 
+abortreply.
+
+.I forward
+is used by a process acting as an intermediary between the client
+and the process which will actually reply.
+forward delivers a copy of 
+.I out_msg
+to 
+.I addr
+and sets the sender field of out_msg to refer to the sender of 
+the original message,
+.IR in_msg .
+This will be the address returned by 
+.IR msg_getsender (3).
+See also 
+.IR msg_isforwarded (3) 
+and 
+.IR msg_gettruesender (3).
+Typically out_msg will be the same as in_msg,
+but this is not required.
+
+.SH ORDERING
+
+All these reply and forward functions enforce the ordering
+constraints of the broadcast type used to deliver the
+original message.
+
+All these functions may block.
+
+.SH DIAGNOSTICS
+.IR isis_errno (3)
+will be set to
+.IR IE_BADARG,
+if an error is discovered in one of the format items.
+
+.SH "SEE ALSO"
+bcast(3), bcast_l(3), isis_entry(3), 
+msg_format(3),
+ISIS(3)

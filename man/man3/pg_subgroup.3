@@ -1,0 +1,97 @@
+.TH PG_SUBGROUP 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pg_subgroup \- create a subgroup
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B
+address *pg_subgroup(gaddr_p, sgname, incarn, members, clients)
+.RS
+.B address *gaddr_p;
+.br
+.B char *sgname;
+.br
+.B int incarn;
+.br
+.B address members[], clients[];
+.RE
+
+.SH DESCRIPTION
+A \fIsubgroup\fR is a conventional process group that is initially
+created using a subset of the members of some pre-existing group.
+It retains no special relationship to the parent group after the 
+instant of creation.  The advantage of this interface is that
+the cost of creation is quite low (see, however,
+.I pl_create(3)).
+
+.I pg_subgroup
+creates a new group whose members are a subset of the members of an
+existing group. 
+The new group's name is specified by
+.I sgname
+which must not the name of any existing group.
+The process calling pg_subgroup must be a member the group
+.IR gaddr\_p .
+The new group's members are specified by the array 
+.I members
+of process addresses. Each of these must already be a member of
+gaddr\_p.
+The new group's clients are specified by the array
+.IR clients ,
+which do not have to be clients of gaddr\_p.
+.I incarn 
+gives the initial incarnation number of the new group, 
+typically zero.
+
+Creating a subgroup in this way is significantly cheaper than having
+each element of members calling
+.IR pg_join (3)
+individually, dramatically so if the joins might have been done
+more or less simultaneously.
+However, the interface does not support
+the various options that pg_join permits.
+Members of the new group should explicitly call
+.IR pg_monitor (3)
+if they wish to monitor group changes,
+and 
+.IR allow_xfers_xd (3)
+to enable state transfers.
+This approach may seem awkward, but is unavoidable because pg_subgroup
+is called from \fIone\fR process, whereas pg_join is called
+in \fIeach\fR process.  Since the members of a group may
+have very different approaches to state management and monitoring, 
+the caller of pg_subgroup has no way to provide this information to the
+system.  Consequently, it is common
+for the process that execute pg_subgroup
+to send an initial broadcast to the new group, causing them to take
+these actions.
+
+After creation the 
+new subgroup is behaves exactly like any other group,
+and is not, for instance, dependent on the continued existence 
+of the group gaddr\_p.
+In particular, membership changes to the two groups may be slightly
+out of sync.
+For example,
+it would be possible for a process p to observe that process q has
+left gaddr\_p, but then to receive a message that process q sent to
+sgaddr\_p before seeing process q leave sgaddr\_p.
+Although potentially
+confusing, this is an unavoidable concequence of way that ISIS orders
+group communication with respect to failures.
+
+.SH ORDERING
+
+pg_subgroup is totally ordered with respect to broadcasts of all types, 
+and other process group membership changes.
+
+pg_join may block.
+
+.SH DIAGNOSTICS
+
+If the calling process, or any of the processes in the members 
+list is not a member of gaddr\_p,
+pg_subgroup fails and returns NULLADDRESS.
+
+.SH "SEE ALSO"
+pg_join(3), allow_xfers_xd(3), ISIS(3)

@@ -1,0 +1,184 @@
+.TH COORD_COHORT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+coord_cohort, cc_terminate \- ISIS coordinator-cohort functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int coord_cohort(msg, gaddr_p, action_routine, got_reply, arg)
+.RS
+.B message *msg;
+.br
+.B address *gaddr_p;
+.br
+.B char *arg;
+.br
+.B int (*action_routine)(msg, gaddr_p, how, arg);
+.br
+.B int how;
+.br
+.B int (*got_reply)(msg);
+.RE
+.PP
+.B
+int cc_terminate(gaddr_p, format, [ arg, ]... )
+.RS
+.B address *gaddr_p;
+.br
+.B char *format;
+.RE
+.PP
+.B
+int cc_terminate_l(who_p, gaddr_p, format, [ arg, ]... )
+.RS
+.B address *who_p, *gaddr_p;
+.br
+.B char *format;
+.RE
+
+.SH DESCRIPTION
+
+The 
+.I coordinator-cohort
+tool is used by a process group to perform a fault tolerant computation.
+One group member, the
+.IR coordinator ,
+performs the computation, while the others, the
+.IR cohorts ,
+remain passive unless a failure prevents the coordinator 
+from terminating normally, in which case one
+of the cohorts is chosen to take over and complete the computation.
+The coordinator, when it terminates normally, 
+can transmit the result from the computation (e.g. updates to
+data replicated by group members) to the cohorts.
+
+The 
+.I coord_cohort
+function must be executed by all group members, in parallel,
+typically upon receiving a request message broadcast to the group or
+on observing some other virtually synchronous event, such as a
+group membership change.
+.I msg 
+is that request message and
+.I gaddr_p
+is a pointer to the address of the group performing the computation.
+The
+.I action_routine
+is invoked at the coordinator process
+The message and the group address are passed as its first two arguments.
+The third argument,
+.IR how ,
+indicates whether this is the original coordinator
+for the request 
+.RI ( ORIGINAL ),
+or whether this process is taking over from a failed coordinator,
+.RI ( TAKEOVER ).
+This is useful if a process must take cleanup actions
+when taking over from a failed coordinator.
+The fourth argument to the action_routine
+is the final, user defined pointer,
+.IR arg,
+passed to coord_cohort.
+
+This routine normally completes by doing a 
+.IR reply (3)
+to msg.
+As well as being sent to the requesting process
+the reply message is sent,
+using
+.IR cbcast (3), 
+to each of the cohorts, where the
+.I got_reply
+function called with the reply as its argument.
+If this behavior is not desired, the
+.I got_reply
+argument may be specified as 
+.IR NULL_ROUTINE .
+The client who initiated the request should wait for a single
+reply. As long as at least one group member remains operational,
+a single reply will be sent. 
+If a total group failure occurs, the requesting process
+will return from the bcast call, receiving zero replies.
+
+A coordinator-cohort computation may be initiated by some means
+other than a broadcast request from a client.
+In these cases the msg argument to coord_cohort should be
+.IR NULLMP .
+Of course some means, such as a broadcast or a group change,
+is needed to instruct all group members to call coord_cohort.
+
+.I cc_terminate
+is used by the coordinator
+to indicate successful completion of the computation 
+when there is no message to reply to (i.e., the \fImsg\fR argument to the
+coord_cohort routine was specified as a null pointer).
+cc_terminate constructs a message from the
+.I format
+string and the accompanying arguments in the style of bcast (see
+.IR msg_format (3)),
+and sends this via cbcast to the got_reply routines in the cohorts.
+cc_terminate is also used when a process sends an asynchronous
+request to the process group. Again no reply is needed,
+but the cohorts need to be informed of the successful completion
+of the computation.
+
+.I cc_terminate_l
+is used like cc_terminate, but allows the caller to specify one
+additional destination for the message (this extra destination may
+be a group, a process list, or a single process).
+The routine is useful because it causes a single
+multicast to be sent, atomically, to both this process and the
+cohorts of the original coordinator-cohort computation.
+For example, say that the coordinator's entire computation is
+to calculate some value and send it to some process, which did \fInot\fR
+initiate the original coordinator-cohort computation (i.e., perhaps the
+computation was triggered by a group-view change).
+Lacking such an atomic cc_terminate_l call, it would be hard for the
+cohorts to tell if the coordinator had managed to send
+this message before crashing: they might actually have to query the
+process, or send a duplicate ``just in case''.  With
+cc_terminate_l, the cohorts see the coordinators message too, hence
+they can tell if the coordinator failed before, or after, sending it.
+
+The details of how the coordinator is chosen are normally irrelevant from a
+correctness viewpoint, but understanding of the current strategy
+does have performance benefits.
+The coordinator is chosen identically at each group member
+using the virtually sychronized group views (see
+.IR pg_getview )
+without requiring any extra communication between group members.
+If the group contains members at the same site as the
+requesting process, the lowest ranked such member is chosen,
+decreasing response time.
+Otherwise a hashing of the sender site number is used to choose the
+coordinator, approximately distributing load among group members.
+An internal interface, coord_cohort_l, permits the caller to specify
+a different routine in place of this standard one.
+The mechanism is documented by the code itself (clib/cl_coord.c).
+
+.SH "COORDINATOR UNABLE TO DO THE OPERATION"
+
+In some situations, the coordinator may be unable to perform the
+action routine.  In such cases, the procedure 
+.I cc_refused
+may be called by the coordinator (or specified as the coordinator's
+action routine).
+It is not necessary (and would be potentially incorrect) to call
+cc_terminate or do a reply in a procedure that called cc_refused.
+
+
+.SH ORDERING
+
+The coordinator-cohort tool uses the ordering of the
+initial request message to order the invocation of
+the action_routine. The reply, and thus the invocation of
+the got_reply routines, is ordered by cbcast.
+
+coord_cohort and cc_terminate may block.
+
+.SH "SEE ALSO"
+
+pg_join(3), pg_getview(3),
+bcast(3), bcast_l(3), isis_entry(3), 
+msg_format(3),
+ISIS(3)

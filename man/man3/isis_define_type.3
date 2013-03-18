@@ -1,0 +1,102 @@
+.TH ISIS_DEFINE_TYPE 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_define_type, msg_convertchar, msg_convertshort, msg_convertlong, msg_convertaddress, msg_convertsiteid \- Define new ISIS message field types
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B isis_define_type(format_letter, size, converter)
+.br
+.RS
+.B char format_letter;
+.br
+.B int size;
+.br
+.B void (*converter)();
+.RE
+.PP
+.B msg_convertchar(char_p);   /* NO-OP */
+.br
+.B msg_convertshort(short_p);
+.br
+.B msg_convertlong(long_p);
+.br
+.B msg_convertaddress(address_p);
+.br
+.B msg_convertsiteid(site_id_p);
+.br
+.RS
+.B char *char_p;
+.br
+.B short *short_p;
+.br
+.B long *long_p;
+.br
+.B address *address_p;
+.br
+.B site_id *site_id_p;
+.RE
+
+.SH DESCRIPTION
+.I isis_define_type
+permits the definition of new format letters 
+to be used in the format strings supplied to 
+.IR msg_put (3),
+.IR bcast (3),
+etc.
+
+.I formatletter 
+is the lower-case ascii character that will be used in
+format items corresponding to this type.
+It must not be the same as any existing ISIS format letter
+.RI ( a
+.I b c d e f g h l m p
+or 
+.IR s ).
+The capitalized form (for handling arrays) is provided automatically
+for each type defined by isis_define_type.
+Notice that previous versions of ISIS has a type \fInumber\fR as
+well as a formatletter; in more recent releases of ISIS, the number
+has been eliminated.
+
+.I size 
+is the length in bytes of a data item of this type.
+This is the length of both its primary memory representation
+and its representation in an ISIS message.
+
+The
+.I converter
+argument is a user function that performs byte swapping, if necessary,
+on the data item by calling the following builtin on
+each component data item. It is called once on each data item which
+is stored in or retrieved from a message.
+
+.IR msg_convertchar , 
+.IR msg_convertshort ,
+.IR msg_convertlong ,
+.IR msg_convertaddress ,
+.IR msg_convertfloat ,
+.IR msg_convertdouble ,
+and 
+.I  msg_convertsiteid
+perform byte-swapping on the data item pointed to if the standard
+ISIS byte order differs from that of the host machine architecture.
+msg_convertchar, however is a no-op.
+Macros for doing the more common conversions ``in-line'' can be found
+in mlib/msg_types.c, and have names like msg_doconvertshort().
+We recommend this approach where performance may become a concern.
+
+Note: the ISIS code for converting fields that consist of arrays
+of some base type is highly optimized.  Thus, it is preferable to
+pass a structure containing two hundred integers as an array of integers
+rather than as a new defined type.  The new type is more elegant but
+conversion is likely to be slow.  If the structure is small, however,
+this is less of a concern, since conversion times as a whole will be
+small compared to other ISIS-related costs.
+
+.SH BUGS
+
+Differences in padding and alignment cannot be handled with this mechanism.
+
+.SH "SEE ALSO"
+bcast(3),
+ISIS(3)

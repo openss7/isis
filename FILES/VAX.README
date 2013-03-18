@@ -1,0 +1,9 @@
+How to enable BYPASS communication:
+
+   Release 2.1 of ISIS provides the "BYPASS" communication mode which
+   can speed up multicast up to 10 times over normal ISIS multicasts.
+   To enable this, uncomment the appropriate line that defines the MCHDEP
+   compiler option, near the beginning of this makefile.
+   This will supply the -DBYPASS option to the compiler.
+
+Ken Birman

@@ -1,0 +1,91 @@
+.TH T_WAIT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+t_wait, t_wait_l, t_sig, t_sig_urgent, t_sig_all, t_yield \- ISIS task synchronization
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+void *t_wait_l (&cond, why);
+.br
+.B 
+void *t_yield ();
+.br
+.B 
+void *t_wait (&cond);
+.br
+.B 
+void t_sig (&cond, arg);
+.br
+.B 
+void t_sig_urgent (&cond, arg);
+.br
+.B 
+void t_sig_all (&cond, arg);
+.RS
+.B condition cond = (condition) 0;
+.br
+.B char *why;
+.br
+.B void *arg;
+.RE
+
+.SH DESCRIPTION
+These functions are for synchronizing tasks executing in the
+same ISIS process using
+.I condition 
+variables. 
+A condition variable must be initialized to zero before calling
+any of these functions.
+
+.I t_wait 
+and 
+.I t_wait_l
+cause the current task to be suspended on a queue associated with
+the condition variable.
+The second argument to t_wait_l is used for debugging purposes
+to identify the reason a task is waiting, and will be printed
+in client dumps (see \fIcl_dump(3)).
+(Note that t_wait is actually a macro, not a function.)
+
+.I t_sig
+checks the condition queue, and if it is non-empty, makes 
+the first waiting task runnable. That task does not resume
+executing until the current task (which called t_sig) blocks
+for some reason.
+.I t_sig_urgent
+differs from t_sig in that the calling task blocks and the formerly
+waiting task resumes immediately.
+
+.I t_sig_all
+makes all tasks waiting on the condition runnable.
+
+.I t_yield
+causes the current task to ``yield'' the processor to the next
+active task on the run queue.   The caller
+remains runnable but will not be executed until all other
+runnable tasks execute first.
+For example, say that t0 is active and that t1 is runnable; perhaps,
+it was recently signalled.
+If t0 calls t_yield, t1 will execute.
+Say that t1 forks a new task, t2.  The run queue will now list t0 and then
+t2; t0 will resume execution when t1 completes or blocks, and t2 will be executed
+after t0.
+NB: in ISIS V1.3, this routine was called \fIt_suspend\fR.
+
+
+.SH ORDERING
+
+.IR t_wait , 
+.I t_wait_l 
+.I t_yield, 
+and 
+.I t_sig_urgent
+block.
+.I t_sig 
+and
+.IR t_sig_all
+do not block.
+
+.SH "SEE ALSO"
+t_fork(3), 
+ISIS(3)

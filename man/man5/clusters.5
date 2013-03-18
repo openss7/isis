@@ -1,0 +1,60 @@
+.TH CLUSTERS 5  "1 February 1986" ISIS "ISIS FILE FORMATS"
+.SH NAME
+clusters \- ISIS clusters file
+.SH SYNOPSIS
+.B /usr/spool/isis/clusters
+.SH DESCRIPTION
+The 
+.I clusters
+file tells ISIS long haul package three things: what are the clusters with
+which the local cluster will communicate (i.e. this local cluster view
+of the wide area system); what are the access points of each cluster;
+and what tcp port number to use to contact each access point.
+
+Here's a typical one:
+.br
+2200
+.br
+3 norway N:hermod.cs.cornell.edu/0  N:hymir.cs.cornell.edu/2000 0
+.br
+1 sweden  N:thiazi.cs.cornell.edu/2201 N:sigyn.cs.cornell.edu/0 0
+.br
+5 usa N:eldir.cs.cornell.edu/2000 N:utgard.cs.cornell.edu/2200 0
+.br
+
+Starting at the second line, each cluster is specified by: its 
+.I clusterID,
+its
+.I clusterName,
+and a list of its 
+.I access points.
+
+The first cluster in this example is named "norway" and
+its
+.I clusterID
+is 3. The 
+.I clusterID
+and
+.I clusterName
+of each cluster must be unique toward the wide area system.
+.I clusterID
+ranges from 0 to MAX_CLUSTERS which is a constant defined in
+long_haul.h file.
+.I clusterName
+is any character string. 
+
+An
+.I access point
+is specified either by its internet address or
+by its internet host name. In the former case, the address is prefixed
+by the string "A:", and in the latter case, the internet name is prefixed
+by "N:". In both cases, each the access point specification ends with
+a number. If different of 0, this number is the tcp port number where
+this access point can accept tcp connection. If 0, this access point
+will tcp connection connection request on port 2200 (the number in the first line)
+which is the default port number.
+The port number and thw access point address or name are separated by the 
+character '/'.
+
+.SH "SEE ALSO"
+

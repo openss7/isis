@@ -1,0 +1,45 @@
+#!/bin/csh
+# $RCSfile: fix_mlib_for_gcc,v $ $Revision: 2.0 $ $Date: 90/05/04 15:12:23 $ 
+# 
+# fix_mlib_for_gcc <c-compiler-command>
+# Initializes mlib for use by gcc.
+#
+# If <c-compiler-command> indicates that gcc is being used, then
+# we try to find gcc-gnulib, and use it as the library file into
+# which mlib will be archived. This causes mlib to contain the gcc
+# builtin libraries required by some gcc-generated code (most particularly
+# varargs). If these builtins are not included in mlib, then users who
+# link an gcc-compiled mlib with a non-gcc compiled main program will get
+# linker undefines ("Undefined: __builtin_saveregs" is typical).
+#
+# If the compiler is not gcc, or we can't find gnulib, we do nothing.
+
+# Is the compiler gcc?
+if ( $1 !~ *gcc ) then
+   exit 0
+endif
+
+# Compile and link a null program with gcc -v and pick out the gnulib
+# pathname.
+set tmp = /tmp/isis$$
+cat > ${tmp}.c <<___EOF
+void main () {}
+___EOF
+set gnulib = `gcc -v ${tmp}.c -o ${tmp}.out |& sed -n -e '/gnulib/s/.* \([^ ]*gnulib\).*/\1/p'`
+/bin/rm -f ${tmp}.c ${tmp}.out
+
+if ( "$gnulib" != "" ) then
+   if ( -e $gnulib ) then
+      echo Since you are using gcc, I am including gnulib into libisism.a.
+      echo cp $gnulib libisism.a
+      cat /dev/null > libisism.a  # Ensures that libisism.a gets the protection
+                              # specified by umask, rather than that of gnulib.
+      /bin/cp $gnulib libisism.a
+      exit 0
+   endif
+endif
+
+echo "Warning: Cannot find gnulib. You may get linker undefined errors "
+echo "         when linking non-gcc compiled main programs with ISIS."
+exit 1
+

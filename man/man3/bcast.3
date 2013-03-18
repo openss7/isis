@@ -1,0 +1,227 @@
+.TH BCAST 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+bcast, abcast, cbcast, gbcast \- ISIS broadcast functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int [a|c|g]bcast (addr_p, entry, out_fmt, [ arg, ]... 0)
+.PP
+.br
+.ta 31n;
+.B 
+int [a|c|g]bcast (addr_p, entry, out_fmt, [ arg, ]... nwant,
+.br
+	reply_fmt, [ reply, ] ...)
+.RS
+.B address *addr_p;
+.br
+.B int entry, nrpl;
+.br
+.B char *out_fmt, reply_fmt;
+.br
+.B int nwant;
+.RE
+
+.SH DESCRIPTION
+A broadcast is the delivery of a message to a process or process group.
+Three kinds of broadcast are provided by the ISIS functions:
+.IR abcast,
+.IR cbcast,
+and 
+.IR gbcast.
+The broadcast types differ in the ordering guarantees and performance
+they provide
+(see ORDERING below).
+The fourth function 
+.I bcast
+is a synonym for abcast, and is the "safest" kind of ordering.
+In the following, "bcast" will be used to refer generically to all four
+broadcast functions, which have the same interface.
+
+The ISIS manual discusses the major performance issues that
+arise in designing ISIS-based applications.
+These include the type of broadcast ordering properties needed
+by the application, whether or not the ``bypass'' protocol
+suite can be exploited by the system, and the size of the
+destination process group. 
+This discussion will not be repeated below.
+
+bcast constructs an output message from the
+.I out_fmt
+string 
+and its accompanying
+.IR arg s
+(see 
+.IR msg_format (3))
+and delivers this to the processes specified by 
+.IR addr_p.
+addr_p may be a group address or the address of a single process.
+At each of the destination processes the function associated with
+the entry number
+.I entry
+is called with the message as its argument (see 
+.IR isis_entry (3)).
+
+The
+.I nwant
+argument specifies, as a non-negative integer, how many replies are wanted.
+This may also be given as
+.I ALL
+indicating that replies from all the currently 
+operational destination processes are wanted, or
+.I MAJORITY
+indicating that replies from a majority are wanted.
+If nwant is non-zero, bcast waits after sending the message
+until one of the following three conditions holds:
+.br
+(1) the desired number of replies are received,
+.br
+(2) all the processes which received the message send a reply, send a 
+.IR nullreply (3), 
+or terminate (crash), or
+.br
+(3) at least one process sends an 
+.IR abortreply (3).
+.br
+In the last case, -1 is returned and 
+.I isis_errno (3) is set to IE_ABORT.
+Otherwise bcast returns the number of replies actually received,
+and sets the global variable
+.I isis_nreplies 
+to this value.
+The global variable 
+.I isis_nsent
+is set to the number of processes to which the message was delivered.
+
+The data from the reply messages is retrieved
+using the format specified by the 
+.I reply_fmt
+string (see 
+.IR msg_format (3))
+and stored in the accompanying reply argument pointers.
+The number of replies will never exceed MAX_PROCS, currently 128,
+which is the internal limit on the number of destinations to which
+a single broadcast can be sent.
+
+If the nwant
+argument is zero then this is an
+.I asynchronous broadcast
+and no replies are expected.
+bcast returns zero, without waiting for replies. 
+Note that in the asynchronous case, bcast may return before any or all of 
+the destinations have received the message, although
+all surviving destinations will eventually receive the message.
+See 
+.IR flush (3).
+
+The long form broadcast,
+.IR bcast_l (3),
+provides many more options for performing broadcasts.
+
+.SH ORDERING
+
+The three broadcast types provide different guarantees about
+the order in which concurrent broadcast are received at 
+overlapping destinations.
+
+.I abcast
+(a.k.a. \fIbcast\fR)
+provides a total ordering.
+If the destinations of any two abcasts, A and B, 
+intersect at some set of processes,
+then either A is delivered before B at all the intersecting destinations
+or B is delivered before A.
+In the bypass mode, \fIabcast\fR is between one-half and one-third
+as fast as \fIcbcast\fR.
+
+.I cbcast
+provides causal ordering.
+If the destinations of two
+cbcasts, A and B, intersect,
+and the initiation of A 
+.I happened before
+the initiation of B, 
+then A is delivered before B at all the intersecting destinations.
+An event, E happens before another event F if
+.br
+(1) The execution of F follows that of E in the same process 
+.br
+(2) E is the initiation of a cbcast and F is the delivery of a cbcast
+at a destination process.
+.br
+(3) the transitive closure of (1) and (2)
+.br
+.I cbcast
+can often be substituted for 
+.I abcast,
+but this is not always the case.  When
+.I cbcast
+can be used, it will also provide the fastest possible
+multicast with virtually synchronous addressing properties
+(e.g., the recipients of the broadcast will all see the same
+group membership if they all call 
+.I pg_getview
+on reception of the message).
+
+.I gbcast
+provides a total ordering with respect to
+all gbcasts, abcasts, cbcasts, group membership changes, 
+and process failures.
+Note that abcast and cbcast are not ordered relative to each other
+and that ordering is defined with respect to entire (Unix) processes,
+not individual light-weight tasks.
+.I gbcast
+is quite expensive and should be avoided if possible.
+Notice that
+.I gbcast
+and 
+.I abcast
+are exactly equivalent in a group that never
+receives 
+.I cbcast
+broadcasts; it is the presence of
+.I cbcast
+that may necessitate use of 
+.I gbcast.
+
+All calls to bcast may block, including asynchronous broadcasts in which
+.I nwant
+is specified as 0.
+
+.SH DIAGNOSTICS
+Upon most errors bcast returns -1, and sets the value of 
+.IR isis_errno (3).
+Possible errors include:
+.br
+.IR IE_TOOLONG ,
+indicating that the internal limit of 
+.I MAX_PROCS
+on the number of destination processes for a broadcast 
+was exceeded;
+.br
+.IR IE_BADARG,
+indicating that an error was discovered in one of the format items;
+.br
+.IR IE_MISMATCH,
+indicating that the data in the reply messages did match the format items;
+.br
+.IR IE_UNKNOWN,
+indicating that the group address was unknown;
+.br
+.IR IE_ABORT,
+if one of the destination processes called 
+.IR abortreply (3).
+
+isis_errno is not set if
+fewer than the expected number of destination processes
+reply to a broadcast, since this may or may not be
+an error from the programmer's point of view.
+In such cases the programmer should compare the return
+value of bcast with the number of replies wanted and 
+take appropriate action.
+
+.SH "SEE ALSO"
+reply(3), bcast_l(3), isis_entry(3), 
+msg_format(3), flush(3),
+pg_lookup(3), ISIS(3)

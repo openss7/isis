@@ -1,0 +1,89 @@
+#  $RCSfile: pmake.protos,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:40 $
+S = /usr/u/isis/protos
+MCHTYPE=SUN3
+DFLAGS =
+CFLAGS = -I/usr/u/isis/include -O -D$(MCHTYPE) $(DFLAGS)
+CPPFLAGS = -I/usr/u/isis/include -D$(MCHTYPE)
+LIBFILES = ../mlib/mlib.a
+LFLAGS = 
+
+OFILES = pr_abcast.o pr_cbcast.o pr_gbcast.o pr_init.o pr_dump.o \
+	pr_alloc.o pr_addr.o pr_astore.o pr_gmgr.o \
+	pr_mcast.o pr_queues.o pr_task.o pr_local.o \
+	pr_main.o pr_inter.o pr_client.o pr_dlist.o pr_clentry.o \
+	pr_fdect.o pr_watch.o pr_viewlocks.o pr_glocks.o pr_setjmp.o
+
+CFILES = $(S)/pr_abcast.c $(S)/pr_cbcast.c $(S)/pr_gbcast.c $(S)/pr_init.c \
+	$(S)/pr_dump.c $(S)/pr_alloc.c $(S)/pr_addr.c $(S)/pr_astore.c \
+	$(S)/pr_gmgr.c	$(S)/pr_mcast.c $(S)/pr_queues.c $(S)/pr_task.c \
+	$(S)/pr_local.c	$(S)/pr_main.c $(S)/pr_inter.c $(S)/pr_client.c \
+	$(S)/pr_dlist.c $(S)/pr_clentry.c \
+	$(S)/pr_fdect.c $(S)/pr_watch.c $(S)/pr_viewlocks.c $(S)/pr_glocks.c
+
+all: ../bin/protos
+
+../bin/protos: $(OFILES) $(LIBFILES) 
+	|cc $(LFLAGS)  -o ../bin/protos $(OFILES) $(LIBFILES)
+
+../bin/protos.gprof: $(OFILES) $(LIBFILES) 
+	|cc $(LFLAGS) -pg -o ../bin/protos.gprof $(OFILES) $(LIBFILES)
+
+lint:
+	|lint -I/usr/u/isis/include -DSUN $(CFILES) ../mlib/mlib-l.c
+
+pr_abcast.o:	$(S)/pr_abcast.c
+	|cc -c $(CFLAGS) $(S)/pr_abcast.c
+pr_alloc.o:	$(S)/pr_alloc.c
+	|cc -c $(CFLAGS) $(S)/pr_alloc.c
+pr_cbcast.o:	$(S)/pr_cbcast.c
+	|cc -c $(CFLAGS) $(S)/pr_cbcast.c
+pr_gbcast.o:	$(S)/pr_gbcast.c
+	|cc -c $(CFLAGS) $(S)/pr_gbcast.c
+pr_init.o:	$(S)/pr_init.c
+	|cc -c $(CFLAGS) $(S)/pr_init.c
+pr_dump.o:	$(S)/pr_dump.c
+	|cc -c $(CFLAGS) $(S)/pr_dump.c
+pr_addr.o:	$(S)/pr_addr.c
+	|cc -c $(CFLAGS) $(S)/pr_addr.c
+pr_astore.o:	$(S)/pr_astore.c
+	|cc -c $(CFLAGS) $(S)/pr_astore.c
+pr_gmgr.o:	$(S)/pr_gmgr.c
+	|cc -c $(CFLAGS) $(S)/pr_gmgr.c
+pr_mcast.o:	$(S)/pr_mcast.c
+	|cc -c $(CFLAGS) $(S)/pr_mcast.c
+pr_queues.o:	$(S)/pr_queues.c
+	|cc -c $(CFLAGS) $(S)/pr_queues.c
+pr_task.o:	$(S)/pr_task.c
+	|cc -c $(CFLAGS) $(S)/pr_task.c
+pr_local.o:	$(S)/pr_local.c
+	|cc -c $(CFLAGS) $(S)/pr_local.c
+pr_main.o:	$(S)/pr_main.c
+	|cc -c $(CFLAGS) $(S)/pr_main.c
+pr_inter.o:	$(S)/pr_inter.c
+	|cc -c $(CFLAGS) $(S)/pr_inter.c
+pr_client.o:	$(S)/pr_client.c
+	|cc -c $(CFLAGS) $(S)/pr_client.c
+pr_dlist.o:	$(S)/pr_dlist.c
+	|cc -c $(CFLAGS) $(S)/pr_dlist.c
+pr_clentry.o:	$(S)/pr_clentry.c
+	|cc -c $(CFLAGS) $(S)/pr_clentry.c
+pr_fdect.o:	$(S)/pr_fdect.c
+	|cc -c $(CFLAGS) $(S)/pr_fdect.c
+pr_watch.o:	$(S)/pr_watch.c
+	|cc -c $(CFLAGS) $(S)/pr_watch.c
+pr_viewlocks.o:	$(S)/pr_viewlocks.c
+	|cc -c $(CFLAGS) $(S)/pr_viewlocks.c
+pr_glocks.o:	$(S)/pr_glocks.c
+	|cc -c $(CFLAGS) $(S)/pr_glocks.c
+pr_setjmp.o: pr_setjump.i
+	|as -o pr_setjmp.o pr_setjmp.i
+pr_setjmp.i: $(S)/pr_setjmp.s
+	|/lib/ccp $(CPPFLAGS) $(S)/pr_setjmp.s > x; mv x pr_setjmp.i
+
+
+../mlib/mlib.a:
+	echo external dependency on ~*
+
+clean:
+	rm -f ../bin/protos* $(OFILES) 2>> /dev/null
+

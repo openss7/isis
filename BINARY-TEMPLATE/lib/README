@@ -1,0 +1,6 @@
+This is the directory where ISIS stores INSTALLED LIBRARIES.  These
+are the versions of ISIS programs used in, e.g., run_isis
+
+Run "make install" one level above this to initiate installation.
+Many sites will also want to install symbolic links from the system
+library area (/usr/lib) pointing to these installed libraries.

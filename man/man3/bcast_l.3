@@ -1,0 +1,258 @@
+.TH BCAST_L 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+bcast_l, abcast_l, cbcast_l, gbcast_l, reply_l \- ISIS long-form broadcast functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+.ta 20n;
+int [a|c|g]bcast_l (option_string, [ <guard>, ] <address>, 
+.br
+	<out_info>, nwant, <reply-info>)
+.PP
+.B 
+int [a|c|g]bcast_l ("x", addr_p, entry, out_fmt, arg, ..., 
+.br
+	nwant, reply_fmt, [ reply_arg, ]...)
+.br
+.B 
+int [a|c|g]bcast_l ("l", addr_l,      out_fmt, arg, ...,
+.br
+	nwant, reply_fmt, [ reply_arg, ]...)
+.br
+.B 
+int [a|c|g]bcast_l ("m", addr_p, entry, msg_p, nwant, msg_pa)
+.br
+.B 
+int [a|c|g]bcast_l ("f", addr_p, ...)
+.PP
+.B 
+int reply_l (option_string, msg_p, [ addr_l, ] <out-info>)
+.PP
+int reply_l ("m",  msg_p, reply_msg_p)
+.br
+.B 
+int reply_l ("c",  msg_p, addr_l, out_fmt, [ arg, ]...)
+.br
+.B 
+int reply_l ("cx", msg_p, addr_l, out_fmt, [ arg, ]...)
+
+.RS
+.br
+.B char *option_string;
+.br
+.B address *addr_p, addr_l[];
+.br
+.B int entry, nwant;
+.br
+.B char *out_fmt, reply_fmt;
+.br
+.B message *msg_p, *reply_msg_p, *msg_pa[];
+.RE
+
+.SH DESCRIPTION
+.I bcast_l 
+and 
+.I reply_l
+provide more functionality than the 
+.IR bcast (3)
+and 
+.IR reply (3)
+functions, but are more complicated to call.
+
+.I bcast_l takes an
+.I option_string
+is composed of characters from
+.IR lmsrxfzBPn .
+(Previous versions of ISIS also supported a \fIg\fR option,
+which has been eliminated as of ISIS V2.0).
+.TP 10
+Option l
+indicates that the address is specified as a NULLADDRESS terminated
+list of process and group addresses.
+Otherwise the destination is specified as an address pointer followed
+by an entry number, as for a simple bcast call.
+When option l is specified,
+the address(es) are expanded into the destination list to which the
+message will be sent.
+The number of replies will never exceed MAX_PROCS, currently 128,
+which is the internal limit on the number of destinations to which
+a single broadcast can be sent.
+
+There is currently a restriction on some group addresses
+in the destination list.
+If list contains more than two
+destinations, then it must not contain an address of a group
+to which sender is
+neither a member nor a client (in the 
+.IR pg_client (3)
+sense).
+If so the error
+.I IE_RESTRICTED
+will occur.
+A process that is not a member or a client of
+a group can broadcast to that group, but not to a list
+including other destinations in the same atomic message delivery.
+This restriction arises from the way address expansions are done in ISIS.
+To avoid the problem, the caller should be added to the group as a client,
+using pg_client.
+.TP 
+Option s 
+specifies that the there is a single <out-info> argument which is a 
+pointer to the message to send.
+Otherwise the <out-info> consists of a format string and associated
+arguments as in the short form broadcast.
+.TP
+Option r
+specifies that the there is a single <reply-info> argument which 
+is a pointer to a vector of message pointers, at least 
+.I 
+nwant
+long, into which pointers to the reply messages will be saved.
+Otherwise the <reply-info> consists of a format string and associated
+arguments as in the short form broadcast.
+.TP 
+Option m
+combines the r and s options.
+.TP 
+Option x
+specifies that the sender of the message should not be sent a copy, even
+if listed as a destination (``exclude the sender'').
+This is useful when a sender takes a local action and then sends
+an asynchronous broadcast to inform other processes of the outcome of
+that action.
+.TP 
+Option f
+causes the broadcast to be forked off as a task;
+returning an integer
+.IR broadcast ID .
+The caller will rendezvous with
+it later to collect the results 
+by passing the broadcast ID to
+.IR bcwait (3).
+.TP 
+Option T#
+specifies that the broadcast should timeout after # seconds, returning 0.
+This option is new in ISIS V2.1, and has not been extensively tested.
+A separate task is forked (as for option f) to run the broadcast
+and will run it to completion regardless of timeout.
+Thus, the effect of option T is primarily that the caller has an
+indication that the broadcast is taking longer than expected -- a
+broadcast will not be aborted even if it does take too long to complete.
+.TP 
+Option z
+Specifies that the message should be sent lazily.
+ISIS may delay transmission to attempt to optimize its use of I/O 
+channels or to piggyback.
+Transmission will always occur within about 2 seconds.
+See also 
+.IR flush (3).
+.TP
+Option B
+is used to specify that a \fIbypass\fR multicast is required.
+This option is more of an assertion than an option, since it
+does not affect the way that ISIS decided if it can use the
+bypass protocol suite (see \fIbypass(3)\fR).
+Rather, it generates an error message if the bypass suite cannot be
+used.  This may be useful in debugging, and will warn
+users if the application is ever changed in such a way as to
+require non-bypass communication.
+Since the type of multicast done has important performance
+implications, option B may be useful in an application that
+depends strongly on having the higher performance afforded by the
+bypass protocols.
+.TP
+Option Pn
+This option requires a one-digit qualifier, i.e. P2.
+It is used only with cbcast's being sent either to an entire group of
+processes to which the caller belongs (or is a client),
+or to a single member of such a group.
+The option causes ISIS to use a different transport protocol than would be
+used by default.
+See also
+.IR isis_transport(3).
+.PP
+The 
+.I nwant 
+argument specifies the number of replies to wait for.
+It should either be a non-negative integer or one of the constants
+.I
+ALL
+or 
+.IR MAJORITY .
+If nwant is zero, the <reply-info> should be omitted, and
+the r option is meaningless.
+
+.I reply_l takes an
+.I option_string
+similar to bcast_l
+composed of characters from the set
+.IR cxm .
+.TP 10
+Option c
+indicates that a NULLADDRESS terminated 
+list of additional destinations is supplied.
+These will
+receive carbon-copies of the message.
+If c is not given, this address list is omitted.
+.IR Note : 
+replies are sent using 
+.IR cbcast , 
+hence
+the cbcast delivery guarantees also apply to replies.
+.TP
+Option x 
+indicates the sender should be excluded as a destination when the
+address list is expanded.
+.TP 
+Option m
+indicates that <out-info> is a pointer to the message to send; otherwise,
+the <out-info> gives a format and arguments for constructing the message.
+
+.SH ORDERING
+
+The same ordering semantics apply to bcast_l and reply_l
+as apply to the short forms bcast and reply.
+Note that lazy transmission may increase the 
+Note that for lazy and/or asynchronous broadcasts, 
+bcast_l may return before any or all of 
+the destinations have received the message, although
+all surviving destinations will eventually receive the message.
+See 
+.IR flush (3).
+
+bcast_l and reply_l may block.
+
+.SH DIAGNOSTICS
+Upon most errors bcast returns -1, and sets the value of 
+.IR isis_errno (3).
+Possible errors include:
+.br
+.IR IE_TOOLONG ,
+indicating that the internal limit of 
+.I MAX_PROCS
+on the number of destination processes for a broadcast 
+was exceeded;
+.br
+.IR IE_BADARG,
+indicating that an error was discovered in one of the format items;
+.br
+.IR IE_UNKNOWN,
+indicating that the group address was unknown;
+.br
+.IR IE_RESTRICTED,
+indicating that an address list contained the address
+of a group to which the caller was neither a member or a client.
+
+isis_errno is not set if
+fewer than the expected number of destination processes
+reply to a broadcast, since this may or may not be
+an error from the programmer's point of view.
+In such cases the programmer should compare the return
+value of bcast with the number of replies wanted and 
+take appropriate action.
+
+.SH "SEE ALSO"
+reply(3), bcast(3), isis_entry(3), 
+msg_format(3), flush(3),
+pg_lookup(3), ISIS(3)

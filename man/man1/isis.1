@@ -1,0 +1,73 @@
+.TH ISIS 1  "1 February 1986" ISIS "ISIS COMMANDS"
+.SH NAME
+isis \- ISIS initialization program
+.SH SYNOPSIS
+.B isis	[-A] [-Z] 
+.br
+	[portnumber] [-Ssitesfile] [-Rrestartfile]
+.br
+	[-t] [-csiteno/incarn] [-Hsiteno]
+.SH DESCRIPTION
+The
+.I isis
+command  initializes the ISIS system at this site,
+and then remains in operation to monitor the failure of ISIS
+subsystems at this site. Normally the isis command is run
+in background mode, i.e. isis&, from a system startup script such
+as 
+.IR rc.local (8)
+so that ISIS is initialized whenever the machine is booted.
+
+The isis command has the following user options:
+.TP 10
+-Z
+Zap. Kill the ISIS system at
+.I all 
+sites listed in the 
+.IR sites (5)
+file.
+.TP
+-A 
+Auto restart. Restart the ISIS system whenever it crashes. 
+
+.TP 0
+The remaining options are not for general use, and if not 
+used with 
+extreme care will cause ISIS to initialize incorrectly. 
+They are described here 
+for completeness:
+.TP 10
+portnumber
+Use this port number to broadcast to other sites during 
+initialization to see if they are up.
+.TP 
+-Ssitesfile
+Use sitesfile as the 
+.IR sites (5)
+file rather than the default "sites".
+.TP
+-Rrestartfile
+Use restartfile as the
+.IR isis.rc (5)
+file instead of "isis.rc".
+.TP
+-t
+Do a total restart regardless of other ISIS sites, listed in the sites file,
+that are already running. 
+.I Warning:
+this site will be unable to contact 
+the already running sites.
+.TP
+-csiteno/incarn
+Do a partial restart using as the coordinator
+the site with site number siteno and
+incarnation number incarn. Normally ISIS chooses its coordinator 
+automatically.
+.TP
+-Hsiteno
+Initialize this sites using siteno as the site number, which must be listed in
+the sites file.
+
+.SH "SEE ALSO"
+protos(1), isis.rc(5), sites(5), rc.local(8), ISIS(3), isis/MCHTYPE/run_demos/isis.rc,
+isis/MCHTYPE/run_demos/sites

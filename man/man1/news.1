@@ -1,0 +1,18 @@
+.TH XMGR 1  "1 February 1986" XMGR "ISIS COMMANDS"
+.SH NAME
+news \- ISIS news daemon.
+.SH SYNOPSIS
+.B news 
+.SH DESCRIPTION
+The
+.I news
+program  is run from within the isis.rc file and handles a program-level news storage
+and notification facility.
+Although modeled after the network news facility, news(1) has no interactive
+command-level interface other than the one the ISIS cmd tool provides.
+News is normally idle if not in use, and need only be run on
+sites that intend to use the ISIS news tool.
+
+.SH "SEE ALSO"
+
+ISIS(3), isis(1), cmd(1)

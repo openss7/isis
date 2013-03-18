@@ -1,0 +1,4 @@
+This is the directory where ISIS stores INSTALLED BINARIES.  These
+are the versions of ISIS programs used in, e.g., run_isis
+
+Run "make install" one level above this to initiate installation.

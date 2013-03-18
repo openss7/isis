@@ -1,0 +1,14 @@
+This is an old port of ISIS for the Gould 9800 and similar machines.
+Although Cornell no longer runs Gould hardware, some of our users do
+and report that ISIS is quite solid on this equipment.  Let us know
+if you run into any problems and we'll do our best to help out.
+
+How to enable BYPASS communication:
+
+   Release 2.1 of ISIS provides the "BYPASS" communication mode which
+   can speed up multicast up to 10 times over normal ISIS multicasts.
+   To enable this, uncomment the appropriate line that defines the MCHDEP
+   compiler option, near the beginning of this makefile.
+   This will supply the -DBYPASS option to the compiler.
+
+Ken Birman

@@ -1,0 +1,57 @@
+#!/bin/csh
+echo "Starting to remake symbolic links for AIX"
+cd ../include
+/bin/rm -f *
+ln -s ../{mlib,clib,protos,util,demos}/*.h .
+cd ../AIX/mlib
+/bin/rm -f makefile
+ln -s ../../mlib/makefile .
+cd ../clib
+/bin/rm -f makefile
+ln -s ../../clib/makefile .
+cd ../protos
+/bin/rm -f makefile
+ln -s ../../protos/makefile .
+cd ../util
+/bin/rm -f makefile
+ln -s ../../util/makefile .
+cd ../demos
+/bin/rm -f makefile make_grid
+ln -s ../../demos/makefile ../../demos/make_grid .
+cd pmk
+/bin/rm -f makefile
+ln -s ../../../demos/pmk/makefile .
+cd ..
+
+set demos = ( twenty qa testjoins silentjoins bank teller testtasks selftest \
+              grid sun_grid fortran_test pmake )
+set utils = ( isis rexec spooler news rmgr rmgr_cmd lmgr cmd tabex prstat xmgr )
+
+cd ../run_isis
+
+foreach f ( $demos $utils protos pmake pmkexec )
+   /bin/rm -f $f
+   ln -s ../bin/$f .
+end
+/bin/rm -f questions.dat
+ln -s ../demos/questions.dat .
+
+cd ../run_demos
+foreach f ( $demos )
+   /bin/rm -f $f
+   ln -s ../demos/$f .
+end
+/bin/rm -f pmake pmkexec
+ln -s ../demos/pmk/pmake ../demos/pmk/pmkexec .
+/bin/rm -f questions.dat
+ln -s ../demos/questions.dat .
+
+foreach f ( $utils )
+   /bin/rm -f $f
+   ln -s ../util/$f .
+end
+/bin/rm -f protos
+ln -s ../protos/protos .
+cd ..
+
+echo "Done remaking symbolic links"

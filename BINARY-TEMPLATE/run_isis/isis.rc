@@ -1,0 +1,8 @@
+;;
+;; This isis.rc file uses the installed copies of system binaries
+;;
+../bin/protos <isis-protos> -d#.logdir
+../bin/rexec <isis-rexec>
+../bin/news <isis-news>
+../bin/lmgr <isis-lmgr>
+../bin/xmgr <isis-xmgr>

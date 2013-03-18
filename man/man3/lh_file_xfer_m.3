@@ -1,0 +1,152 @@
+.TH LH_FILE_XFER_M 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+lh_file_xfer_m \-- ISIS long-haul file transfer function.
+.SH SYNOPSIS
+.B 
+#include ``isis.h''
+.PP
+.B err = lh_file_copy(gname,entry,dest,msg,fname)
+.B err = lh_file_move(gname,entry,dest,msg,fname)
+.br
+.B char *gname, *dest, *fname;
+.br
+.B int entry;
+.br
+.B message *msg;
+.br
+.B lh_file_srcerr_handler(gname, entry)
+.B lh_file_dsterr_handler(gname, entry)
+.br
+.B char *gname.
+.br
+.B int entry;
+.br
+.B lh_file_xfer_srcdir(dir);
+.B lh_file_xfer_dstdir(dir);
+.br
+.B char* dir;
+.PP
+.SH DESCRIPTION
+.PP
+The long haul file transfer primitive is used to send a file to
+another group located in a remote ISIS cluster.  This function assumes
+that the spooler process is running and that its long haul
+communication option is already enabled (see .IR spool(3)).
+.PP
+A file may be copied or moved to a remote cluster. A file that is
+moved is simply deleted after a successful copy.  The source file may
+be named in one of two ways:  either absolutely, or relative to the
+directory specified in a previous call to
+.I lh_file_xfer_srcdir(dir)
+at the sending process.
+Similarly, the file will be place in the directory specified in a
+previous call to
+.I lh_file_xfer_dstdir(dir)
+at the sending process.
+If there was no such call, the file will be placed in
+.I /tmp.
+ When using NFS, if
+your installation has more than one file system, and if you use this
+mode, the received file might be put on any of the file systems where
+the long_haul facility can accept connections (this is specified in
+the long-haul configuration file, which is specified to the spooler to
+start it in long-haul mode).
+.PP
+The basic interface to the facility is via 
+.I lh_file_copy(gname,entry,dest,msg,fname),
+which
+causes the specified file to be transfered to a remote cluster, where the
+specified group will be informed by delivery of the \fImsg\fR.
+The location where the file was stored may be determined by applying the function
+.I get_fname_and_holder(msg)
+to this message.
+.SH ARGUMENTS
+.PP
+In a call to lh_file_copy(gname,entry,dest,msg,fname),
+.I gname
+is the name of the group to whom this file is destined on the remote cluster.
+.PP
+.I entry
+is the entry point of the remote group  where the file will be delivered.
+.PP
+.I dest
+is the name of the remote cluster where is located the destinator group, as
+specified in your long-haul configuration file.
+In addition to a specific cluster name, the following wild-card 
+destinations are also accepted: \fI"all"\fR, \fI"all_clusters"\fR, \fI"allClusters"\fR,
+\fI"local"\fR, \fI"local_cluster"\fR, \fI"localCluster"\fR.
+\fI"all"\fR, \fI"all_clusters"\fR, and \fI"allClusters"\fR are synonyms and trigger
+the sending of the named file to all registered clusters.
+\fI"local"\fR, \fI"local_cluster"\fR, and \fI"localCluster"\fR are synonyms too
+and trigger the sending of the named file to the local cluster.
+.PP
+.I msg
+is delivered to the remote group once the transfer of the file is completed (using
+the specified
+.I entry
+point).
+.PP
+.I fname
+is the absolute name of the file to be sent.
+.PP
+To determine where the file was placed, you should call
+.I get_fname_and_holder(msg,lname,holder).
+Interpretation of the information this routine returns also
+requires some knowledge of your NFS configuration.
+Here,
+.I msg
+is the message anouncing the arrival of the file;
+\fIfname\fR is a character pointer and returns
+the local file name where the file was saved; \fIholder\fR is a character pointer and returns
+the name of ISIS site that received the file, as a pointer into the array ISIS calls
+site_names[].
+Notice that to access the file, you will need an NFS mount from the machine on which
+the destination group is running to the NFS on which the spooler received and saved the
+file.
+If \fImsg\fR wasn't a legitimate message from the file transfer facility, both \fIlname\fR
+and \fIholder\fR return a null pointer.
+.PP
+.I lh_file_move(gname,entry,dest,msg,fname)
+is similar, but the file will be deleted after a successful copy.
+A file can only be moved to one other cluster, not all others.
+.PP
+.SH errors
+If needed, the long-haul mechanism can report file transfer errors at
+both the source and destination clusters.  The routine
+.I lh_file_srcerr_handler(gname, entry)
+can be called in order to spool error messages to the entry
+.I entry
+of group
+.I gname
+when there is an error at a
+.I remote
+cluster for a transfer request generated at this cluster.  Similarly,
+the routine
+.I lh_file_dsterr_handler(gname, entry)
+can be called to set up an error handler for errors at
+.I this
+cluster for transfer requests generated elsewhere.
+In both routines, when a message is received at the entry, the routine
+.I lh_get_error_report(mp,src,dst,cluster,err)
+can be called.
+.I mp
+is the message announcing the error.
+.I src
+and
+.I dst
+will be set to the source and destination file names respectively.
+.I cluster
+will be the other cluster involved in the transfer.
+.I err
+will be the unix error number indicating the problem.
+
+.SH NOTE
+.PP
+In the case of a local copy or move, there is no actual data transfer since
+this is unecessary. Therefore, the destination group will receive the
+absolute name of the file as provided by the sender as result of
+the call to \fIget_fname_and_holder()\fR. The holder will be
+the sending host.
+.PP
+.SH "SEE ALSO"
+spool(3), ISIS(3)

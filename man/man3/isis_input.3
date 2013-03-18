@@ -1,0 +1,163 @@
+.TH ISIS_INPUT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_input, isis_output, isis_signal \- ISIS event catching functions.
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int isis_input (fd, inp_routine, arg);
+.br
+.B
+int isis_input_sig (fd, cond_p, arg);
+.br
+.B 
+int isis_output (fd, inp_routine, arg);
+.br
+.B
+int isis_output_sig (fd, cond_p, arg);
+.br
+.B 
+int isis_except (fd, exc_routine, arg);
+.br
+.B
+int isis_except_sig (fd, cond_p, arg);
+.br
+.B 
+int isis_select (masklen, imask, omask, xmask, timeout);
+.br
+.B 
+int isis_signal (signo, sig_routine, arg);
+.br
+.B 
+int isis_signal_sig (signo, cond_p, arg)
+.br
+.B 
+int isis_chwait (sig_routine, arg);
+.br
+.B 
+int isis_chwait_sig (cond_p, arg)
+.RS
+.B int fd, signo;
+.br
+.B 
+int masklen; /* Must be a multiple of 32. */
+.br
+.B 
+int *imask, *omask, *xmask;
+.br
+.B 
+struct timeval *timeout;
+.br
+.B int arg;
+.br
+.B condition *cond_p;
+.br
+.B void (*inp_routine)(arg);
+.br
+.B void (*sig_routine)(arg);
+.br
+.RE
+.B void isis_wait_cancel(wid);
+.br
+.B int isis_gotsignal();
+.RE
+
+.SH DESCRIPTION
+These functions cause ISIS to create a task running a specified
+procedure or to signal a specified condition variable
+when input becomes available on a specified input
+file descriptor (isis_input), when it becomes possible to
+output to a specified file descriptor (isis_output), or
+when a signal is
+received (isis_signal).
+The action is taken once for each transition of an
+input/output ready bit in select for each signal received.
+The isis_chwait variants watch for SIGCHLD, a signal sent by UNIX
+when a child process (created using the UNIX fork(2) or vfork(2)
+system call) terminates.
+
+With the exception of isis_select, all the
+requests return an id that should be used to cancel the specified operation; if not
+cancelled, the system will continue to monitor the specified file descriptors and
+will notify your code repeatedly each time the event monitored for occurs.
+Thus, a typical sequence might be:
+.nf
+        wid = isis_input(fd, routine, arg);
+            . . .
+        isis_wait_cancel(wid);
+.fi
+Although the name may seem to suggest otherwise, this interface is used to cancel
+both requests that fork tasks and requests that signal condition variables.
+
+isis_select differs in that it is called from a task that needs to block
+until input or output becomes possible on a specified io channel or the specified
+timeout period expires (see \fIselect(2)\fR for details).
+That is, isis_select is essentially the same as select but on a per-task basis rather
+than on a whole-process basis.
+The calling task will be suspended until
+the specified condition occurs, and the return value and masks will be
+the ones select(2) would have returned.
+isis_select returns 1 if the select condition was satisfied (regardless of how
+many bits are set in the masks 0 if the timeout occurred; in this case the
+masks will be zeroed).  There is no way to cancel a call to isis_select.
+
+For compatibility with ISIS V1.3.1, a synonym for isis_select is
+support.
+.I isis_wait
+has the same arguments and behavior as isis_select.
+We recommend that isis_select be used and will eliminate the
+isis_wait interface in future releases of ISIS.
+
+ISIS only checks for input/output when a task blocks.
+Signals can be fielded at any time, but the signal handler will not be forked until
+any task currently active when the signal is received has blocked or called
+\fBisis_accept_events\fR.
+The routine isis_gotsignal() returns true if ISIS has received a signal
+and is waiting to deliver it and false if not.
+
+If several wait requests refer to the same descriptor, each event causes only one
+wait action to be taken, in FIFO order based on when the wait was posted.
+For example, to respond absolutely as rapidly as possibly to an input event, one
+could fork of <n> tasks and have each block in isis_wait.  For each
+input, one task will be awakened.
+
+.SH "MACRO EXPANSIONS"
+All the wait routines are actually macros that expand into calls to
+an internal routine called \fIisis_select\fR.
+Despite the similarity of name (and behavior) between this routine and
+the UNIX SELECT(3) system call, isis_select 
+should never be called directly from user code, as its arguments differ
+from those to the UNIX select. Calls to it could confuse non-ISIS
+programmers who later read your code, and the internal interface
+isn't guaranteed to remain unchanged.
+
+.SH ORDERING
+These functions are NOT virtually synchronous.
+If multiple processes see the same event, the order in
+which the event is observed may differ arbitrarily between them.
+
+.SH DIAGNOSTICS
+When the _sig variants are used, ISIS currently requires that there
+actually be a task waiting on the specified condition variable when the
+condition becomes true (otherwise, it is hard to see how ISIS could
+avoid going into an infinite loop).
+In general, this means that one should post the _sig request immediately
+before calling t_wait and cancel it immediately after waking up:
+
+.nf
+        wid = isis_input_sig(in_fdes, &while_away_the_hours, 0);
+        t_wait(&while_away_the_hours);
+        isis_wait_cancel(wid);
+.fi
+
+If you \fIdon't\fR cancel the _sig operation, there is a danger that
+before the next time your task blocks on the condition variable,
+something will lead ISIS to do a select -- and notice that input
+is again (or still) available on the file descriptor in question.
+Should this happen,
+ISIS panics, terminating your program with an error message.
+Note that because ISIS only checks for input/output when a task blocks,
+the three-line sequence shown above will always work correctly.
+
+.SH "SEE ALSO"
+t_wait(3), ISIS(3)

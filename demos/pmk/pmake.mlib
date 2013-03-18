@@ -1,0 +1,40 @@
+#  $RCSfile: pmake.mlib,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:37 $
+S = /usr/u/isis/mlib
+CFLAGS = -I/usr/u/isis/include  -O
+
+OFILES = msg_fields.o msg_memory.o msg_msgs.o msg_new.o msg_types.o \
+	msg_utils.o msg_fmt.o
+
+all:  mlib.a
+
+mlib.a: $(OFILES)
+	|rm -f mlib.a; \
+	ar r mlib.a $(OFILES); \
+	ranlib mlib.a
+
+header:
+	touch header
+
+msg_fields.o: $(S)/msg_fields.c header
+	|cc -c $(CFLAGS) $(S)/msg_fields.c
+msg_memory.o: $(S)/msg_memory.c header
+	|cc -c $(CFLAGS) $(S)/msg_memory.c
+msg_msgs.o: $(S)/msg_msgs.c header
+	|cc -c $(CFLAGS) $(S)/msg_msgs.c
+msg_new.o: $(S)/msg_new.c header
+	|cc -c $(CFLAGS) $(S)/msg_new.c
+msg_types.o: $(S)/msg_types.c header
+	|cc -c $(CFLAGS) $(S)/msg_types.c
+msg_utils.o: $(S)/msg_utils.c header
+	|cc -c $(CFLAGS) $(S)/msg_utils.c
+msg_fmt.o: $(S)/msg_fmt.c header
+	|cc -c $(CFLAGS) $(S)/msg_fmt.c
+
+nest: nest.c mlib.a ../clib/lib2.a
+	|cc -o nest $(CFLAGS) nest.c mlib.a ../clib/lib2.a
+
+../clib/lib2.a:
+	echo external dependency on $*
+
+clean:
+	rm -f mlib.a $(OFILES) nest 2>> /dev/null

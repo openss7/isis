@@ -1,0 +1,18 @@
+This port of ISIS to AUX is by Matthew Newman <numb@cs.qmw.ac.uk>
+The port runs under A/UX 1.1.1 and is believed solid under A/UX 2.0.
+
+How to enable BYPASS communication:
+
+   Release 2.1 of ISIS provides the "BYPASS" communication mode which
+   can speed up multicast up to 10 times over normal ISIS multicasts.
+   To enable this, uncomment the appropriate line that defines the MCHDEP
+   compiler option, near the beginning of this makefile.
+   This will supply the -DBYPASS option to the compiler.
+
+Note to AUX users:
+
+   This port of ISIS was contributed by a user and has not been tested
+   directly by the Cornell ISIS group.  It is apparently quite solid,
+   but if you do encounter any problems, please let us know.
+
+Ken Birman

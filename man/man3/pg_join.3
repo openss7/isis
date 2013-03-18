@@ -1,0 +1,245 @@
+.TH PG_JOIN 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pg_join, pg_join_inhibit, isis_inhibit_joins \- join an ISIS process group
+.SH SYNOPSIS
+.B 
+#include "isis.h"
+.PP
+.B 
+address *pg_join(gname, [ key, [ arg, ]... ]... 0)
+.br
+.B char *gname;
+.PP
+.B int pg_join_inhibit(state)
+.br
+.B int state;
+
+.B int isis_inhibit_joins(entry_number)
+.br
+.B int entry_number;
+
+.SH DESCRIPTION
+.I pg_join 
+adds the calling process as a member of the named group, 
+returning a pointer to the group address.
+This pointer is valid as long as this process remains a member of the group.
+Many optional arguments exist to initiate a group membership monitor,
+transfer member state, and log group messages.
+
+The 
+.I gname
+argument is a null-terminated string of the form ``@scope:name'',
+giving the 
+.I scope 
+in which to search
+and the 
+.I name 
+of the group.
+The 
+.I global 
+scope, which encompasses all sites, is specified by 
+``@*:name''.
+The ``@scope:'' part may be omitted, in which case the scope
+to which the caller's site belongs is used.
+
+In the standard usage of pg_join, the site of the calling
+process must be in the scope specified in the gname argument.
+If a group with the given name already exists in the scope, the process
+calling pg_join 
+is made a member of the group.
+Otherwise, a new group is created with the calling process as its only
+member unless the 
+.I PG_DONTCREATE 
+option is specified (see below).
+
+It is not recommended to call pg_join from a  process that 
+is not within the specified scope.
+This paragraph describes the current behavior in this case, but
+we may change this in a subsequent release of ISIS.
+If the group does exist in that scope,
+then the join succeeds, 
+but if all the other group members local to the scope
+fail,
+searches using the original scope
+will not find the group.
+If the calling process is not within the scope,
+and the group does not exist in that scope,
+pg_join will fail and return 
+.I NULLADDRESS.
+
+.I pg_join_inhibit 
+temporarily prevents new processes from joining
+any process group that the process calling pg_join_inhibit is a
+a member of.
+The 
+.I state
+argument must be 
+.IR TRUE " or " FALSE .
+The function inhibits joins as long as the
+TRUE requests outnumber FALSE requests.
+FALSE requests may not outnumber TRUE requests.
+A process attempting to join a process group when joins are inhibited is
+simply made to wait until they are not.
+This facility is intended mostly for use in 
+coordinator-cohort computations (see 
+.IR coord_cohort (3)).
+
+.I isis_inhibit_joins
+inhibits new members from joining a process group while 
+the entry  
+.I entry_number 
+is active.
+isis_inhibit_joins arranges for the system to call pg_join_inhibit
+when a message to the designated entry point is received, and to undo this
+when the entry terminates.
+
+.SH OPTIONS TO PG_JOIN
+Options to pg_join are placed between the first argument and the
+last, which is always 0.
+Each option consists of a keyword followed by the arguments required
+for that option.
+The keywords are listed below, with their arguments in square
+brackets. 
+.TP 10
+PG_DONTCREATE [no arguments] 
+Disallows group creation if a
+group does not already exist.
+.TP
+PG_LOGGED [fname, reply_entry, flush_type, end_replay]
+Tells the system that the state of this
+process group should be backed up on a log file.
+On recovery, if the process group is restarting after a total failure
+and the group does not already exist, the log will be reread to recover the group
+state.
+Otherwise, if the group was already
+operational, the log will be ignored and the join will make use of a state transfer
+from an operational member.
+Logging and the meaning of the arguments to PG_LOGGED
+are discussed in much more detail in 
+.IR isis_logentry (3).
+.TP
+PG_INIT [routine (pointer to a function)] 
+Calls 
+.I routine(gaddr_p)
+if this group is being created and no log for it could be found. 
+The routine is
+responsible for the 
+first-time initialization of the group, which will have been assigned
+address gaddr_p.
+.IR Warning :
+the initialization routine will be invoked
+before pg_join returns.
+.TP
+PG_MONITOR [routine (pointer to a function), arg (integer)] 
+Sets up a monitor for group membership changes.
+.I routine(gview_p, arg) 
+is invoked as a task with
+.I gview_p 
+pointing to the new 
+.I groupview
+whenever the group membership changes (see 
+.IR pg_monitor (3)).
+.IR Warning :
+the monitor routine will trigger for the first time
+before the pg_join returns.
+Notice that the group address is available as part of the groupview 
+data structure.
+.HP
+PG_XFER [domain (integer), send_routine, receive_routine (pointers to functions)]
+.br
+Transfers state to the joining process, (see 
+.IR xfer_out (3)).
+If a group member will be unable to transfer state out to joining processes,
+the send routine may be specified as xfer_refused(), or may
+call xfer_refused() and return without taking further actions.
+.TP
+PG_BIGXFER [no arguments] 
+This argument is outmoded and no longer has any effect.
+.TP
+PG_CREDENTIALS [credentials (null-terminated string)] 
+Defines
+.I credentials 
+to be the credentials string for this process.
+It is presented to an existing member of the group to obtain authentication
+for this join request.
+.TP
+PG_JOIN_AUTHEN [routine (pointer to a function)] 
+Prevents
+processes from joining the group without presenting credentials.
+When a process attempts to join,
+.I routine
+is called in one of the existing members
+with the credentials string of the joining process passed
+as its first parameter.
+If the routine returns -1, the join is refused.
+.TP
+PG_CLIENT_AUTHEN [routine (pointer to a function)] 
+Makes it possible to
+prevent processes that are neither members nor clients from
+communicating with this group (see 
+.IR pg_client (3)).
+When a process attempts to become a client by calling pg_client,
+.I routine 
+is called in one of the existing members
+with the credentials string of the process passed
+as its first parameter.
+If the routine returns -1, the pg_client request is refused.
+Whenever a group member receives some broadcast it can check
+whether the sending process is neither a member or a client by calling
+.IR pg_rank_all (3).
+
+.SH ORDERING
+pg_joins are totally ordered with respect to broadcasts of all types, 
+and other pg_joins.
+The sequence of events that occurs when a pg_join is invoked is as follows.
+First, either the 
+initialization routine or the state transfer receive routines will be invoked,
+depending on the current state of the group.
+Next, the monitor invocation, if any, will take place.
+After this pg_join will return.
+Only after all of these events will incoming requests to the group begin to
+be processed.
+Reception of incoming requests will be deferred even longer if the task
+that called pg_join is the startup task.
+In this case, the group will not receive incoming requests until that task
+either terminates or calls 
+.IR isis_start_done (3).
+
+pg_join may block.
+
+.SH DIAGNOSTICS
+
+When pg_join encounters an error it returns 
+NULLADDRESS and puts an indication of the error into
+.IR isis_errno (3).
+
+.I IE_BADARG
+will occur if ISIS detects an error in the arguments to pg_join.
+Naturally not all argument errors can be detected.
+
+.I IE_UNKNOWN
+occurs if PG_DONTCREATE was specified and the group does not exist.
+
+.I IE_TOTFAIL
+occurs when the group experiences total failure (i.e. all
+existing members fail) before this process is successfully joined.
+If the state transfer tool was used, ISIS may have performed part
+of the state transfer, and is not able
+to leave the joining member in a consistent state.
+It is therefor highly recommended that the process terminate itself
+and restart.
+
+.I IE_MUSTJOIN
+occurs if PG_LOGGED was specified and the recover log for this process
+was out of date. The pg_join should be retryed after some other
+process has created the group.
+
+.SH BUGS
+
+Under rare circumstances when
+pg_join should return the IE_TOTFAIL error, it instead
+prints a fatal error message and kills the joining process.
+
+.SH "SEE ALSO"
+pg_lookup(3), pg_leave(3)
+ISIS(3)

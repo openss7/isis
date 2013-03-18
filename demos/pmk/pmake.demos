@@ -1,0 +1,31 @@
+#  $RCSfile: pmake.demos,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:30 $
+S = /usr/u/isis/demos
+MCHTYPE=SUN3
+CFLAGS = -D$(MCHTYPE) -I/usr/u/isis/include -I$(S) -c -O
+LDFLAGS =
+LIBS = ../clib/lib1.a ../clib/lib2.a ../mlib/mlib.a
+
+all:	../bin/twenty ../bin/qa ../bin/grid
+
+../bin/twenty:	twenty.o $(LIBS)
+	|cc -n -o ../bin/twenty $(LDFLAGS) twenty.o $(LIBS)
+../bin/qa:	qa.o $(LIBS)
+	|cc -o ../bin/qa $(LDFLAGS) qa.o $(LIBS)
+../bin/grid:	grid.o display.o $(LIBS)
+	|echo Warning: Using the X10.4 version of libX.a
+	cc -o ../bin/grid  $(LDFLAGS) grid.o display.o libX.a $(LIBS)
+
+twenty.o:	$(S)/twenty.c
+	|cc $(CFLAGS) $(S)/twenty.c
+qa.o:		$(S)/qa.c
+	|cc $(CFLAGS) $(S)/qa.c
+grid.o:		$(S)/grid.c
+	|cc $(CFLAGS) $(S)/grid.c
+display.o:	$(S)/display.c
+	|cc $(CFLAGS) $(S)/display.c
+
+$(LIBS):
+	echo external dependencyt on $*
+
+clean:
+	rm -f ../bin/* *.o

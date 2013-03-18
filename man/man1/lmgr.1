@@ -1,0 +1,38 @@
+.TH LMGR 1  "1 February 1986" LMGR "ISIS COMMANDS"
+.SH NAME
+lmgr \- ISIS log manager recovery daemon.
+.SH SYNOPSIS
+.B lmgr 
+.SH DESCRIPTION
+The
+.I lmgr
+program  is run from within the isis.rc file and performs some initial log-related operations,
+but then exits immediately.  A normal restart sequence is illustrated below:
+.nf
+% isis
+Site 4 (fafnir.cs.cornell.edu): isis is restarting...
+Is anyone there?
+... found no operational sites, checking again just in case
+Is anyone there?
+site 4 (fafnir.cs.cornell.edu) doing a total restart
+../bin/protos <isis-protos> -d/usr/u/isis/DEVEL/SUN4/run_demos/#.logdir
+../bin/rexec <isis-rexec> 1653 
+../bin/rmgr <isis-rmgr> 1653 
+../bin/lmgr <isis-lmgr> 1653 
+../bin/xmgr <isis-xmgr> 1653 
+Site 4/0 is up!
+site view has viewid 4/1
+    fafnir.cs.cornell.edu         [site_no 4  site_incarn 0]
+Transaction Manager: checking that lmgr is initialized...
+Log Manager: Startup Completed (exiting normally)
+isis: detected termination of <../bin/lmgr>
+Transaction Manager: lmgr initialized, resuming xmgr startup seq...
+Transaction Manager (xmgr): initialization complete.
+.fi
+
+Note that the coresponding isis.rc file does not specify 1653 as an argument to 
+the lmgr command, this is added by the system when it runs the lmgr daemon.
+
+.SH "SEE ALSO"
+
+ISIS(3), isis(1)

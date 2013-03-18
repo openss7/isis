@@ -1,0 +1,173 @@
+.TH PG_LEAVE 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pg_leave, pg_delete, pg_client, pg_rank, pg_rank_all, pg_signal \- leave, delete an ISIS process group
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int pg_leave(gaddr\_p)
+.br
+.B
+int pg_delete(gaddr\_p)
+.br
+.B
+int pg_client(gaddr\_p, credentials)
+.br
+.B 
+int pg_rank(gaddr\_p, paddr\_p)
+.br
+.B 
+int pg_rank_all(gaddr\_p, paddr\_p)
+.br
+.B
+int pg_signal(gaddr\_p, signo)
+
+.RS
+.B address *gaddr\_p, *paddr\_p;
+.br
+.B char *credentials;
+.br
+.B int signo;
+.RE
+.B
+
+.SH DESCRIPTION
+.I pg_leave 
+causes the calling process 
+to cease to be a member of process group
+.IR gaddr\_p .
+When a process terminates (either normally or because of a failure), this
+function is invoked automatically once for every group that the process was
+a member of. Unlike in previous versions of ISIS,
+the address pointer gaddr_p remains valid even after returning from pg_leave.
+
+From the moment pg_leave is called, a filtering routine will be applied
+to the messages received by your process.  This routine
+selectively identifies and discards messages that went to your
+process because of its ``prior membership'' in the group.
+As a result, the following anomaly is avoided: process p belongs to group
+g and calls pg_leave because it is no longer capable of
+servicing requests to g for some reason.
+However, after pg_leave is called and before it returns, a message m,
+multicast to g, is delivered to p.
+In many applications, such a message would cause fatal errors or
+serious confusion; the filter causes such a message to be
+silently supressed and prevents the higher level code of p
+to be insulated from this counterintuitive behavior.
+
+.I pg_delete
+causes the specified group to be deleted.  The
+group membership and client counts drop to 0, triggering all applicable watch
+and monitor routines, and the group then ceases to exist,
+and the address pointer gaddr_p will no longer be
+valid.
+If recreated, it will receive a different group-address.
+Subgroups (see
+.IR pg_subgroup (3))
+of a deleted group are 
+.I not 
+deleted automatically when the
+parent group is deleted.
+Like pg_leave, incoming messages addressed to the group are silently
+ignored.
+
+.I pg_client
+authenticates the calling process to the process group
+.IR gaddr\_p
+and, if successful, makes it a 
+.I client
+of the group.
+If the PG_CLIENT_AUTHEN option was specified to
+.I pg_join
+then the 
+.I credentials
+string is passed to an authentication 
+function in one of the process group members.
+If this routine returns -1 the pg_client request is refused,
+and 
+.IR isis_errno (3)
+will contain 
+.IR IE_NOTALLOWED .
+Whenever a group member receives some broadcast it can check
+whether the sending process is neither a member or a client by calling
+.IR pg_rank_all (3).
+pg_client also has a benefit unrelated to its
+authentication properties: it is used by
+ISIS to optimize broadcasts that the client
+may subsequently issue to the group (specifically, clients
+cache an accurate copy of the group membership, and this eliminates
+the phase of the ISIS communication protocols used to check that
+the membership was accurate).
+Although such broadcasts are still much slower than "bypass" broadcasts,
+they are faster then broadcasts to a group from non-members
+that have not called pg_client to register as a client.
+
+.I pg_rank
+returns the rank of process 
+.I paddr\_p 
+in process group
+.IR gaddr\_p , 
+if it is a member of the group.
+Each member of a process group has a unique rank, which changes only when
+the group membership changes.
+The oldest member has rank 0, the second oldest is rank 1,
+and so on (ties are broken in the same way everywhere).
+The rank may be used to give each member of a process group a unique
+identifier.
+If the process is not a member of the process group, 
+.I pg_rank 
+returns -1.
+It can hence be used to test for membership in a group.
+The calling process must be a member of the group.
+
+.I pg_rank_all
+is just like pg_rank, but includes clients in the
+ranking as well.
+Clients have larger rank than members.
+Processes that are neither members nor clients are ranked -1. 
+The calling process must be a member of the group.
+
+.I pg_signal
+causes the 
+UNIX signal 
+.I signo  
+to be delivered to
+the members of a process group.
+This function bypasses the ISIS ordering mechanisms and is intended to be
+used only in exceptional situations.
+
+.SH ORDERING
+
+pg_leave, pg_delete, pg_client, pg_rank, and pg_rank_all
+are totally ordered with respect to broadcasts of all types, 
+and group membership changes.
+pg_signal is not ordered consistently with any ISIS events.
+
+pg_leave, pg_delete, pg_client and pg_signal may block.
+
+.SH DIAGNOSTICS
+
+All these return -1 upon errors, setting 
+.IR isis_errno (3)
+with an indication of the error, which may include:
+
+.I IE_NOTALLOWED
+occurs if a process calling pg_client fails its authentication.
+
+.I IE_UNKNOWN
+occurs if a group address argument to any of these functions
+refers to a non-existent group.
+
+.I IE_NOTMEMB
+occurs if pg_rank is given the address of a non-member process,
+or if pg_rank_all is given the address of a process which is neither
+a client nor a member.
+
+.SH BUGS
+
+Under rare circumstances when
+pg_join is should return the IE_TOTFAIL error, it instead
+prints a fatal error message and kills the joining process.
+
+.SH "SEE ALSO"
+pg_lookup(3), ISIS(3)

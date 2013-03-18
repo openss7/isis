@@ -1,0 +1,70 @@
+.TH FLUSH 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+flush, bcwait, bcpoll, bc_getevent, bc_cancel \- ISIS broadcast synchronization
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+flush ()
+.br
+.B int bcwait (bcid)
+.br
+.B int bcpoll (bcid)
+.br
+.B event_id bc_getevent (bcid)
+.br
+.B int bc_cancel (bcid)
+.RS
+.B int bcid
+.RE
+
+.SH DESCRIPTION
+.I flush
+ensures that every broadcast sent by this process has been received
+by all its destination processes. flush is typically called to
+ensure that messages are stable before taking irreversible external 
+world actions.
+
+.I bcwait 
+and 
+.I bcpoll 
+are associated with forked broadcasts, while
+.I bc_getevent
+and 
+.I bccancel
+are associated with forked, guarded broadcasts.
+.I bcid
+is a broadcast ID returned from forked
+.IR bcast_l (3)
+call.
+
+.I bc_wait blocks until the broadcast terminates,
+then returns what the broadcast would have returned:
+either an error code, or the number of replies that
+were collected.
+
+.I bc_poll returns  
+TRUE if the broadcast is finished, FALSE if not.
+
+.I bc_getevent 
+converts the broadcast ID into an event ID,
+which can be used in guards.
+
+.I bc_cancel 
+returns TRUE, if the broadcast was guarded and had not yet
+been delivered, in which case it will have been canceled at all
+its destinations. It fails, returning FALSE, 
+if delivery had already taken place.
+This is relevant only if options 
+.I g 
+and 
+.I f 
+were both specified when the broadcast was initiated.
+
+.SH ORDERING
+
+All these functions may block.
+
+.SH "SEE ALSO"
+bcast(3), bcast_l(3), isis_entry(3), reply(3),
+ISIS(3)

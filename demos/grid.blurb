@@ -1,0 +1,53 @@
+This program is used to demonstrate the performance of the various
+ISIS broadcasts as well as the state transfer mechanism and the
+concept of consistent replicated data.  The program runs under X10.4,
+and may need some changes to be compiled under the version of X windows
+on your machine.  We have never run it under X within NeWs.
+
+Each new "grid" that you bring up joins the existing process group when you 
+toggle "join" and starts broadcasting.  There is one broadcast loop active
+per grid member, so although this may not show the maximum achievable
+throughput, it isn't far from it.   Toggle "stop" to stop all grid programs
+and you will see that the grid is in the same state everywhere ("go" to
+restart).  Toggle quit to simulate the failure of a member, or crash ISIS
+at its site if you prefer death by blunt objects.
+
+The table is a set of numbers updated, randomly, using either a divide by
+two or a random increment.  Each update also flips the color of a square.
+The updates are incredibly order-sensitive, and this makes consistency
+a subtle issue, particularly since a state transfer occurs on join.  Yet,
+you will see that consistency is preserved at all times.  In cbcast mode,
+a tricky heuristic is used to ensure that cbcast actually suffices to 
+preserve consistency.
+
+To run grid under X from a single workstation (but with members on multiple
+remote workstations) you need to get fancy.  Here's how I do it:
+
+Suppose you are using Sun abc, and want to run grid on xyz and mno.
+First on abc I start two windows on the other hosts:
+
+        abc % xterm -e rlogin xyz
+        abc % xterm -e rlogin mno
+
+Then, I run xhost (on abc) for each of these hosts:
+
+        abc % xhost xyz xyz.cs.cornell.edu
+        abc % xhost mno mno.cs.cornell.edu
+
+Basically, this tells abc to accept displayed output from xyz and mno.
+ 
+In each of the xterm windows that come up I now set the DISPLAY environment
+variable as follows:
+
+        xyz % setenv DISPLAY abc:0
+        mno % setenv DISPLAY abc:0
+
+This tells xyz and mno where to display their X output.
+ 
+Then in each of those xterm windows I proj to isis, cd and change my path
+accordingly, and run grid, perhaps with the port to connect to as an argument.
+
+Note: the program ``testjoins'' works like grid, but prints each update
+on the screen.  This was useful for debugging ISIS and the join mechanism.
+We left it around for those who are porting ISIS to some non-standard system
+and need a diagnostic program to run, but don't have X windows running.

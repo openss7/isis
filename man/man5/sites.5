@@ -1,0 +1,98 @@
+.TH SITES 5  "1 February 1986" ISIS "ISIS FILE FORMATS"
+.SH NAME
+sites \- ISIS sites file
+.SH SYNOPSIS
+.B /usr/spool/isis/sites
+.SH DESCRIPTION
+The 
+.I sites
+file tells ISIS three things: what sites the system
+is able to run on, what inter-net port numbers to use to
+talk to ISIS at each of these sites, and what namespace ``scopes''
+each site belongs to.
+
+Here's a typical one:
+.br
++ 1:1601,1602,1603 aditi.cs.cornell.edu bldg1,csdept,aditi
+.br
++ 2:1601,1602,1603 hymir.cs.cornell.edu bldg1,csdept,hymir
+.br
++ 3:1601,1602,1603 thiazi.cs.cornell.edu bldg2,csdept,thiazi
+.br
++ 4:1601,1602,1603 sigyn.cs.cornell.edu bldg2,physics,sigyn
+.br
++ 5:1601,1602,1603 modi.cs.cornell.edu bldg2,physics,modi
+.br
+
+The plus sign just means that the line contains a valid
+sites-file entry.
+It is followed by the site-number (1-127), a colon,
+3 internet port-numbers and the fully qualified site-name for each site.
+Finally, a list of zero or more scope names are given for each site -- here, aditi and hymir are
+in scopes ``bldg1'' and ``csdept'', etc.
+Each is also listed as being in a scope with its own name, so that a 
+search for, e.g., ``@aditi:name'' will work.
+The scope information is used when a 
+.IR pg_lookup (3) 
+is done within
+the ISIS system: the search will only occur with the scope specified
+at the time of the lookup, and if no scope is given, the default is
+to search within all the scopes to which the caller's site belongs.
+
+The internet port
+numbers can be selected pretty randomly.
+The first one is used when ISIS talks to ISIS at another site.
+If desired, it can also be given as 0 and the actual
+number listed as the 
+.I isis/udp
+port in the system file 
+.IR /etc/services (5)
+(e.g. the line labeled ``isis'', with information given as port-no/udp).
+The second number tells clients how to contact ISIS at the site
+where they run.
+It is recommended that this number be listed in /etc/services
+in an entry identified as isis/tcp.
+The third number is used when ISIS starts up, to do a simulated broadcast to
+other ISIS sites on the network.
+Again, this can be given as 0, in which case it should
+go in the services file as isis/bcast.
+
+For example, the above sites file would correspond to the following three
+lines in /etc/services (or /yp/etc/services):
+.nf
+isis                    1601/udp       # default for ISIS-ISIS communication
+isis                    1602/tcp       # for talking to local ISIS.  (might not use TCP!)
+isis                    1603/bcast     # how ISIS asks "Is anyone there?"
+.fi
+
+All sites normally use the same set of three port numbers.
+Port numbers should be picked to not conflict with those used by
+other applications.
+Numbers in the range 1200 to 1800 should be safe.
+
+The sites file should be located in the directory where ISIS is
+to be started up, probably not the root directory because of the
+log files ISIS will generate.
+Normally, we use 
+.IR /usr/spool/isis, 
+but you can pick some
+other location provided that you tell ISIS what directory you used 
+.RI ( -d
+option, below).
+Normally, all ISIS sites share identical site-files.  If desired, you can place
+the sites file in a single well-known place 
+on a network file system and specify
+its location to ISIS using the
+.I -S option to the protocols process.
+However, this would prevent ISIS from restarting when the NFS unit is down.
+
+If you change a sites file when ISIS is already running, use the 
+.I rescan
+command in the 
+.IR cmd (1) 
+tool to tell ISIS to reread the file.
+You only need to issue the command from one site; all sites will
+reread the file at the same time.
+
+.SH "SEE ALSO"
+isis(1), cmd(1), ISIS(3), netstat(1)

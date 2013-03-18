@@ -1,0 +1,259 @@
+.TH ISIS_LOGENTRY 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_logentry, log_recovered, log_in_replay, log_checkpoint, log_flush, log_write \- ISIS logging functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+isis_logentry (gaddr, entry)
+.RS
+.B address *gaddr;
+.br
+.B int entry;
+.RE
+.PP
+.B
+address pg_join (gname, ...
+.br
+.B
+                 PG_INIT, ...,
+.br
+.B
+                 PG_XFER, ...,
+.br
+.B
+                 PG_LOGGED, fname, replay_entry, flush_type,
+.br
+                            end_replay
+.br
+.B
+                 ..., 0)
+.br
+.RS
+.B char *fname;
+.br
+.B int replay_entry;
+.br
+.B int flush_type;
+.br
+.B int (*end_replay)();
+.RE
+.PP
+.B
+int log_recovered(gaddr);
+.br
+.B
+int log_checkpoint(gname);
+.br
+.B
+int log_flush(gaddr);
+.br
+.B
+int log_write(gaddr, msg_p);
+.RS
+.B address *gaddr;
+.br
+.B char *gname;
+.br
+.B message *msgp;
+.br
+.B int entry;
+.RE
+.PP
+.B int log_in_replay;
+
+.SH DESCRIPTION
+The logging facility provides a way for a process group to survive 
+.I total failure
+(i.e. failure of all the members of the group).
+It does so by periodically checkpointing the state of the group, 
+and then logging all subsequent messages to the group.
+(Checkpointing is done whenever the log gets too long to manage
+efficiently; the actual parameters controlling this are presently hardwired
+into the ISIS system.)
+The first member to restart after a total failure is initialized with the
+checkpoint and then replayed the logged messages.
+There are two ways to use the logging tool: automatic logging,
+and manual logging.
+In automatic logging messages to entry points specified by
+.I isis_logentry
+are logged in volatile memory, and
+periodically flushed to the log file.
+In manual logging messages are logged using only the
+.I log_write 
+routine.
+The semantic and performance ramifications of automatic versus manual
+logging are discussed fully in Chapter 12 of the ISIS Manual.
+
+The
+.I isis_logentry
+routine is called for each entry point for which messages should be logged
+when automatic logging is used.
+Typically these are the entries which modify some state of the group.
+The arguments give the group for which this entry is being logged, and the
+entry number.
+All isis_logentry calls should appear after the pg_join call and before
+.IR isis_start_done(3).
+
+The logging tool is invoked with the PG_LOGGED option to 
+.IR pg_join (3),
+in conjunction with the PG_INIT and PG_XFER options. The logging tool
+uses the state transfer mechanism to take a checkpoint and to reinitialize
+the group member upon restart. The PG_INIT option specifies a routine to be
+called to initialize the group state when the first member does a pg_join
+and no log file from a previous execution of the group exists.
+
+The arguments to the PG_LOGGED option are as follows:
+The 
+.I fname
+argument gives name of the log file for this process. 
+This file is opened in the 
+.I logs
+subdirectory of the ISIS startup directory.
+Each member of the group will have its own log file for the group, so care
+should be taken that each member uses a unique fname. (Basing the
+fname on the machine name makes most sense.)
+Applications should never use file names that match the wildcard
+``log_temp*'' since these are used for internal purposes by the logging
+tool. 
+
+The 
+.I replay_entry
+argument specifies the entry number to which all logged messages should be
+replayed when manual logging is used. See 
+.I log_write
+below for details.
+If replay_entry is NULLROUTINE (i.e. zero) then automatic logging is used
+and the logged messages are replayed to the original entry points specified
+by isis_logentry.
+
+The 
+.I flush_type
+argument may be L_AUTO or L_MANUAL.
+L_AUTO
+specifies that logged messages will be flushed to the log file
+at points chosen by the logging tool.
+L_MANUAL specifies that messages will be flushed only when
+log_flush is called (if the routine is not called, the in-core log
+may grow without limit).
+Manual flushing may be necessary to preserve atomic semantics, 
+and may improve performance. 
+
+Note that manual flushing and manual logging are two different concepts.
+Manual \fIlogging\fR is specified using a non-zero value for the
+replay entry; automatic logging by giving a 0 for this
+value and calling isis_logentry as desired.
+Manual \fIflushing\fR is concerned with when a log will be flushed to disk,
+and is specified using L_MANUAL.
+
+The
+.I end_replay
+argument specifies a routine to be called after all log messages have been
+replayed and before new messages are received by the group.
+This may be specified as NULLROUTINE (i.e. zero) if no such end of replay
+processing is necessary.
+
+If the process executing pg_join failed well before other members of the
+group, its log will be out-of-date. The pg_join will give the error
+.I PG_MUSTJOIN
+indicating that this process must wait for some other member to recover
+the group state from its (more up-to-date) log and before reattempting the
+pg_join. 
+
+If after a total group failure, a process not at one of the original sites
+executes pg_join, it may succeed in creating a new incarnation of the
+group, without reconstructing its state from any log. To prevent this use
+the 
+.I PG_DONTCREATE
+option to pg_join when this is a possibility.
+
+The 
+.I log_recovered
+routine returns TRUE if the specified group was recovered from the log,
+and FALSE if it was created from scratch.
+
+The 
+.I log_in_replay
+global variable contains TRUE while messages are being replayed from the
+log and FALSE once normal processing has begun.
+
+The 
+.I log_checkpoint
+routine should be called from the 
+.I end_replay
+routine supplied to the PG_LOGGED option.
+This informs the logging tool that the group state has been reconstructed
+correctly. The logging tool will then take a checkpoint to properly record
+the new group state. This routine should not be called in any other
+circumstances. 
+
+The 
+.I log_flush
+routine is used with the L_MANUAL flush option to cause logged messages to
+be flushed to the log file.
+
+The
+.I log_write
+routine is used in manual logging mode to write messages to the log file,
+typically straight after some change is made to group state.
+This is the only way that information is written to the log.
+
+.SH ORDERING
+
+Messages are replayed in the same relative order that they were originally
+received. Messages are replayed exactly as before except the destination
+field is changed to reflect that there is only one group member.
+During replay all join requests to the recovering group are inhibited, 
+and new messages to the recovering member are inhibited, preventing 
+both inconsistent replay, and inconsistent views of the group state by others.
+
+Processes which join multiple logged groups should do so in some consistent
+total order.
+
+Each recovery of a group after a total failure causes the incarnation
+number in the group address to be incremented.
+
+log_recovered, log_checkpoint, log_flush and log_write may block.
+
+.SH DIAGNOSTICS
+
+When pg_join encounters an error it returns NULLADDRESS and 
+puts an an indication of the error into
+.IR isis_errno (3).
+
+.I IE_BADARG 
+will occur if ISIS detects an error the arguments to pg_join.  Naturally
+not all argument errors can be detected.
+
+.I IE_MUSTJOIN 
+occurs if PG_LOGGED was specified and the recover log for
+this process was out of date. The pg_join should be retryed after some
+other process has created the group.
+
+log_recovered normally returns TRUE (1) or FALSE (0). Upon an error it
+returns a negative number, and sets isis_errno.
+log_checkpoint, log_flush, and log_write
+normally return 0. Upon an error they return a negative
+number and set isis_errno. The following errors can occur:
+
+.I IE_UNKNOWN 
+occurs if the group name or group address is unknown.
+
+.I IE_NOTLOGGED
+occurs if the group exists but is not logged.
+
+.I IE_NOT_MEMB
+occurs if the calling process is not a member of the specified group.
+
+.I IE_TOTFAIL
+occurs if a total failure occurs while attempting a log_flush.
+
+.I IE_NOTALLOWED
+occurs if a log_write is attempted from an automatically logged group.
+
+.SH "SEE ALSO"     
+ISIS provides a second persistent data facility called the ``spooler'', see spool(3) for
+details.  Also relevant:
+pg_join(3),
+isis_entry(3), 
+ISIS(3)

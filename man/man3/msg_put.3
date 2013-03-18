@@ -1,0 +1,133 @@
+.TH MSG_PUT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+msg_newmsg, msg_put, msg_gen, msg_copy, msg_get, msg_rewind, msg_delete, msg_increfcount \- ISIS message functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B message *msg_newmsg()
+.br
+.B int msg_put(msg_p, format, [, arg 
+] ... )
+.br
+.B message *msg_gen(format, [, arg 
+] ... )
+.PP
+.B int msg_get(msg_p, format, [, arg 
+] ... )
+.br
+.B message *msg_copy(msg_p)
+.br
+.B msg_rewind(msg_p)
+.PP
+.B msg_delete(msg_p) (MSG_DELETE(msg_p))
+.br
+.B msg_increfcount(msg_p)
+
+.SH DESCRIPTION
+A 
+.I message
+is a container for storing typed data and communicating
+it between processes. 
+
+.I msg_newmsg 
+returns a pointer to an empty, newly allocated message.
+
+.I msg_put
+stores data in a message, in a manner similar to
+.IR fprintf (3).
+The variable number of arguments are appended to the message
+according to the
+.I format
+string. See 
+.IR msg_format (3).
+Multiple calls to msg_put are permitted and 
+result in data being appended to the message.
+
+.I msg_gen
+is equivalent to a call to msg_newmsg followed
+by a call to msg_put.
+It returns a pointer to a message into which data has already been copied.
+
+.I msg_copy
+makes a copy of the message.  It may be
+manipulated without affecting the original copy.
+(An inexpensive copy-on-first-change scheme is used).
+
+.I msg_get
+retrieves data from a message in a manner similar to
+.IR fscanf (3).
+The first call to msg_get for a particular message, or the first call 
+after 
+.I msg_rewind
+(see below) retrieves the first data item stored
+by msg_put or msg_gen.
+Each successive call to msg_get retrieves the next item stored in the
+message.
+msg_get returns the number of items read (0 if there are no more items).
+It aborts the scan and returns -1, setting 
+.I isis_errno 
+to IE_MISMATCH, if the type of the item in the message
+fails to match the type of the item specified in format.
+
+.I msg_rewind
+causes the next call to msg_get for that message
+to start retrieving at the first item in the message.
+msg_rewind has no effect on msg_put.
+
+Messages are allocated and deallocated by ISIS, 
+which maintains a reference count for each message.
+The reference count is initialized to 1 when a message is created.
+.I msg_delete
+decrements the reference count for a message.
+When the reference count reaches zero ISIS deletes the message
+and reclaims its storage.
+This routine is defined as a macro.
+.I MSG_DELETE
+is like msg_delete, but is a subroutine and hence can
+be used in situations demanding a call-back routine.
+.I msg_increfcount
+increments the reference count of a message.
+You must call msg_delete once for each message obtained by
+msg_newmsg or msg_gen, or by the %m format item, 
+and additionally once for each
+call to msg_increfcount.
+You should not call msg_delete for a message delivered as an entry
+task argument unless you applied msg_increfcount to the argument, (see
+.IR isis_entry (3))
+since ISIS automatically calls msg_delete once on your behalf for
+such a message.
+(The general rule is that the procedure that
+allocated a message or incremented its reference count should 
+do the corresponding msg_delete).
+
+
+.SH DIAGNOSTICS
+
+msg_gen returns a 
+.I NULL 
+message pointer in case of error and set
+.R isis_errno (3)
+with an indication of the error.
+
+msg_put returns 0 normally, and -1 if an error is detected, 
+setting
+.IR isis_errno (3).
+msg_get normally returns the number (possibly zero) of data items retrieved,
+but if an error is detected, -1 is returned and isis_errno is set.
+
+msg_newmsg, msg_rewind, msg_delete, and msg_increfcount return no diagnostic.
+
+A message may be printed using the routine 
+.IR pmsg(3)
+or, in a more detailed form, using
+.IR msg_printaccess(3).
+
+.SH "SEE ALSO"
+pmsg(3), msg_printaccess(3),
+msg_format(3),
+msg_getsender(3), 
+msg_read(3), 
+msg_putfld(3),
+isis_define_type(3),
+address(3), bcast(3),
+ISIS(3)

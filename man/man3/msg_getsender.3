@@ -1,0 +1,75 @@
+.TH MSG_GETSENDER 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+msg_getsender, msg_gettruesender, msg_isforwarded, msg_getdests, msg_getid, msg_getlen \- Auxiliary ISIS message functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B address *msg_getsender(msg_p)
+.br
+.B address *msg_gettruesender(msg_p)
+.br
+.B int msg_isforwarded(msg_p)
+.br
+.B address *msg_getdests(msg_p)
+.br
+.B long msg_getid(msg_p)
+.br
+.B int msg_getlen(msg_p)
+.br
+.RS
+.B message *msgp;
+.RE
+
+.SH DESCRIPTION
+.I msg_getsender
+returns a pointer to the address of original sender of 
+.IR msg_p ,
+which is the client which sent this message with 
+.IR bcast (3),
+ignoring processes which may have forwarded it.
+The address pointer returned actually points into the message itself,
+and hence remains valid only so long as the message has not be deleted.
+
+.I msg_isforwarded
+returns 
+.I TRUE
+if this message has been forwarded (see
+.IR forward (3)),
+and 
+.I FALSE
+otherwise.
+
+.I msg_gettruesender
+returns the address of the client which most recently
+forwarded this message, or the original sender if the message
+has not been forwarded.
+The address pointer returned actually points into the message itself,
+and hence remains valid only so long as the message has not be deleted.
+
+.I msg_getdests
+returns a pointer to the 
+list of destination processes stored in this message.
+The list is terminated by a
+.I NULLADDRESS 
+value. This list is deallocated when the containing message is deleted.
+The effect of modifying this list is undefined.
+The destination list returned by this function will consist of addresses
+with the entry numbers filled in.
+For example,
+by scanning for the address(es) on which addr_ismine(3) returns TRUE
+and checking the entry number, one can determine which entries
+will receive a copy of a given message.
+This is how ISIS determines which tasks to create upon reception of a message.
+
+.I msg_getid
+returns a number which uniquely identifies this message among
+those transmitted by the original sender.
+Together, msg_getid and msg_getsender define a globally unique identifier
+for this message.
+
+.I msg_getlen
+returns the number of bytes occupied by the message.
+
+.SH "SEE ALSO"
+msg_put(3), forward(3),
+ISIS(3)

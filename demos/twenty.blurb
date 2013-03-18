@@ -1,0 +1,116 @@
+TWENTY QUESTIONS DEMO
+
+This demo program consists of two parts: the {\em twenty
+questions server}, which maintains a database of
+answers to a very restricted set of questions, and the {\em questions-answers} front-end,
+which poses queries to the service and interprets the results.
+
+The program is fully described in the ISIS paper that appeared
+in the 11th Symposium on Operating Systems Principles.
+
+To run it, copy the file ``questions.dat'' to a directory
+where isis is running (normally, /usr/spool/isis).
+Make sure that the pathname used in the rexec request in
+twenty.c will work on your system (normally, /usr/games/twenty).
+Start twenty questions up in that directory, for example:
+\begin{verbatim}
+kama% twenty 
+\end{verbatim}
+(you can specify a port number if the default in /etc/services
+is not set up correctly on your system).
+
+The program will start up a total of 5 additional processes
+picking the sites at which to do this randomly.
+It is then operational.
+If any subset of the twenty questions processes is killed,
+new ones will be restarted by the survivors.
+
+Twenty questions will be maintaining a database that has
+columns titled guess (the thing you are trying to
+guess is the category of object about which it is thinking)
+and color, price, size, etc., which are categories
+against which can may pose queries.
+
+Queries are of the form {\tt category op value},
+where the category must come from the list, the operator
+is one of <, >, and = (no double-character operators!),
+and the value is a number or a text string.
+Sample queries are: {\tt price>15000000},
+{\tt color=red}, {\tt guess=car}.
+
+To query the database, run the qa program: {\tt qa} (or
+{\tt qa port-number}).
+{\tt qa} will print the categories available and
+ask you to pick a random number, which is used to select
+the class of object against which your queries will be
+solved.
+
+Each query can be typed in one of three ways: as a simple
+query, in which case one of the servers will answer
+(and you can always expect to get {\em exactly one}
+answer),
+with an asterix in from (e.g. {\tt *price > 15000000})
+in which case all active servers will answer (one is 
+a hot standby and won't respond, so expect 5 answers),
+or with an {\tt @} in front, as in {\tt @price>15000000},
+which works like an asterix but repeats the query 50 times
+consecutively, about twice per second if the system is
+running on a SUN 3/50.
+
+In the case of a simple query, the answer is computed
+over the entire column that applies.
+The answer will be one of {\tt yes, no} or {\tt sometimes},
+meaning {\em always yes}, {\em always no}, or
+{\em sometimes yes and sometimes no}.
+The case of a query prefixed by {\tt *} or {\tt @} is
+more complicated; here, each of the 5 servers is
+responsible for handling some rows of the database, and
+the answers each returns relate to the selected category
+for its rows only.
+For example, if the random number chosen is 1 (planes),
+and the query is {\tt *price>1500000},
+the answer will be printed as
+\begin{verbatim}
+sometimes no no no sometimes 
+\end{verbatim}
+
+Twentry questions and qa demonstrate several aspects of
+ISIS.
+First, they are illustrative of the simple development
+strategy used when building ISIS software -- both programs
+are pretty trivial.
+Second, they illustrate the sense in which all
+members of a process group see the same events in the
+same order.
+Finally, they illustrate fault-tolerance.
+You may want to kill some members of the twenty
+questions process group while an {\tt @} query is
+running.
+You will either see no effect at all, or at worst will see
+something like this:
+\begin{verbatim}
+sometimes no no no sometimes 
+sometimes no no no sometimes 
+sometimes no no no sometimes 
+sometimes no no no sometimes 
+twenty questions service is restarting... please be patient
+... retrying
+sometimes no no no sometimes 
+sometimes no no no sometimes 
+\end{verbatim}
+Briefly, while the service was unavailable, {\tt qa} just
+had to sit and wait.
+
+By the way, {\tt qa} is what we call a {\en client}
+of the twenty questions process group.
+This gives somewhat faster query times then if the
+program were to talk to {\tt twenty} without
+being installed as a client.
+You can remove the {\tt pg\_addclient} call in 
+{\tt twenty} to see the difference in performance.
+Adding a client takes a little time, and this is what
+causes the delay when {\tt qa} first starts up.
+Without the {\tt pg\_addclient}, ISIS runs queries
+slower, but the first query will be quite a bit
+faster.
+

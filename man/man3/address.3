@@ -1,0 +1,169 @@
+.TH ADDRESS 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+
+ISIS address type, functions, and global variables:
+
+address, addr_isequal, addr_isnull, addr_ismine, addr_isgid, addr_isact,
+addr_ispl, addr_cmp, paddr, paddrs, NULLADDRESS, my_address
+
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B int addr_isequal(a1, a2)
+.br
+.B int addr_isequal_x(a1, a2)
+.br
+.B int addr_cmp(a1, a2)
+.br
+.B int addr_cmp_x(a1, a2)
+.br
+.B int addr_isnull(a)
+.br
+.B int addr_ismine(a)
+.br
+.B int addr_islocal(a)
+.br
+.B int addr_ispid(a)
+.br
+.B int addr_isgid(a)
+.br
+.B int addr_isact(a)
+.br
+.B int addr_ispl(a)
+.br
+.B paddr(a)
+.br
+.B paddrs(alist)
+.RS
+.B address *a, *a1, a2, *alist;
+.RE
+.PP
+.B address NULLADDRESS;
+.br
+.B address my_address;
+
+.SH DESCRIPTION
+
+An 
+.I address 
+in ISIS is a structure used to identify a 
+process or process group, and optionally an entry
+(see 
+.IR isis_entry (3))
+supported by that process, or group.
+ISIS functions typically manipulate 
+.I pointers 
+to addresses, or vectors of addresses.
+
+The global variable 
+.I my_address 
+contains the address by which ISIS knows the current user process.
+Addresses of groups or other processes are typically obtained from
+calls to 
+.IR pg_lookup (3)
+or from fields of messages.
+The variable 
+.I NULLADDRESS
+contains a null address, which is often used as a distinguished
+value by functions handling addresses.
+All the fields of this address are zero.
+
+ISIS supports several types of address. A \fIprocess address\fR
+is the address of an individual process, giving its host machine, incarnation
+number, and process-id as assigned by UNIX.
+A \fIgroup address\fR is a logical identifier for a process group
+and will be expanded by ISIS into a process-group \fIview\fR on
+demand, or used to communicate with the group.
+A \fIprocess list address\fR is a logical identifier used to multicast
+to a subset of the members of a process group.  And, an
+\fIactivity-id\fR is an internal data structure used by ISIS to
+distinguish between computational actions during process group joins.
+Macros are provided to test for these different cases; in normal
+use, applications will only encounter process addresses, 
+process group addresses, and process list addresses.
+
+The rules for address comparison normally \fIignore entry information\fR.
+Thus, if the \fIaddr_cmp\fR routine is applied to two process addresses
+for the same process, but using differing entry numbers, it will return
+true (0, as explained below) even though the entry fields differ in value.
+To do an exact comparison of addresses, including entry fields,
+you should use the routine addr_cmp_x() or addr_isequal_x().
+
+.I addr_isequal
+returns TRUE if the addresses pointed to are "equal", and FALSE otherwise.
+Two addresses are equal if all the fields are identical, ignoring the 
+contents of the entry fields.  Addresses of differing types are never equal.
+
+.I addr_isequal_x is like addr_isequal, but also compares entry fields.
+This routine treats the entry value 0 as a wildcard:  it will match
+any entry value.
+
+.I addr_isnull
+returns TRUE if the address pointed is null, or the pointer itself is null
+(zero) and FALSE otherwise.
+
+.I addr_ismine
+returns TRUE if the address pointed to equals my_address
+and FALSE otherwise.
+
+.I addr_islocal
+returns TRUE if the address pointed to refers to a process at
+the same site as the caller; FALSE if the process is at a remote
+site.
+
+.I addr_cmp
+defines an arbitrary canonical ordering on addresses which may be used
+for sorting and table lookup.
+It returns 0 if the addresses are equal, a negative integer if 
+.I a1
+is "less than" 
+.IR a2, 
+and positive if 
+.I a1 
+is "greater than"
+.IR a2 .
+Entry fields are ignored.
+
+.I addr_cmp_x
+is like addr_cmp but also compares entry fields.
+
+.I paddr
+prints an address on standard output in the format
+(site-number/site-incarnation-number:process-id.entry).
+If possible, the entry is printed using the text string
+supplied to 
+.IR isis_entry (3)
+otherwise the entry number is printed.
+
+.I paddrs
+prints a null-terminated list of pointers to addresses using paddr .
+
+The fields of the address structure are not normally manipulated directly
+by user programs.
+Nonetheless, for completeness, the structure used in
+ISIS V2.0 is as follows:
+.nf
+struct     address
+{
+            union
+            {
+              short             u_process;
+              short             u_groupid;
+            } ad_un;
+            u_char              addr_site;
+            u_char              addr_incarn;
+            short               addr_portno;
+            short               addr_entry;
+};
+#define     addr_process        ad_un.u_process
+#define     addr_groupid        ad_un.u_groupid
+.fi
+The ``type'' information is encoded through special values of the
+addr_portno field.  If this field is non-negative, the address is
+a process address and the portno is the UNIX UDP port for the 
+process in question.
+If this field has a negative value, the address is a group, process list,
+or activity id.
+
+.SH "SEE ALSO"
+ISIS(3), site_id(3), pg_lookup(3)

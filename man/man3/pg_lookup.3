@@ -1,0 +1,36 @@
+.TH PG_LOOKUP 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pg\_lookup \- lookup up ISIS process group name
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B address *pg\_lookup(search\_path)
+.br
+.B char *search\_path;
+.SH DESCRIPTION
+.I pg\_lookup 
+returns a pointer to the address of a process group, without causing
+the calling process to join the group.
+The pointer is valid as long as the group continues to exist.
+The 
+.I search\_path
+argument is a null-terminated string of the form ``@scope:name'',
+giving the 
+.I scope 
+in which to search
+and the 
+.I name 
+of the group.
+The 
+.I global 
+scope, which encompasses all sites, is specified by 
+``@*:name''.
+The ``@scope:'' part may be omitted, in which case the scope
+to which the caller's site belongs to is used.
+
+.SH DIAGNOSTICS
+If the named group does not exist in the scope a NULLADDRESS is returned.
+
+.SH "SEE ALSO"
+pg_join(3),
+ISIS(3)

@@ -1,0 +1,35 @@
+.TH RMGR_CMD 1  "1 February 1986" ISIS "ISIS COMMANDS"
+.SH NAME
+rmgr_cmd \- ISIS recovery manager command
+.SH SYNOPSIS
+.B 
+rmgr_cmd	siteno [-E] key program [ args ... ]
+.br
+.B rmgr_cmd	siteno key
+.SH DESCRIPTION
+The recovery manager provides a facility that automatically restarts
+an ISIS application after a crash.
+.I rmgr_cmd
+is a command interface to the functionality of the
+.IR rmgr_update (3)
+routine.
+
+The first form adds the specified program 
+to the recovery manager's database under the specified unique key
+(a string).
+If that program crashes, or if the entire site is crashes and is restarted 
+the program will be restarted with the specified arguments.
+.I siteno
+is the site at which the database update is made.
+By default the program will be started with a null shell environment.
+Specifying the
+.I -E
+option causes it to use the environment of this instance of rmgr_cmd.
+
+The second form deletes the entry identified by 
+.I key
+from the database at the specified site.
+
+.SH "SEE ALSO"
+rmgr_update(3),
+ISIS(3)

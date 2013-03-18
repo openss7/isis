@@ -1,0 +1,65 @@
+.TH MSG_RCV 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+msg_rcv, MSG_ENQUEUE, msg_ready \- ISIS task-oriented message receive
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B void isis_entry(entry, MSG_ENQUEUE, "any message")
+.br
+.B int entry;
+.br
+.B message *msg_rcv(entry)
+.br
+.B int entry;
+.br
+.B int msg_ready(entry)
+.br
+.B int entry;
+.RE
+
+.SH DESCRIPTION
+
+ISIS supports two styles of message receipt into a process.
+The most common style is one in which the system creates a new
+lightweight task for every message received by the process.
+This style is simple to understand and avoids deadlock in situations
+where a process has a message to receive but no task ready to read it.
+But, it is a potentially costly solution in situations where the
+small cost of task creation is still a significant concern.
+Moreover, under LISP (where task creation costs a fortune), this
+interface could be a real bottleneck.
+
+The second style of reception is one in which the process
+declares that ISIS should queue up messages to certain entry points.
+It then forks off tasks that block to receive messages on entry
+points of interest.
+The relevant interface is as follows.
+
+.I "isis_entry(entry, MSG_ENQUEUE, \"any message\")"
+is called to tell ISIS to start "queueing" messages on the entry
+number(s) in question.
+.I msg_rcv(entry)
+blocks until the next message is received to the specified entry
+and then returns a pointer to it.
+Your code must later call
+.IR msg_delete (3)
+to discard this message.
+.I msg_ready(entry)
+counts the backlog of messages on an entry point and returns the
+corresponding value, or 0 if their are none.
+
+.SH ORDERING
+
+Only msg_rcv() is potentially blocking.
+Users must be wary of situations in which a message is queued up
+for a long enough period of time so that the process group view 
+changes before it is received.
+In such cases, reception will lose its
+virtual synchrony properties and routines such
+as the coordinator-cohort facility can only be used with care.
+This problem can be avoided by arranging that there
+is always a task waiting on each entry point.
+
+.SH "SEE ALSO"
+isis_entry(3), 
+ISIS(3)

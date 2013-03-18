@@ -1,0 +1,85 @@
+.TH PG_LIST 3  "1 February 1989" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pl_create, pl_add, pl_remove, pl_getview, pl_list, pl_makegroup \- manage process lists
+.SH SYNOPSIS
+\fB#include "isis.h"\fR
+.PP
+\fBaddress *pl_create(gaddr_p, alist), *pl_makegroup(list_p, gname);\fR
+.br
+\fBaddress *alist;\fR
+.br
+\fBchar *gname;\fR
+.PP
+\fBvoid pl_add(list_p, addr_p), pl_remove(list_p, addr_p);\fR
+.PP
+\fBgroupview *pl_getview(list_p);\fR
+.PP
+\fBvoid pl_delete(list_p);\fR
+.br
+\fBaddress *gaddr_p, *list_p;\fR
+
+.SH DESCRIPTION
+.B pl_create
+is used to create a \fIprocess list\fR.
+Such a list is referenced using a \fIlist pointer\fR of type \fIaddress\fR, but
+known only within the address space of the process that invoked \fBpl_create\fR.
+The initial membership of the list will be as specified in the null terminated 
+array of addresses given by the \fBalist\fR argument.
+Later, the membership is automatically changed if processes fail, and can also be
+manually changed by calls to \fBpl_add\fR and \fBpl_remove\fR specifying a process
+whose address should be, respectively, appended to the list or removed from it.
+The list can be deleted by a call to \fBpl_delete\fR.
+
+The process group list facility requires that the list be a \fIsubset\fR of the
+membership of some process group to which the creator of the list belongs.
+This ``parent group'' is designated at the time of list creation and will be
+monitored by the list facility to detect failures of listed processes.
+If a process in the initial list or an argument to \fBpl_add\fR is not a member
+of the parent group, it will be excluded silently from the list.
+
+The major reason for creating a process list is that it can be used in
+calls to the ISIS multicast interface.
+This permits the user to overcome one of the limitations on the
+bypass communication protocols, namely that the destination be either
+a single group to which the sender belongs, or a single process
+that belongs to some group that the sender also belongs to.
+When using a process list as the destination in a multicast, ISIS will
+route the resulting communication via the so-called ``bypass'' protocol suite, just as if
+the list address were a real process group address.
+In contrast, if the same destinations were ``spelled out'' by passing a null-terminated
+vector of their process
+addresses directly to the multicast interface, the bypass protocols would not be used and
+communication performance would suffer.
+
+.IR pl_getview 
+is an alias for 
+.IR pg_getview(3).
+When called with a list\_p argument,
+\fBpg_getview\fR will construct a \fIgroupview\fR
+data structure from a process list.
+Similarly, the routine 
+.IR pl_rank
+is an alias for
+.IR pg_rank(3).
+
+A process list cannot be monitored or used like a process-group address.  Moreover, one cannot
+pass a list address to a remote process (more specifically,
+one can pass a list of processes and a group address with which
+a remote process could use to create a new process list for its own
+use; however, an existing process-list address is of no use to a 
+process other than its creator,
+since the membership of the list is local to its creator).
+In our view, these sorts of operations are not required and
+support for them would impose exactly the sort of overhead that the
+process list facility is intended to avoid.
+However, if desired, a list can be ``turned into'' a completely normal
+process group using the
+\fBpl_makegroup\fR facility, which creates a new process group,
+having the specified name, and returns the new address.  
+
+.SH BUGS
+The major disadvantage of a process list is that the members do not know that
+they belong to the list.
+Consequently, the facility cannot be used to obtain fault-tolerance as in a
+coordinator-cohort computation.
+A less significant disadvantage is that process lists do not have names. 

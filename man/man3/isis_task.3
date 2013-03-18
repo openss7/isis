@@ -1,0 +1,91 @@
+.TH ISIS_TASK 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_task, isis_entry \- ISIS task declarations
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int isis_task (task, name);
+.br
+.B
+int isis_entry (entry, handler/MSG_ENQUEUE, name);
+.RS
+.B void (*task)(arg);
+.br
+.B void *arg;
+.br
+.B char *name;
+.br
+.B int entry;
+.br
+.B void (*handler)(msg_p);
+.br
+.B message *msgp;
+.RE
+
+.SH DESCRIPTION
+
+.I isis_task
+declares that the function
+.I task
+will be forked later as a task using
+.IR t_fork (3)
+or similar.
+.I name
+is a string name associated with the task. 
+This allows ISIS to name the task in error messages and dumps
+(without relying on details of the particular compiler or run-time
+system).
+
+.I isis_entry
+declares that incoming messages
+addressed to 
+.I entry
+are to be processed by forking the function
+.I handler
+as a task.
+In the normal case, the specified
+handler will be called with a pointer to the incoming message
+as its argument.
+If the handler is specified as MSG_ENQUEUE then a subsequent call to
+.IR msg_rcv(entry)
+should be issued to collect the message, which must later be deleted by
+calling
+.IR msg_delete().
+Task creation is normally a small cost, but LISP users should
+probably favor the msg_rcv() interface over the normal callback
+one.
+
+The contents of the message may be retrieved using
+.IR msg_put (3),
+and a reply to the message sent using
+.IR reply (3).
+A message can be forwarded to some other process for handling
+using the routine
+.IR forward (3),
+but this action must be taken explicitly on reception.
+
+
+.SH ORDERING
+
+All reply messages are sent using \fIcbcast\fR unless the user
+explicitly specifies otherwise (see reply_l (3)).
+Likewise, messages are forwarded using cbcast.
+This implies that forwarded messages will respect the causal
+delivery constraints of the broadcast type used to deliver the
+original message, but may not give virtually synchronous
+ordering if multiple copies of the same message are independently forwarded.
+
+All these functions may block.
+
+.SH DIAGNOSTICS
+.IR isis_errno (3)
+will be set to
+.IR IE_BADARG,
+if an error is discovered in one of the format items.
+
+.SH "SEE ALSO"
+pg_join(3),
+bcast(3), bcast_l(3), isis_entry(3), msg_rcv(3),
+msg_format(3),
+ISIS(3)

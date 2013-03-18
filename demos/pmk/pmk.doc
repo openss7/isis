@@ -1,0 +1,550 @@
+/*   $RCSfile: pmk.doc,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:46 $ */
+	                             USING PARALLEL MAKE
+ 
+Parallel make (pmake) is an ISIS application in which several processors
+cooperate to execute a job specified in the language of the standard UNIX make
+utility.  This introduction to parallel make assumes some familiarity with
+standard make, and with the execution environment of ISIS applications.
+ 
+A pmake job is modeled as a directed acyclic graph (DAG) in which nodes
+represent steps in the job, and edges represent data dependencies between
+steps.  Each explicit rule in pmake has the form
+
+     {target}* : {dependency}* <cr>
+     {<tab> shell command <cr>}*
+
+The commands specified in a rule are executed sequentially as one step in the
+pmake job.  The same is true for each instantiation of an implicit rule.
+ 
+For example, consider the following make file text:
+ 
+product: file1 file2
+ 
+file1.o : file1.c file1.h
+          cc -c file1.c
+ 
+file1 : file1.o
+          rm file1
+          cc -o file1 file1.o
+ 
+file2 : file2.c file1.o
+          rm file2
+          cc -o file2 file2.c file1.o
+ 
+product, file1.o, file1 and file2 appear as targets, file1.c, file2.c file1.h
+and file1.o appear as dependencies, and cc and rm shell commands are specified
+in the rules.  Since the rm and cc commands under file1 are specified in the
+same rule they are recognised as a single step.  Parallel make will always
+execute them in sequence. The same is true under file2.
+ 
+Like make, parallel make does not require that all dependency and target names
+be files.  Symbolic dependencies ( such as "product" in the example ) may
+appear which do not represent specific files.  It is VERY important that ALL
+dependencies be carefully specified in the make file(s).  Unlike serial make,
+parallel make will feel free to execute whole steps in any order allowed by the
+dependencies.
+ 
+In the example, standard make would build file1 followed by file2 because that
+is the order in which steps are listed in the "product" rule.  Parallel make
+might build file1.o, followed by file2, and end with file1 as that is allowed
+by the dependencies specified.
+
+ 
+                    PARALLEL vs. SERIAL SPECIFICATIONS
+
+Parallel make executes steps in 2 phases, a serial phase followed by a 
+parallel phase.  During the serial phase pmake's activity is exactly like
+standard make's activity, with one exception.  When pmake is about to execute
+a step in the make file it first checks to see whether the user specified that
+it be executed during the parallel phase.  If so, a description of the step
+and its dependencies is enqueued in a graph file for later execution. 
+Otherwise the step is considered to be a serial step, and is executed
+immediately.  Thus pmake's capabilities are a superset of make's capabilities.
+
+The user specifies a parallel rule by preceding the first command in the rule
+with a | character.  Any rule without a leading | is executed during the serial
+phase of pmake.  Rules with leading | characters are accumulated in a graph
+file and executed after all of the serial steps in the entire job are complete.
+This means that even though specifications of serial and parallel steps may
+be interleaved in the make file, all of the serial steps are executed before
+any of the parallel ones.  All of the parallel steps are executed by one
+invokation of pmkexec, the parallel execution manager.
+
+Pmake insures correct ordering of steps executed during parallel phase using
+dependencies accumulated during the serial phase.  The default implicit
+rules do not begin with | characters.  Users should either avoid or modify
+implicit rules.
+ 
+In the following example, the rm commands are separated from the cc commands
+using symbolic dependencies.  The rm commands are not preceded by | symbols, so
+they are executed during serial phase as they are encountered. The cc commands
+are accumulated and placed in a graph file for later parallel execution.
+ 
+product: file1 file2
+ 
+file1.o : file1.c file1.h
+          |cc -c file1.c
+ 
+rmfile1:
+          rm file1
+ 
+rmfile2:
+          rm file2
+ 
+file1 : file1.o rmfile1
+          |cc -o file1 file1.o
+ 
+file2 : file2.c file1.o rmfile2
+          |cc -o file2 file2.c file1.o
+ 
+The distinction between serial and parallel steps must be carefully considered
+when devising a parallel make specification.  For example, in instances where
+one pmake includes another as one of its steps, a completely independent 
+invokation occurs.  If the imbedded pmake command used default options the
+subordinate would execute its own parallel phase before returning.  
+
+It is also possible to accumulate job steps from multiple make files for
+execution during one parallel phase.  Since pmake generates the graph file in
+append mode, steps accumulate until the graph file is purged.  Normally pmake
+purges its graph file after executing the parallel phase.  The -A option can
+be used to supress execution of the parallel phase and the purging of the
+graph file.  Subordinate pmakes which use the -A option accumulate job steps
+for execution during parallel phase, then just leave them in the graph file.
+This allows other pmake instances to continue accumulating steps in the same
+graph file for execution during ITS parallel phase. In this case the data
+dependencies identified by various subordinates must be sufficient to force
+correct execution order.
+ 
+In the following example three make files, one of which invokes the other two,
+accomplish the same result as the earlier examples.
+ 
+dir/makefile contains the following:
+ 
+product: file1 file2
+ 
+rmfiles:
+          rm file1
+          rm file2
+          rm product.gph
+ 
+file1 : rmfiles
+          cd subdir1; pmake -G ../product.gph -A
+ 
+file2 : rmfiles
+          cd subdir2; pmake -G ../product.gph -A
+ 
+ 
+dir/subdir1/makefile contains this:
+ 
+file1:
+          |cc -o file1 file1.o
+ 
+file1.o : file1.c file1.h
+          |cc -c file1.c
+ 
+ 
+and dir/subdir2/makefile contains this:
+ 
+file2:
+          |cc -o file2 file2.c ../subdir1/file1.o
+
+This pmake is invoked with the command:
+          pmake -G product.gph
+
+The use of the -G and -A options in the pmake command cause output from the two
+submakes to be appended to the same graph file, product.gph.  The rm commands,
+including one to remove the old product.gph, are specified serially, so they
+execute during the serial pass instead of being queued on product.gph.  Because
+the submakes are accumulated in the same graph file, the file and symbolic
+names contained in them are resolved together, allowing them to reference each
+other.  Parallel make can interleave the execution of commands from the
+submakes constrained only by the specified dependencies.
+ 
+All dependency and target names are evaluated in UNIX style, even if they are
+symbolic.  Thus 2 names which yield the same path ( taking current directories
+into account where appropriate ) will be treated as the same object by parallel
+make even if they arose from different sub-makes.  In the example parallel make
+realizes that the reference to ../subdir1/file1.o refers to the same object as
+file1.o referenced from the other submake.  Parallel make does not account for
+synonyms such as those which result from the ln command, so be sure to refer to
+such objects in a consistent manner.
+ 
+Be careful of any conditionals such as "if" or "for" statements used in serial
+rules which depend on data created or massaged by parallel rules.  Keep in mind
+that we are pulling off a major con job on serial make by deferring execution
+of its steps.
+
+ 
+                       PARALLEL MAKE FLOW
+ 
+The serial phase is executed directly by the command "pmake" on make files
+which are compatible with standard make with the exceptions mentioned above.
+ 
+During the serial phase of parallel make, steps to be executed in the parallel
+phase are accumulated in a graph file.  The user may specify the name of the
+graph file using the -G option in the pmake command.  To cause parallel
+execution of the commands stored in the graph pmake automatically executes the
+command:
+ 
+    pmkexec product.gph pmk 0 6
+where:
+     product.gph is the graph file (pmake.gph is the default)
+     pmk is the name of the isis group to be formed for execution
+     0 is the isis port number associated with the site view to be used
+     6 is the maximum number of workstations to be used at any one point
+          during the job.
+
+Pmkexec reads the graph file and passes it to the prescheduler which
+evaluates and allocates steps to servers in a hopefully reasonable manner.
+After that the ISIS process group which will execute the job is formed.  In the
+event that execution does not progress as the prescheduler thought it would
+steps are dynamically reallocated ( fought over ) by group members.
+ 
+The identity of the servers assigned to the job is specified in the current
+ISIS site view.  Parallel make uses only servers which have no users as
+process group members other than the server from which the job was begun.
+The user must be sure isis is running on the servers before running pmake.
+Pmake uses r_exec to start server processes on remote sites.
+ 
+The standard output from steps executed by each server is accumulated in a
+separate results file.  These are concatenated when the job is completed to
+present a complete but artificially ordered history of the job in files in the
+directory that was current when pmkexec was run.  Pmake prints job output to
+stdout upon completion of the job.  Remember that pmake is not robust in the
+isis sense, but pmkexec is.
+
+
+                  HOW TO RUN A PARALLEL MAKE DEMO
+
+1. - Load and make the isis system including the demos directory.
+
+2. - cd to ~isis/SUN/demos/pmk, the object directory for parallel make.
+
+3. - If they don't aleardy exist, copy qtest*.c and makeqtest from
+     ~isis/demos/pmk.
+
+4. - If qtest exists, type the command:
+     make -f makeqtest clean
+     to remove the old version
+
+5. - Be sure isis is started on the server you are using.  This demo uses up
+     to 5 additional servers if isis is running on them and they have no
+     other users.
+
+6. - type the command:
+     ../../bin/pmake -f makeqtest -P<port>
+
+     where <port> is the isis port number.
+     This causes the following output when run with only 1 available server:
+
+isis% ../../bin/pmake -f makeqtest -P 1551
+SERIAL PHASE
+    |cc -c qtest1.c
+    |cc -c qtest2.c
+    |cc -c qtest3.c
+    |cc -c qtest4.c
+    |cc -c qtest5.c
+    |cc -o qtest qtest1.o qtest2.o qtest3.o qtest4.o qtest5.o
+    |qtest
+PARALLEL PHASE
+
+RUNNING /usr/u/isis/DEVEL/SUN/bin/pmkexec pmake.gph pmk 1551 6
+RESULTS:
+**********************************************************************
+STEP 1 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -c qtest2.c; 
+**********************************************************************
+STEP 2 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -c qtest3.c; 
+**********************************************************************
+STEP 3 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -c qtest4.c; 
+**********************************************************************
+STEP 0 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -c qtest1.c; 
+**********************************************************************
+STEP 4 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -c qtest5.c; 
+**********************************************************************
+STEP 5 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  cc -o qtest qtest1.o qtest2.o qtest3.o qtest4.o qtest5.o; 
+**********************************************************************
+STEP 6 : cd /usr/fsys/odin/c/b/isis/DEVEL/SUN/demos/pmk;  qtest; 
+1 2 3 4 5 5 4 3 2 1
+
+The order of the printed results changes depending on the number of servers.
+The command associated with each step number should always be the same as that 
+shown here.
+
+
+              HOW TO RUN PARALLEL MAKE WITH YOUR OWN MAKEFILES
+
+1. - Locate the absolute files pmake and pmkexec and make pmake accessible to
+     the user and/or directory(s) where you will be running pmake.  Both of
+     these files must be in the same directory, i.e. ~isis/SUN/bin.
+
+2. - Modify or generate your makefile to indicate which steps should be done
+     in parallel.  Remember:
+       - pmake requires that dependencies be seperated from commands by a
+         <cr> <tab> sequence.  A ";" confuses it.
+       - The precious option does nothing
+       - Parallel steps begin with a "|"
+
+3. - Remove the old graph file if it exists.
+
+4. - type the pmake command incorperating the following options in addition to
+     those supported by standard make:
+       -G : graph file name.  Default: pmake.gph.
+       -P : ISIS port number. Default: 0.
+       -S : number of servers. Default: 6.
+             A negative port number generates lots of messages indicating
+             pmkexec's progress.
+       -K : keep the report files generated by pmake described below.
+             Default: Destroy files at end of job.
+       -A : accumulate parallel steps in the graph file without executing them.
+             Default: execute at end of pmake.
+
+5. - Pmake will print a report including the commands executed and their
+     standard output when execution is complete.
+
+6. - If the -K option was requested, the following files will persist:
+       - the graph file containing a description of the parallel steps executed
+         in a pmake specific format described below.
+       - a copy of the graph file annotated with step execution and server
+         queue and speed information.  The name of this file is the name of the
+         graph file with a "r" appended to it.
+       - a map of way the job was actually executed indicating which steps
+         were executed by which servers in what order.  Step numbering is
+         generated by pmake and can be converted into command contents using
+         the graph file. The name of this file is the name of the graph file
+         with "r.sum" appended to it.
+       - a file for each server containing the standard output it generated.
+         The names of these files are the name of the graph file with ".stdoX"
+         appended to it, where X is the server number.  Servers are numbered
+         beginning at 0 by pmake.
+       
+7. - You can rerun the exact same seqeunce of parallel steps just completed
+         using the command:
+
+         pmkexec file group port servers
+         where:
+            file = graph file name
+            group = isis process goup name
+            port = isis port
+            server = number of servers
+
+         You can also add servers to a job manually by logging into the desired
+         server and typing the command
+
+         pmkexec group port servers
+
+         These are the commands used by pmake and rexec to execute the parallel
+         part of a parallel make job.
+
+8. - When making pmake, use the C preprocessor variable ABSDIR in the cc
+         commands for main.c and pmkexec.c to indicate the directory in which
+         pmkexec will reside.  The value of ABSDIR must be a string ( including
+         double quotes ) containing the complete path name to the directory.
+
+
+                           A LARGER EXAMPLE
+
+The pmakefiles necessary to make isis are included in the ~isis/demos/pmk
+account.  In order to pmake isis these files must be placed in the isis object 
+directory hierarchy rooted at some directory, say, isis_home as follows:
+
+   pmk directory file         copy to:
+      pmake.isis              isis_home/makefile
+      pmake.protos            isis_home/protos/makefile
+      pmake.clib              isis_home/clib/makefile
+      pmake.mlib              isis_home/mlib/makefile
+      pmake.util              isis_home/util/makefile
+      pmake.demos             isis_home/demos/makefile
+
+Pmake can then be run on the isis code from isis_home.
+*** These makefile are not out-of-date with the latest release of Isis and
+    will not successfully build Isis ***
+
+
+                           INTERNAL GRAPH FILE FORMAT
+
+Pmkexec receives descriptions of parallel steps in a textual "graph file" in
+which every line contains a 1 to 6 character keyword beginning in its first
+column.  The keyword determines the meaning of the rest of the line.
+All communication between pmake and pmkexec, as well as the initial state
+specifications for new server processes use this format.  In addition, one or
+all servers can be forced to dump thier states into a file of this format 
+using the send command in the isis cmd utility.  A single parameter indicating
+the name of the file in which the dump should be placed is required.  Each
+server will append its pmake server number to the file name specified to
+yield the name of the dump file to be generated.  Note that the consistency of
+these dumps depends on the type of broadcast used by the send command.
+
+Data items and process steps are defined by lines or sequences of lines in
+this file.  Data items and steps are numbered for reference by pmkexec in the
+order in which they appear in the graph file.  The following line formats may
+appear:
+
+NEW
+       Indicates the beginning of the graph
+
+SIZE   steps items servers
+       Indicates the number of job steps, data items, and server data
+       structures to be allocated for the job description.  This information
+       is not essential but its presence allows faster processing of the graph
+       file.
+
+IN     name mod size type
+       Indicates an input dependency. - Also used to declare a data item for
+       future reference as an input or output dependency.
+       name - the name of the file
+       mod - indiactes whether or not the file is out of date or has been
+             modified  ( "U" for unmodified, "M" for modified ), 
+       size - size of the file in bytes
+       type - numeric file type indicator - NOT USED
+       
+OUT    name mod size type
+       Indicates an output file generated during execution of a step.  A given
+       data item may only be generated by one step.  If an OUT line appears
+       outside of a step definition, subsequent IN lines ( up to the next
+       OUT or STEP line) designate input dependencies to be applied to the
+       step which generates the OUT file.  This allows dependencies to be
+       specified before the command for generating a file is known.
+       Parameters same as those of IN.
+
+STEP   content
+       Begins definition of a step for execution.  Also declares that the step
+       is in a particular processors queue if it lies between a PROC line
+       and an END line.
+       content - The bourne shell command which constitutes the step.
+    
+TIME   milliseconds
+       Indicates the expected duration of the step whose definition is in
+       progress.
+       milliseconds - the expected duration in milliseconds.
+
+CALCS  ctime dtime mod status dep
+       A set of calculations generated by pmkexec.
+       ctime - the length of the critical path from this step to the end of
+               the job
+       dtime - The total compute time of steps which depend on this one.
+       mod   - "U" for no recomputation necessary, "M" for recompute.
+       status - The completion status of the step:
+                1 - RAW - CALCS not yet computed
+                2 - EVAL - CALCS computed, but step not allocated to processor
+                3 - ALLOCATED - Step allocated to server but dependencies not
+                                 fulfilled
+                4 - SCHEDULED - Step allocated and ready to execute,
+                                 or executing
+                5 - SCHED_LOCK - Step allocated and ready but being transferred
+                                 or about to change status
+                6 - DONE - Step execution complete.
+       dep - The number of input dependencies which have not yet been fulfilled
+
+RSLT   start stop exp_stop deny
+       Statistics resulting from executing or scheduling a step.  All times
+       in milliseconds.
+       start - the time at which execution was started 
+       stop  - the time at which execution ended
+       exp_stop - The time at which execution is expected to end based on
+                  simulated execution - NOT USED
+       deny - The time at which a request for the step was last denied.
+
+       These times vary from one server to another because their clocks are not
+       synchronized in any way.  The one time on which all servers should agree
+       is (stop - start), as the messages actually exchanged between servers
+       contain this quantity as reported by the executing server.
+
+ENV    env_string
+       A UNIX environment variable assignment to be installed before executing
+       a step.
+       env_string - Specification of a variable and its valus in the form:
+                    variable=value
+
+IN#    item
+       Specifies that a previously encountered data item is an input to a step
+       item - The internally generated number of the data item
+
+OUT#   item
+       A previously encountered data item is output by a step.
+       item - The number of the data item.
+
+STDO   file
+       NOT USED
+
+SPEED  speed_ratio
+       Indicates the measured speed of the execution of a step, defined to be
+       the actual execution time of the step divided by the expected execution
+       time.  Also used to indicate the average of the speeds of all steps
+       executed by a given processor.
+       speed_ratio - ((stop - start)/TIME)
+
+DUMDUR milliseconds
+       Indicates that execution of a step is to be simulated using a unix sleep
+       command of (milliseconds/1000) seconds instead of actually executing the
+       command associated with the step.
+
+END
+       Indicates that the definition of a step is complete
+
+PROC   name
+       Indicates the beginning of the definition of a server.  Definitian ends
+       when another PROC command is encountered.  Any steps defined after a
+       PROC are in that server's queue.
+       name - The ascii name of the server
+
+RANK   num
+       Indicates the current rank of a server in an isis process group view
+       num - the rank, assigned by isis.
+
+STEP#  num
+       Indicates that a previously encountered step is in a server's queue
+       num - the number of the step
+
+DONE
+       Indicates that the all precedeing steps in a processor's queue have been
+       completely executed, and that any subsequent steps have not.
+
+DUMSPD speed_ratio
+       Indicates the speed at which any SIMULATED steps on this processor
+       should be executed.
+       speed_ratio - factor by which to multiply a step's DUMDUR to obtain
+                     the length of the sleep command
+
+
+                           PMAKE SOURCE FILES
+
+Makefile - the standard unix make file for making pmake and pmkexec
+
+check.c - a module of the public domain make utility not modified for pmake
+
+input.c - unmodified public domain make module
+
+macro.c - unmodified public domain make module
+
+main.c - the pmake main program - modified public domain module
+
+make.c - the pmake dependency interpreter - modified public domain module
+
+make.h - include for pmake - modified public domain module
+
+makeqtest - pmake file for quick test
+
+pmake.* - pmake files for building isis
+
+pmk.doc - this document
+
+pmkdat.h - data structures for pmkexec
+
+pmkexec.c - parallel execution module - encapsulates all isis interaction
+
+pmkgph.c - DAG data structure manipulation
+
+pmkio.c - graph file input and output
+
+pmklib.c - routines converting make command lines and their dependencies into
+           graph file entries.  Performs execution time estimates.
+
+pmklst.c - linked lisk manipulation
+
+pmksched6.c - sixth generation scheduling decision maker
+
+qtest*.c - quick pmake demo/test
+
+reader.c - unmodified public domain make module
+
+rules.c - unmodified public domain make module

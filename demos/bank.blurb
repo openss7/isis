@@ -1,0 +1,72 @@
+BANK TRANSACTION DEMO
+
+This is a toy bank demo that illustrates the Isis transaction mechanism.
+The 'bank' program maintains a simple database of bank account balances,
+and the 'teller' program queries and updates that database. You can run any
+number of copies of the teller, but only one copy of the bank program
+should be active. The teller has a 'help' command which explains how to use
+it.
+
+To get more of a feel for the transaction mechanism, try killing the bank
+and restarting it. The bank will read its log and re-execute all
+transactions that committed. In some cases the bank may not know the
+outcome if the transaction was committing or aborting at the moment it was
+killed.  In such cases it will consult the transaction manager (the xmgr
+process started up when Isis is initialized) to find out about these
+transactions.  When the bank is restarted, any still-running tellers will
+notice that the old bank has died, giving the error 'unable to contact bank
+service'.  When the next command is entered the teller will connect to the
+new bank process and continue.
+
+The bank demo uses most of the features of the transaction mechanism.
+Looking at the source of the bank and teller programs will give you some
+idea of how what is needed in an Isis transaction program. Briefly, the
+application itself, or the database system it uses, must store data in
+non-volatile or stable storage, manage some prepare/commit/abort 'bit' for
+the updates each transaction makes to that data, initiate recovery of
+transactions after a crash, and provide concurrency control.
+
+The bank demo is a toy in most respects.  It is NOT a model of how to write
+a high-performance, or large scale transaction application. The bank uses
+an intentions list on secondary storage to record changes to the database
+which is stored in primary memory. This means that upon crash and restart
+the bank re-reads and executes all the updates it has ever done. Any real
+application would have to checkpoint the database to secondary storage
+periodically, or more likely, store the entire database on secondary
+storage and cache part of it in primary memory.
+
+Further, intentions lists are almost always slower than in-place updates
+with write-ahead logs. With intentions lists, a transaction records the
+updates it wishes to make in the log, and the updates are made to the real
+data only when the transaction commits, causing a flurry of disk activity
+during transaction commit. With write-ahead logs the updates are made to
+the actual data during the transaction and the log is used to record
+before-images of the records as they are modified.  Upon transaction abort
+the in-place updates are undone using the information in the log.
+
+The bank uses a simple form of optimistic, non-serializable concurrency
+control.  Two balances are maintained for each bank account. The true
+balance, and the 'cleared' balance. During a transaction which withdraws $X
+from an account the cleared balance will be $X less than the true balance.
+Most of the time the balances are identical and the 'inquire' command will
+only display the cleared balance if it differs from the true balance.  A
+real application would require more in the way of concurrency control.  The
+token tool (described in Chapter 9 of the manual) would be a good choice
+for this.
+
+In the future we expect to write a more realistic bank demo, incorporating
+multiple bank servers. Such a demo would demonstrate how the transaction
+mechanism coordinates multi-site commit.
+
+As this is the first release of the Isis transaction mechanism we would
+welcome comments from anyone who uses it. We are particularly interested in
+people's experience with interfacing our transaction mechanism with a
+pre-existing database system, especially one which you cannot modify to
+suit Isis. One of our goals is to make such inter-working successful.
+
+Comments, suggestions and complaints can be sent to:
+
+   Robert Cooper                   rcbc@gvax.cs.cornell.edu
+   Computer Science Dept
+   4124 Upson Hall
+   Cornell, Ithaca NY 14853

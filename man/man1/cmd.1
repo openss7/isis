@@ -1,0 +1,131 @@
+.TH CMD 1  "1 February 1986" ISIS "ISIS COMMANDS"
+.SH NAME
+cmd \- Interactive ISIS control program
+.SH SYNOPSIS
+.B cmd [port-number] [command [args ...] ]
+.SH DESCRIPTION
+The
+.I cmd 
+tool
+is an interactive program that provides information about and control
+of the sites on which ISIS is currently running and the status
+of the ISIS processes and process groups.
+
+You start the cmd tool by typing:
+.br
+    cmd  application-port-number
+.br
+(The application port number is the number in the second column of numbers
+in the
+.I sites (5)
+file.)
+You may leave out the port number, in which cast 
+.I cmd 
+will try 
+to look up the port number in the system file.
+.I cmd 
+will then prompt you to enter commands.
+
+The following commands are supported:
+.TP 10
+sites
+List the sites in the current site view,
+which is obtained from the routine
+.IR sv_getview (3).
+.TP
+list [scope]
+Prints 
+the name and address of all groups known within a 
+specified scope.
+If scope is omitted the scope of the current site is assumed.
+A scope is specified as 
+.IR @name ; 
+.I @* 
+stands for the global scope.
+You may use the form 
+.I list @sname:pattern
+to list only only groups with
+names that match 
+.IR pattern.
+.I pattern 
+consists of ordinary characters, `*', `?', and `[...]'
+which are interpreted in the same way as by the unix 
+.IR csh (3).
+.TP
+group group-name
+Print a process group view, obtained by calling
+.IR pg_getview (3).
+.TP
+dump 
+Prints the current status of the local protocols process.
+See the section on dumps in the ISIS manual
+on how to interpret this information.
+.TP
+pr_dump
+Dump the protos process to its log file, which is named
+<site-no>.log in the ISIS startup directory (see 
+.IR isis.rc (5)).
+.TP
+snapshot
+(As root) dumps every process in the
+system to log files.
+.TP
+rescan
+Cause all ISIS sites to rescan the sites file.
+It should be used if the sites file is changed while ISIS is running.
+.TP
+shutdown
+Cause ISIS to shut down at this site.
+.TP
+send address [ arg ... ]
+Send a command message to a set of processes.
+.I send puts the given arguments into a messages and broadcasts the message
+to the the set of proceses denoted by 
+.I address 
+(entry MSG_COMMAND, see "include/cl_cmd.h").  
+It waits for replies and prints them.
+The address may be specified in one of the following forms:
+.br
+<site>:<group>:<process>
+.br
+   denotes the member of <group> at <site> with 
+.br
+   pid <process>.
+.br
+<site>:<group>
+.br
+   denotes all members of <group> at <site>.
+.br
+<group>
+.br
+   denotes all members of <group>.
+
+In all of the above forms <group> may be specified as '*' (or left out) in
+which case the most recently referenced group (in a 'group' or 'send' 
+command)
+is used.
+Isis system processes may be addressed by leaving out <group> and
+specifying <process> as -1, -2, ...  (the symbolic names 'protos', 'rexec'
+'rmgr', 'isis', 'news', and 'xmgr' are also recognized).
+.TP
+help
+Print a list of commands and their abbreviations
+.TP
+help command 
+Print more information about a command.
+.TP
+quit 
+Quit the cmd program. (The end-of-file character also exits cmd).
+
+The cmd tool also accepts a sequence of commands,
+separated  by commas, on a single input line.
+If the cmd tool is invoked as
+.br
+    cmd [port-number] command arg0 arg1 ...
+.br
+it will execute the specified command and quit immediately instead
+of running interactively.
+
+.SH "SEE ALSO"
+isis.rc(5), sites(5),
+ISIS(3)

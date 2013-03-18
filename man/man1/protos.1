@@ -1,0 +1,37 @@
+.TH ISIS 1  "1 February 1986" ISIS "ISIS COMMANDS"
+.SH NAME
+protos \- ISIS protocols server
+.SH SYNOPSIS
+.B protos [-dname] [-f#] 
+.SH DESCRIPTION
+The
+.I protos
+command  is run from within the isis.rc file and starts the basic ISIS protocols
+service.
+(This file is interpreted by 
+.IR isis(1),
+a special ISIS-specific shell program).
+Protos must be running to use ISIS, and is involved in many of the ISIS operations.
+In a sense, it is similar to the UNIX kernel, because it is the part of the ISIS system
+that implements many ISIS system calls.
+
+The
+.B -dname
+option tells protos where to put ISIS log files.  When several ISIS systems
+share one disk these files must be stored in separate directories.
+For this purpose, a # character may be included in the file name; it is
+replaced by ISIS with the local site-id.
+
+The
+.B -f#
+option tells ISIS to change the speed with which its failure detector detects and
+reacts to failures.
+The default is -f60, this checks for failures once per minute,
+detecting and reacting to a machine failure within 1 minute more.
+With -f10, ISIS checks every 10 seconds and reacts within 10 seconds more,
+although the total delay may exceed 20 seconds.
+Values other than 60 and 10 are a bit risky.
+
+.SH "SEE ALSO"
+isis(1), isis.rc(5), sites(5), rc.local(8),
+ISIS(3)

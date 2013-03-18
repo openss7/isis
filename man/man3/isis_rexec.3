@@ -1,0 +1,159 @@
+.\" isis_rexec.3
+.\" written by Mark J. Steiglitz
+.TH ISIS_REXEC 3 "30 March 1990" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_rexec \- ISIS remote execution facility
+.SH SYNOPSIS
+.B #include """isis.h"""
+.PP
+.B 
+nran = isis_rexec(nwanted, group, sites, prog, args, env, user, passwd, addrs)
+.RS
+.nf
+.B int nwanted;
+.B address *group, *addrs;
+.B site_id *sites;
+.B char *prog, **args, **env, *user, *passwd;
+.fi
+.RE
+.SH DESCRIPTION
+.B isis_rexec
+attempts to start
+.I nwanted
+instances of the program
+.I prog
+at the chosen
+.IR sites ,
+with one attempt made per site.
+.B rexec
+must be running at those sites.
+The arguments to the program are specified by
+.IR args ,
+which is an argument vector of the form used by
+.BR execve ,
+and the UNIX environment is specified by
+.IR env ,
+which is an environment vector of the form used by
+.BR execve .
+
+The process is monitored using
+.B pg_watch
+to make sure it succeeds in joining
+the ISIS process group
+.IR group .
+If the join is unsuccessful, then an attempt will be made to start the process
+at another site.
+If
+.I group
+is specified as &NULLADDRESS,
+.B isis_rexec
+will assume that the program started successfully if the
+.B execve
+is performed successfully.
+This is also the case if the caller of 
+.B isis_rexec
+does not actually belong to the designated group.
+
+.I prog
+is the pathname that will be used to find the program to run.
+If
+.I prog
+is an absolute pathname, then that path only will be used.
+If
+.I prog
+is a relative pathname, the home directory of the user
+.I user
+will be searched first, if the calling process has been
+successfully authenticated.
+Then the paths contained in the environment variable PATH when
+.B rexec
+was started on the remote machine will be searched.
+
+The username that the program will be run under is specified by
+.IR user .
+This username will also be taken as the username of the process calling
+.BR isis_rexec .
+If
+.B rexec
+was compiled with REXEC_ALLOW_RSH defined, then
+if the .rhosts file for the username or the /etc/hosts.equiv file for the
+remote system is set up so as to allow
+.B rsh
+from the caller's machine to the destination machine, then the calling process
+is said to have been successfully authenticated.
+If the username specified is equivalent to superuser (e.g.
+.IR root ),
+then the above means of authentication is not permitted.
+If the calling process has not been authenticated yet, then the username
+and the password specified by
+.I passwd
+are used to perform authentication in the manner of
+.BR login .
+If authentication is successful, then the program will be run under the
+username
+.IR user .
+Otherwise, it will be run under the userid
+.IR nobody .
+If
+.B rexec
+is not running as superuser, then authentication will be ignored and the
+program will be run under whatever account was used to start
+.BR rexec .
+However, if
+.B rexec
+was compiled with REXEC_REQUIRE_SETUID defined,
+then the program will not be run
+unless it can be run under the account specified by
+.IR user .
+
+After successful completion,
+.I addrs
+will contain a null-terminated list of process addresses
+corresponding to the processes that were created.
+The number of processes successfully started will be returned.
+.SH "SEE ALSO"
+login(1), rexec(1), rsh(1), execve(2), pg_watch(3)
+.SH "BUGS"
+On versions of UNIX in which
+.B fork
+does not work properly (e.g., Apollo UNIX), authentication will be ignored,
+and the program will run under whatever userid
+.B rexec
+was started under.
+If REXEC_REQUIRE_SETUID is defined, and
+.B rexec
+is run as superuser on such a version of UNIX, then it will abort.
+
+If the
+.B fork
+succeeds, but the
+.B setuid
+or
+.B setgid
+fails, and
+.I group
+is specified as &NULLADDRESS, then
+.B rexec
+will not report a failure.
+This may occur if
+.B rexec
+attempts to
+.B setuid
+or
+.B setgid
+to a negative
+UID or GID.
+We recommend that you avoid using negative UIDs and GIDs,
+especially for username
+.IR nobody .
+.SH "WARNINGS"
+Currently, no authentication of the caller is provided by
+.B rexec
+on the remote host if
+.B rexec
+is compiled with REXEC_ALLOW_RSH defined.
+This will be fixed in the near future
+when a more general authentication service is implemented for ISIS.
+Until then, we recommend that
+.B rexec
+not be compiled with REXEC_ALLOW_RSH defined.

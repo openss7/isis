@@ -1,0 +1,9 @@
+This is a recent port of ISIS to the Silicon Graphics at system
+software release System V R 3.3 or higher.  Port by Dave Forthlund
+of Los Alamos Labs.  Not extensively tested yet.
+
+Please report bugs or problems to isis-bugs@cs.cornell.edu
+
+Consider this an experimental port...
+
+Ken

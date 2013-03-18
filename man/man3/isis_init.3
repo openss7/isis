@@ -1,0 +1,117 @@
+.TH ISIS_INIT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_init, isis_init_l, isis_init_remote, isis_mainloop, isis_start_done \- ISIS initialization functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int isis_init (port_no);
+.br
+.B 
+int isis_init_l (port_no, flags);
+.br
+.B 
+int isis_init_remote (``remote_machine'', port_no, flags);
+.br
+.B
+isis_mainloop (task, arg);
+.br
+.B
+int isis_start_done();
+.br
+.B
+
+.RS
+.B int port_no;
+.br
+.B void (*task)(arg);
+.br
+.B void *arg;
+.br
+.B 
+.RE
+
+.SH DESCRIPTION
+.I isis_init
+should be called as the first action of an ISIS program, 
+and certainly before any other ISIS library calls.
+The argument is the port number which the ISIS program will use to
+communicate with the rest of the ISIS system. (In detail, this is the
+port number over which ISIS client programs communicate with the
+.I protos
+program.)
+
+In the long form, a flag may be specified to indicate how ISIS
+should handle problems that arise during connection establishment.
+If the flag bit ISIS_AUTORESTART is included, ISIS will
+run the shell (/bin/csh) on the file ``/usr/bin/startisis'', wait 90
+seconds, and try again; it prints the message ``Auto-restarting ISIS''
+when doing this.
+If the flag bit ISIS_PANIC is specified, failed connection attempts
+cause a panic; if not, failed connections result in a -1 return value.
+
+In the remote form, an application may connect with ISIS on a remote
+machine.  Auto-restart is not supported in this case, regardless of 
+the flag settings.
+A process connected to ISIS via a remote connection is in all
+ways identical to one connected directly to ISIS on the machine
+in question. If the ``mother machine'' crashes, the child's
+\fIisis_failed\fR procedure (if any) will be invoked.
+Reconnection to some other remote machine may then be attempted, if
+desired.
+
+If the port number is specified as 0, then the port number is obtained
+either from an environment variable or, if none is set, the
+the /etc/services file.
+The environment variables used by ISIS are ISISPORT for connections
+via isis_init and ISISREMOTE for connections by isis_remote.
+Failures to connect cause the program to panic with an error message unless
+the isis_init_l interface is used.
+
+
+.I isis_mainloop
+causes the function ``task'' to be forked with ``arg''
+as its argument as the first task of the program. This task
+typically performs initialization of the rest of the program.
+isis_mainloop never returns.
+
+.I isis_start_done
+is called after the program has initialized itself.
+Until this is called, no application-level messages are delivered
+to this program, and no application-level task switches occur. 
+Thus between the call to isis_init, and the call to isis_start_done,
+the program may initialize data strctures, and call other ISIS routines
+(e.g. to join a group, or to fork further tasks) without the possibility 
+of startup race conditions.
+
+Typically isis_mainloop is called to fork an initialization task which
+calls isis_start_done at the appropriate point. If the main task
+returns without explicitly calling isis_start_done, ISIS calls
+isis_start_done automatically.
+
+In another common usage, isis_mainloop is not used. Instead
+initialization and calling isis_start_done is performed by the
+``main()'' function, after which 
+.IR isis_accept_events (3)
+must be called periodically to permit process switch to occur.
+(In this usage the ISIS scheduler is not run automatically, and must
+be invoked by calling isis_accept_events.)
+This method is convenient for retro-fitting ISIS to programs 
+without the disturbing existing program structure.
+
+.SH ORDERING
+
+All ISIS activity after isis_init and before isis_start_done 
+is serial, and no process switches or message deliveries occur.
+The effect is that no ``blocking'' ISIS routines block in this interval.
+It thus follows that isis_start_done may block.
+
+.SH DIAGNOSTICS
+Upon errors isis_init will return -1 and set
+.IR isis_errno (3)
+to indicate the error condition.
+
+.SH "SEE ALSO"
+isis_accept_events(3), isis_probe(3), isis_task(3), isis_wait(),
+ISIS(3)
+

@@ -1,0 +1,388 @@
+.TH ISIS_TRANSPORT 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_transport -- define new multicast transport protocol.
+
+.SH SYNPOSIS
+.B "include \"isis.h\""
+.br
+.B "int isis_transport(pname, mt_send, mt_groupview, mt_physdead)"
+.RS
+.B "char *pname;"
+.br
+.B "int (*mt_send)(gaddr, exmode, mp, to, callback, arg0, arg1);"
+.br
+.B "void (*mt_groupview)(ginfo_p), (*mt_physdead)(addr_p);"
+.RE
+.br
+.B "int net_send(gaddr, exmode, to, callback, arg0, arg1);"
+.br
+.B "int isis_querydead(who);"
+.br
+.B "void isis_fragment(size, mt_send, gaddr, exmode, mp, to, callback, arg0, arg1);"
+.br
+.B "void isis_receipt(mp, from, pn);"
+.br
+.B "int MAY_REPLY(mp);"
+.br
+.B "void t_yield();"
+
+.SH "GENERAL DESCRIPTION"
+When compiled with the -DBYPASS flag, ISIS makes use of an
+experimental mechanism that bypasses the normal ``protocols''
+process whenever possible on transmission of CBCAST and FBCAST
+messages.
+By default, this is done using a UDP-based message delivery protocol,
+but you can substitute a delivery protocol of your own if you
+like.
+A delivery protocol has two major features; it may accept or reject
+individual messages, and messages that it has accepted must be
+delivered reliably to the groups or processes addressed.
+It is somewhat weaker than a transport protocol, which must also order
+messages; since ISIS is ordering messages at a higher level,
+the delivery protocol need not repeat this work.
+If a message is rejected by a user-supplied delivery protocol, it will
+be transmitted using the default protocol, which accepts all
+messages.
+
+ISIS V2.0 provides a 
+facility for determining whether or not a given
+destination is operational; for message fragmentation
+and reassembly; and for hinting whether or not
+a given message will generate a reply.
+The rest of this manual page describes in detail the routines that a
+given delivery protocol must provide, and the routines that
+ISIS provides to assist the protocol implementor.
+
+.SH RESTRICTIONS
+First, some restrictions.
+The bypass protocols may only be used in situations where the sender
+of a multicast belongs to (or is a client of)
+the group to which it is sending.
+Moreover, the protocols are very limited in the type of destination
+addressing permitted.  
+They are used only for multicasts to a single group and for point-to-point
+messages from one group member to another, such as replies to a
+group multicast.  
+Any other sort of destination addressing causes ISIS to route the
+multicast via the pre-existing, slower protocol suite.
+This includes cases in which a message is sent by a client of a group
+(see pg_client) or to a set of destinations that includes clients
+of a group.
+If your application needs to multicast to a group of processes and you	
+want to use the bypass protocols, you will therefore need to create
+a group that corresponds closely to the set of destination processes.
+
+The BYPASS mechanism works correctly even if the processes involved
+belong to multiple groups, or join and leave the same group
+multiple times during an execution.
+The initial implementation, on top of UDP, is already quite fast.
+Using the transport mechanism, however, you can extend it to take
+advantage of special hardware that might require sending less then
+one message to each destination, special protocols that might
+be faster than UDP by avoiding some of the work that UDP normally
+does, or to support protocols with special realtime properties or
+other properties that interest you.
+Since our UDP protocol is oriented towards sending 8k messages
+using a windowing flow control method, you would almost certainly
+need to implement a different scheme for doing realtime graphics or voice,
+or sending huge quanties of data.
+
+.SH "DEFINING A NEW TRANSPORT PROTOCOL"
+To define a new transport protocol, you will need to provide ISIS with 3
+routines:
+.br
+\fB(1) \fBmt_send\fR: routine to send message to list of destinations.
+.br
+\fB(2) \fBmt_groupview\fR: callback for new process-group views.
+.br
+\fB(3) \fBmt_physdead\fR: hint about failures.
+.br
+Inform ISIS of the names of these routines by calling 
+.ce
+\fBisis_transport(pname, mt_send, mt_groupview, mt_physdead)\fR,
+where \fBpname\fR is a transport protocol name (an ascii string).
+A \fItransport protocol number\fR will be returned.
+Transport protocol 0 is pre-defined to correspond to the ISIS UDP
+protocol.
+On the other hand, you may find it convenient to call this protocol
+for sending point-to-point messages from within your transport
+code.  
+We explain how to do this below.
+
+.SH "DEALING WITH NEW GROUP VIEWS AND FAILURES"
+When communication with a group becomes a possibility, ISIS will call
+\fBmt_groupview(ginfo_p)\fR, giving the address of the
+\fBginfo\fR structure about the group.
+This routine will also be called every time the group membership
+changes.
+\fIIt will be called in the same order at all processes that belong
+to the group. \fR
+Your protocol should expect to begin receiving messages from a
+process anytime after this routine is called with a groupview
+containing that process.
+
+When a process fails, ISIS goes through a two-stage sequence.
+First, the system may call \fBmt_physdead(addr_p)\fR, giving the
+address of that process.
+It does this as a sort of a hint to your protocol because
+there may be a delay before the group membership is changed,
+e.g. because some messages are being flushed to ensure atomicity
+of multicasts initiated by the process that crashed.
+However, there are situations where this routine will not be called at all,
+hence it should be treated as a hint and nothing more.
+Calls to \fBmt_physdead\fR may come in \fI any\fR order at different
+members.
+
+However, ISIS will guarantee that if a member fails,
+surviving members will either \fI eventually\fR see a call to
+\fBmt_physdead\fR for this member, or a call to 
+\fBmt_groupview\fR with a view that does not contain that member.
+And, calls to \fBmt_groupview\fR are done in the same order everywhere.
+This is a property on which your transport protocol can depend.
+
+Your protocol may sometimes detect apparent failures.  
+ISIS does not allow you to act on such failures directly, since
+you could be wrong.  However, it does provide a way for
+your code to encourage ISIS to check the status of a
+recalcitrant process.
+This is done via the routine \fBisis_querydead(addr_p)\fR.
+\fBisis_querydead\fR doesn't keep track of process status that ISIS may have
+reported directly to your code, so be careful to monitor
+calls from \fBmt_physdead(addr_p)\fR and \fBmt_groupview\fR if this is what
+you need.
+Needless to say, it is inadvisable to call \fBisis_querydead\fR repeatedly for the
+same argument.
+
+\fBisis_querydead(addr_p)\fR
+returns 1 if ISIS believes that this member is dead, and 0
+otherwise.
+It does this by probing
+the inicated process to see if it is responsive; while doing so, the call
+may block for a significant period of time.
+Thus, if 0 is returned, the process \fIactually responded to a probe
+message after the call was done.\fR
+This action will cause ISIS to notice if the site where the destination is
+running has crashed, but will \fInot\fR detect the fact that a process
+has gone into an infinite loop.
+
+Note: after calling \fBisis_querydead\fR and before it returns, a call
+to \fBmt_physdead(addr_p)\fR and \fBmt_groupview\fR might occur.
+Your code should be designed to operate correctly in these cases, for example by
+using some sort of flag.
+One way to avoid this issue is to run \fBisis_querydead(addr_p)\fR asynchronously, as follows:
+.ti 10
+\fBt_fork(isis_querydead, addr_p);\fR
+This creates a new task to do the query call; the result is discarded.
+The task that calls \fBt_fork\fR will not be blocked while the query occurs.
+
+
+.SH "BASIC TRANSPORT COMMUNICATION INTERFACE"
+The basic transport communication interface is through the send routine.
+Calls to \fBmt_send\fR have the following interface:
+.in +10
+.nf
+mt_send(gaddr, exmode, mp, to, callback, arg0, arg1)
+address *gaddr;
+register message *mp;
+register address *to;
+int (*callback)();
+char *arg0, *arg1;
+{
+   ....
+}
+.fi
+.in -10
+
+Basically, a call to \fBmt_send\fR requests that \fBmp\fR be
+transmitted to the destinations in \fBto\fR and that the 
+\fBcallback\fR routine be invoked when the message is known to have
+been delivered or the destination is dead.
+The destinations in {\to\fR are guaranteed to be a proper subset of the
+members and clients of the group.
+(Your protocol may or may not take advantage of this - ISIS will throw
+away surplus messages).
+If the callback routine is not specified as a null pointer, you
+should do the callback separately for each destination, as
+follows: \fB(*callback)(addr_p, arg0, arg1);\fR, where 
+\fBaddr_p\fR is a pointer to the address of the destination in
+question.
+It is important that you not do the callback until the messages
+have reached their remote destinations safely, as this is one of the
+tools ISIS uses to decide how long to keep spare copies of a message
+to ensure atomicity after failures.
+
+Your protocol may reject a request to send a message, by returning -1; it
+should return 0 if the message was accepted.  
+In the former case, ISIS will transmit the message in question using transport
+protocol 0.
+The protocol 0 transport routine is called \fBnet_send\fR; 
+it transmits messages using the UDP packet protocol.
+You are free to call \fBnet_send \fR if your protocol has a need
+for reliable point-to-point messaging.
+However, be aware that \fBnet_send\fR uses acknowledgement packets to
+ensure that delivery is reliable.
+There is no unacknowledged version of the \fBnet_send\fR protocol.
+This means that \fBnet_send\fR is not a particularly good way
+to send acknowledgement packets needed by your own protocol, unless
+you want to be absolutely sure they reach their destination.
+(Using an acknowledged protocol to send the acks for protocol \fBn\fR
+could effectively double its acknowledgement traffic).
+
+When a process is declared dead, whether from \fBmt_groupview\fR 
+or \fBmt_physdead\fR, it should be treated
+like a sink.
+All messages to that process (if any) should be
+discarded and ISIS should be told that any pending messages
+(and any future attempts to send) have terminated, by calling the
+specified \fBcallback\fR procedure (if the pointer was non-null).
+
+.SH "SELF-ADDRESSED MESSAGES AND EXCLUSION MODE FLAG"
+In general, \fBto\fR may include the address of the \fI sender\fR.
+That is, for some messages, there will be an address in this
+null-terminated list for which \fBaddr_ismine()\fR returns TRUE.
+The \fBexmode\fR flag is set to 1 if this copy of the message \fI
+should be ignored\fR.
+In this case, you should transmit the packet to all addresses except this
+one.
+On the other hand, if \fBexmode\fR is 0, this ``local'' copy of the message
+can be delivered whenever your protocol is ready to do soa
+(immediately if you like) by calling
+.ce
+\fBisis_receipt(mp, &my_address, pn).\fR
+Here, \fBpn\fR is the protocol transport number that was assigned to
+your protocol.
+
+Notice that if \fBexmode\fR is set to 1 and \fBto\fR only lists one process
+for which \fBaddr_ismine\fR returns true, your protocol will not
+need to do any work, but must call the
+callback routine if the pointer is non-null.
+
+.SH "DELIVERY OF MESSAGES FROM REMOTE PROCESSES"
+In the case of a receipt of a message from some remote
+destination, call \fBisis_receipt(mp, addr_p, pn)\fR,
+specifying the address from which the message arrived and the
+protocol transport number that received it.
+\fBisis_receipt\fR will put messages in sequence and detect and reject
+duplicates, so your protocol need not worry about doing this.
+The application will get stuck, however, if your protocol accepts a message
+but never gets around to delivering it at some destination to which
+the message is addressed.
+The client dump contains enough information to figure out that this has
+happened, but you need to suspect the problem to know where to look.
+
+.SH "OTHER USEFUL ROUTINES"
+ISIS provides several routines that we find helpful in designing transport
+protocols.
+For example, your protocol may need to send a message to acknowledge receipt
+of message \fBmp\fR.  
+Should it send the acknowledgement immediately, or wait a little while
+in the hope that some other message will be sent back to the
+sender of \fBmp\fR?
+Obviously, ISIS can't predict the future, but it can tell if the sender
+of \fBmp\fR is waiting for one or more replies.  
+If so, your protocol might want to wait for the routine that \fBmp\fR
+is delivered to to run, in the hope that it will generate such a
+reply (if a multicast is received using protocol \fBpn\fR, any
+reply to it will be presented first to the \fBmt_send\fR routine
+for protocol \fBpn\fR).
+The predicate \fBMAY_REPLY(mp)\fR tells if reply to \fBmp\fR is possible.
+If this predicate is false, the message will not generate a reply.
+If this predicate is true, the message might generate a reply fairly
+soon. 
+This is a hint to the delivery protocol not to send
+an acknowledgement immediately, as there is a chance that the 
+acknowledgement can be piggybacked on the reply message.
+
+But, how long should your protocol wait?  
+After all, \fBMAY_REPLY(mp)\fR only gives a hint, and perhaps no reply
+will be sent!
+To overcome this problem, ISIS provies a routine \fBt_yield\fR.
+If your protocol's receiving task does a \fBt_yield()\fR,  ISIS will
+deliver the message \fBmp\fR.
+If a reply gets sent immediately, your \fBmt_send\fR routine will be
+called while the receiving task is still suspended.
+If no reply is sent, or \fBisis_receipt\fR can't deliver \fBmp\fR
+promptly, \fBt_yield\fR will return and you can send the
+acknowledgement as a separate packet.
+Note that \fBt_yield\fR returns no indication of what happened, you
+are expected to keep track of this yourself using global flags.
+The \fBMAY_REPLY\fR predicate is uniformly true or false at all processors
+that receive a given message.
+
+One easy mistake is to forget that \fBmsg_read\fR creates a message.
+Don't forget to do a \fBmsg_delete\fR after your code has finished
+with such a message, or with one extracted from inside another
+message using the \fB%m\fR format item.
+
+.SH "FRAGMENTING LARGE MESSAGES"
+Your protocol may have a size limit on messages.  
+To check the size of a message, call \fBmsg_getlen(mp)\fR.
+If a message is too long for your protocol, you may call 
+\fBisis_fragment(size, mt_send, gaddr, exmode, mp, to, callback, arg0,
+arg1) \fR.
+This routine will repeatedly call the specified \fBmt_send\fR routine 
+with fragments of the message pointed to by \fBmp\fR that are
+no larger than \fBsize\fR.
+The remaining arguments to \fBmt_fragment\fR will be passed to the
+send routine unchanged.
+The \fBgaddr\fR, \fBexmode\fR, and {\to\fR arguemnts will be passed to
+the send routine unchanged.
+However, the callback routine will be passed as a null pointer on all but
+the last fragment of the message.
+This way, the user-supplied callback will not be called until after all
+fragments of the message have been delivered.
+
+.SH "WHEN YOUR PROTOCOL WILL BE USED"
+ISIS will always use protocol 0 by default.
+To convince ISIS to use your protocol, use \fBmbcast_l\fR, \fBfbcast_l\fR,
+\fBcbcast_l\fR or \fBabcast_l\fR,
+specifying the option \fB``Pn''\fR where \fBn\fR is the protocol
+transport number you chose.
+The mbcast protocol gives FIFO ordering (like FBCAST) but might not be
+atomic in the event that the sender fails during transmission.
+The other protocols are atomic and
+give FIFO delivery order, CBCAST order, and ABCAST order
+respectively, and each is more costly than the preceding one.
+Also, the others are ordered with respect to GBCAST invocations, while
+\fBmbcast_l\fR might not be.
+
+\fBmbcast_l\fR 
+gives the very fastest possible multicast in ISIS, short of calling
+your transport protocol directly.
+
+Note that ISIS will not use your protocol if you don't obey
+the various restrictions on destination address.  
+In such cases, the multicast will work using the old, slow ISIS mechanism.
+
+We expect that support for external delivery protocols will gradually
+improve in future releases of ISIS.
+One facility we are considering will allow a protocol to learn something
+about network topology at runtime, for example to determine if
+all of a set of processes are on the same ethernet or token ring.
+
+.SH "COMPILING WITH BYPASS FLAG"
+Recall that -DBYPASS is specified when you compile ISIS.  In fact, this
+flag only affects two modules of the ISIS client library, clib.
+The rest of ISIS is the same whether or not BYPASS is used.
+In fact, if you don't compile ISIS with -DBYPASS, the system
+never uses the new BYPASS code at all.
+
+You can mix code linked to a clib compiled with -DBYPASS and code compiled
+without this, but only if all members of a process group use the
+same rule.
+Other mixtures will hang, e.g. if a process linked to a library built with
+-DBYPASS tries to join a group linked without BYPASS.
+
+Because the BYPASS facility is experimental, it may have bugs that will
+render ISIS less reliable.  
+We believe that with BYPASS disabled, ISIS V2.0 is the most robust
+version of ISIS yet released, but with it, problems will be
+likely for at least a few months.  
+If performance is not an issue for your application but reliability is
+crutial, you may wish to compile and link most applications with
+a version of clib for which BYPASS is not enabled, using the
+BYPASS version only in isolated applications for which performance
+is especially important.  
+However, this requires multiple copies of the client library routines and
+hence might be a bit hard to administer if your group is not very
+``sophisticated''.

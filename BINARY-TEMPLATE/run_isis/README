@@ -1,0 +1,39 @@
+This is the directory from which we normally run ISIS for "production"
+purposes.  It uses binaries from ../bin and has symbolic links for 
+convenience in starting the various demo programs.  
+
+To start ISIS here you will need to edit the "sites" file in this
+directory to delete references to Cornell machines are replace them
+with definitions for your own machine.
+
+Lines have the format
+	+ ss: uport,tport,bport machinename primaryscope[,scope2,...]
+Where:
+	* The + sign indicates that the entry is "active"
+	* ss is a site number and must be unique
+	* uport is the ISIS "udp port" number.  Pick anything > 1024.
+	* tport is the ISIS "tcp port" number.   "     "         "
+	* tport is the ISIS "bcast port" number. "     "         "
+	  ... most people also list this in /etc/services, i.e.
+                     isis       1601/udp	# for ISIS site-site
+                     isis       1602/tcp	# for connect to ISIS
+                     isis       1603/bcast	# for isis startup
+	* machinename is your machine name, normally fully qualified.  Must
+	  be possible to find it using gethostbyname() (i.e. listed in the
+	  /yp/etc/hosts file).  ISIS matches the output of hostname() in this
+	  file, so make sure that hostname echos a reasonable name.
+	* primaryscope is the name of your institution.  ALL SITES IN YOUR
+          LAN normally have the same primaryscope.  This is used for group
+          namespace creation and if you use different values for different
+          machines, they will have different "namespace scopes".
+	* scope2, etc. are optional scopes.  We often list machines by type
+	  for convenience here.  Not required and can differ from entry to
+	  entry even within a LAN.
+
+With this change ISIS should start right up if you run "isis" from here.
+
+If the system seems not to have been installed, try
+	cd ..; make ; make install
+
+
+	

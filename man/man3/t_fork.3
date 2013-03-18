@@ -1,0 +1,113 @@
+.TH T_FORK 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+t_fork, t_fork_msg, t_fork_urgent, t_fork_urgent_msg \- fork ISIS task
+.br
+THREAD_LEAVE_ISIS, THREAD_ENTER_ISIS \- release and acquire ISIS mutex
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+int t_fork (routine, arg);
+.br
+.B 
+int t_fork_urgent (routine, arg);
+.br
+.B 
+int t_fork_msg (routine, msg_p);
+.br
+.B 
+int t_fork_urgent_msg (routine, msg_p);
+.br
+.RS
+.B void (*routine)(arg);
+.br
+.B void *arg;
+.br
+.B message *msg_p;
+.br
+.B THREAD_LEAVE_ISIS();
+.br
+.B THREAD_ENTER_ISIS();
+.RE
+
+.SH DESCRIPTION
+These routines create a new lightweight task within the current
+address space (Unix process).
+ISIS tasks are non-preemptive; a task runs until it explicitly blocks by
+calling an ISIS routine such as 
+.IR bcast (3)
+or 
+.IR t_wait (3)
+which blocks at which point another ISIS task is selected to run.
+
+.I t_fork 
+causes a new task to be created which executes 
+``routine(arg)''.
+This task is placed on the scheduler run queues, but the current task
+continues to execute until it explicitly blocks.
+The new task terminates when ``routine'' 
+returns.
+
+.I t_fork_msg 
+first increments the reference count of ``msg''
+(see 
+.IR msg_increfcount (3))
+and creates a task which executes 
+``routine(msg)''.
+When ``routine'' returns the task is terminated, and a
+.IR msg_delete (3)
+is done on ``msg''.
+
+.I t_fork_urgent
+and 
+.I t_fork_urgent_msg
+cause the current task to block and the scheduler immediately
+begins executing the newly created task.
+
+For debugging purposes it is a good idea to call
+.PP
+.RS
+.B
+isis_task(routine, "name of routine")
+.RE
+.PP
+at the start of your program for every routine that will be
+forked as a task.
+This allows ISIS to print more meaningful error messages and dumps.
+
+.SH ORDERING
+
+.I t_fork
+and 
+.I t_fork_msg
+do not block.
+.I t_fork_urgent
+and 
+.I t_fork_urgent_msg
+block and cause the newly created task to execute immediately.
+
+.SH "MUTUAL EXCLUSION"
+
+When created, an ISIS task acquires the ISIS mutual exclusion lock,
+called isis_mutex.
+This prevents preemptive execution even in systems capable of
+preemptive scheduling, and makes the idea of virtually synchronous
+event ordering meaningful (with task preemption, the order in which
+ISIS delivered messages or scheduled tasks would be irrelevant because
+preemption could change the order in which these events occur).
+A task can drop this mutual exclusion lock by calling
+.I THREAD_LEAVE_ISIS();
+if desired, the thread can later re-enter ISIS using a call to
+.I THREAD_ENTER_ISIS().
+Threads created ``outside'' of ISIS (i.e. using the native
+thread creation operation for the host operating system) can
+call into ISIS without first calling THREAD_ENTER_ISIS(), because
+ISIS automatically calls THREAD_ENTER_ISIS() in this case.
+Entering ISIS is somewhat costly, so if a thread will do
+large numbers of ISIS operations, it is desirable to enter the ISIS
+scope first, by calling THREAD_ENTER_ISIS(), rather than to
+rely on ISIS to do this automatically on a call by call basis.
+
+.SH "SEE ALSO"
+t_wait(3), isis_task(3), t_set_stacksize(3), msg_increfcount(3),
+ISIS(3)

@@ -1,0 +1,19 @@
+This is an ISIS port for the PC/RS-6000 under the Golden AIX release with
+level F updates.  It seems to work quite well, but let us know if you run
+into any problems.
+
+A minor problem is that AIX won't let you specify the "bcast" port
+used by ISIS in the /etc/services file.  This won't matter unless you
+use isis_remote(), in which case you would either have to specify the
+port by hand or by setting the environment variable ISISREMOTE to the
+desired value. 
+
+How to enable BYPASS communication:
+
+   Release 2.1 of ISIS provides the "BYPASS" communication mode which
+   can speed up multicast up to 10 times over normal ISIS multicasts.
+   To enable this, uncomment the appropriate line that defines the MCHDEP
+   compiler option, near the beginning of this makefile.
+   This will supply the -DBYPASS option to the compiler.
+
+Ken Birman

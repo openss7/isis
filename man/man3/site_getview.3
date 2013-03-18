@@ -1,0 +1,129 @@
+.TH SITE_GETVIEW 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+site\_getview, sv\_watch, sv\_watch_cancel, sv\_monitor, sv\_monitor_cancel \- Obtain / montitor site views
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+site_view *sv\_getview()
+.PP
+.B int wid = sv\_watch(site, event, routine, arg)
+.br
+.B site_id site;
+.br
+.B int event;
+.br
+.B int (*routine)(sid, what, arg);
+.br
+.B char *arg;
+.PP
+.B sv\_watch_cancel(wid)
+.br
+.B int wid;
+.PP
+.B int mid = sv\_monitor(routine, arg)
+.br
+.B int (*routine)(sview_p, arg);
+.br
+.B char *arg;
+.PP
+.B sv\_monitor_cancel(mid)
+.br
+.B int wid;
+.PP
+
+
+.SH DESCRIPTION
+.IR sv\_getview 
+returns a pointer to a data structure containing the current
+site_view, which lists currently operational sites (computers).
+This data structure resides in a static location and will be
+changed, in place, as new sites join and leave the system.
+The format of the site_view structure is as follows:
+.nf
+
+struct sview
+{
+    int             sv\_viewid;                    /* Unique identifier */
+    site_id         sv\_slist[MAX_SITES + 1];      /* List of sites */
+    u_char          sv\_incarn[MAX_SITES + 1];     /* Current incarnations */
+    bitvec          sv\_failed;                    /* Most recent failures */
+    bitvec          sv\_recovered;                 /* Most recent recoveries */
+};
+
+.fi
+The most important information in the structure is the sv\_slist
+field, which gives a null-terminated list of currently operational
+sites, ordered in the sequence that they joined the ISIS system.
+Each site-id consists of a site-number, drawn from the ISIS \fIsistes\fR
+configuration table, and a site-incarnation number, assigned
+by the system and incremented when a site fails and later restarts.
+These fields can be extracted using the macros SITE\_NO(sid) and SITE\_INCARN(sid)
+respectively.
+Given the site-number, the ascii name of the site can be
+determined from a global data structure (accessible in all ISIS
+application programs): site_names[sno][MAXCHARS].
+.PP
+A quick way to determine the current incarnation number for a site
+is to index into sv\_incarn[sno]; this will be the incarnation number or
+the constant FAILED_INCARN if the site is currently down.
+The bit-vectors sv\_failed and sv\_recovered indicate which sites
+have failed (resp. recovered) since the last view was defined.
+These fields can be manipulated using the bit-vector macros btst and bit.
+.PP
+.IR sv\_monitor
+arranges for callback of a user-specified routine
+whenever the site-view changes.
+The callback will be done by a call: (*routine)(newsv, arg),
+and will run as a new ISIS task.
+.PP
+.IR sv\_monitor_cancel
+cancels a previously enabled callback.
+.PP
+.IR sv\_watch
+requests that the system perform a callback to a specified
+routine in the event that a given event occurs to a given site.
+The callback will occur exactly once, and will be done using
+a call: (*routine)(sid, event, arg).
+The callback routine is run as an ISIS task.
+The event codes supported are W_FAIL (callback if site fails) and
+W_RECOVER (callback if site recovers).
+Note: in the case of W_RECOVER, the incarnation
+number is ignored.
+If the site-id is null, a callback occurs if \fIany\fR site fails
+or recovers.
+.PP
+.IR sv\_watch_cancel
+cancels a pending sv\_watch.
+
+.SH ORDERING
+.PP
+Changes in site-views are \fInot\fR synchronized with ISIS broadcast
+and process-group membership change events, in the sense that
+different processes could perform a site_getview and observer
+different site_views at a virtually simultaneous instant in their
+execution.
+On the other hand, ISIS does provide some weaker guarantees that can
+be useful.
+First, all sites observe exactly the same sequence of site-views
+and site-view id's.
+Moreover, the site ordering within the sv_slist field is made to
+reflect the order in which sites recovered.
+.PP
+The user should not assume that
+all messages from a failed site will have been delivered by the system
+before the new site-view is installed.
+Thus, the following sequence of events would be permitted by ISIS:
+(1) a site view showing that site 3 incarnation 2 has
+failed is installed, then (2) additional messages and replies
+from a process which resided at site 3 are delivered, and only then (3)
+a new process group view in which that process has exited is seen.
+However, after being informed of a process failure,  an
+application may safely assume that no further communication
+from that process will be received.
+
+.SH DIAGNOSTICS
+None.
+
+.SH "SEE ALSO"
+pg_getview(3), ISIS(3)

@@ -1,0 +1,76 @@
+This application is a spreadsheet programmed by Robert Wisniewski.  
+
+Spreadsheets are a checkerboard of cells.  These cells can contain either
+strings or formulas.  Formulas must start with an "=" while strings may
+start with any other character.  A string may consist of any desired
+sequence of characters.  A formula needs to follow specifications.  A
+formula may be just a number, e.g., "=97" is a valid formula.  A formula
+may also consist of basic operations, e.g., "=9+8-4" is a valid formula. 
+Formulas may also reference other cells.  This is accomplished by 
+designating the column and row, e.g., "=5+A5" is a valid formula which adds
+5 to whatever value is in cell A5.
+
+Cells may be denoted by either upper or lower case letters.  Referencing a
+cell that does not have a formula will cause an error, e.g., if b5 contains
+"sales" then a cell containing "=b5" will show an error.  Normally, formulas
+are calculated from left to right with division and multiplication first.
+You may use parentheses to assign a desired order to the operations, e.g.,
+"=5+6*8" produces 53, while "=(5+6)*8" produces 88.  One note: please avoid
+circular referencing i.e., cell A5 "=a1"  cell A1 "=a5".  Currently,
+addition, subtraction, multiplication, and division are implemented.
+
+This program is used to demonstrate ISIS's capabilities of maintaining a
+consistent global state.  Additionally, the program is intended as a model
+of a real, useful application.  As an example, the user may think of a
+factory where multiple copies of the spreadsheets are being run
+simultaneously at different locations.  The incoming stockroom may
+have a copy.  Additionally, the outgoing production warehouse, the
+manager, and the accountant may all have a copy running.  As any one cell
+that is affected by a site specific task is changed, all locations will be
+notified immediately of this change, and of the ramifications of this
+change.  An example: if the warehouse ships out 100 units for a
+particular month, the profit total in the managers office may well
+increase.  The benefits of such interactive computing are just beginning to
+be explored.
+
+When a new spreadsheet is started, there are three main options.  Running
+just  spread port-id  will cause the spreadsheet to join a group
+"globalspd".  This can also be accomplished by choosing spread -g port-id.
+Subsequently any modifications made will affect all those
+members who have also joined "globalspd".  Secondly, running spread
+-n"name" port-id will cause the spreadsheet to join group "name".  Again, 
+any changes made to the spreadsheet will affect all the members of the 
+group "name".  Finally, running spread -dX, where X is an integer will
+start the spreadsheet up in the demo mode with a delay time of X seconds
+between simulated inputs.
+
+When the spread sheet comes up, you may join the pre-assigned group by
+choosing join ISIS under the start menu.  Once running, clicking the mouse
+in any cell highlights that cell.  The contents of the cell (if any) are
+displayed near the top of the window.  You may now append characters to the
+end of the already displayed string.  Pressing delete will remove them one
+at a time. To register the entry, you may either hit return, or click the
+mouse in another position.  That cell, plus all those that depend on it
+will be updated.  You may continue making entries as you wish.  If multiple
+copies of the same named spreadsheet are open, each change made in one copy
+will affect all the copies. 
+
+You have several options while the spreadsheet is running.  You may save
+all the spreadsheets by choosing save all under the file menu, or you may
+save just the topmost spreadsheet by choosing save.  If you have not
+automatically engaged the demo mode upon startup you may do so any time
+while the spreadsheet is running. Choosing high-light changes under the
+demo menu will cause all the cells that depend upon a certain cell to be
+highlighted each time a change is made to that cell.  Choosing simulate
+input will cause the computer to randomly choose a cell with =X, where X is
+a number, to randomly change that number by some integral value between -10
+and 10.  This will occur every n number of seconds. After you have finished
+making entries, you may quit by clicking in the the exit box.  This will
+save the spreadsheet as  name  in the current directory for use the next
+time you wish to work with the same data.
+
+Methods for simulating multiple copies on one machine may be found in the
+grid demo documentation.  This spreadsheet program uses abcast to maintain
+a complete ordering of events.  This allows for two user who are editing
+the same cell to maintain a consistent view after they both have finished.
+Note, however, that probably only one of them will get the desired effect.

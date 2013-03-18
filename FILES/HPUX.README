@@ -1,0 +1,59 @@
+How to enable BYPASS communication:
+
+   Release 2.1 of ISIS provides the "BYPASS" communication mode which
+   can speed up multicast up to 10 times over normal ISIS multicasts.
+   To enable this, uncomment the appropriate line that defines the MCHDEP
+   compiler option, near the beginning of this makefile.
+   This will supply the -DBYPASS option to the compiler.
+
+Note to HP users:
+
+   This area builds the HP 300 version of ISIS V2.1.  You should chdir to the
+   HPSPECT area to build the HP Spectrum version of ISIS.
+
+HP Spectrum optimizer:
+
+   The makefiles now use the HP optimizer on all files except 
+   cl_tasks.c and pr_tasks.c (because of task switching) and cl_isis.c 
+   (because that file is too long for the optimizer).
+
+   Ignore the four warnings when compiling cl_plist.c stating that a 
+   register variable is not initialized before being used. The warning
+   is wrong.
+
+HP UDP communication problems:
+
+   A problem that might or might not be due to the HPUX 7.0 system.  
+   On networks that mix HP and other vendor hardware (i.e. HP and MIPS, HP
+   and SUN) we have seen the HP UDP message transmission code hang for
+   3 - 3.5 seconds at a time, very predictably.
+
+   For example, if you write a loop that runs through a list of INET
+   addresses for a mixture of machine architectures (i.e. HPs, MIPS, and/or 
+   SUN machines) and for each destination you send a single UDP packet of any 
+   size to any port you like, it will sometimes pause for 3 seconds at a time.  
+   This has nothing to do with ISIS and will happen even if there is no process
+   on the remote side to receive the message.  Presumably either HP has a
+   bug in their UDP implementation or SUN and MIPS do and HP gets it right.
+   This does not arise if the SUN or MIPS machine does the sending, or if
+   the communication is done entirely between HP systems.
+
+   We are working with HP technical support on the problem and have so far 
+   discovered the following:  The default SO_BURST_OUT value for a socket with 
+   the HPUX 7.0 implementation is 2, which means only 2 messages may be queued 
+   for transmission before the sendto() function will block.  Once the channel 
+   is congested, it takes about 3 seconds to clear.  This version if ISIS has 
+   modified the SO_BURST_OUT default value up to the maximum of 7, which 
+   substantially improves performance, but doesn't completely solve the problem.
+   The channel will still congest, only later on and not as often.
+
+   A consequence is that ISIS will probably run slower for the following 
+   functions on networks whose site list contains HP and non-HP equipment:  
+   isis start-up, looking up process groups, broadcast to large process groups, 
+   certain types of bypass communication, and isis shutdown (isis -Z).  HP is 
+   continuing to investigate the problem and we will post a fix or work-around 
+   to comp.sys.isis when we have one.  HP has also stated that this problem 
+   will not be present in HPUX 8.0.
+
+
+Ken Birman

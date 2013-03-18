@@ -1,0 +1,33 @@
+.TH BYPASS 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+bypass \- ISIS broadcast feature
+
+.SH DESCRIPTION
+ISIS supports two major classes of broadcast primitive, within which
+primitives like cbcast, abcast and gbcast represent subclasses.
+The major distinction concerns the route used to get messages
+from the sender to the destinations.
+When using the ``bypass'' protocol suite, messages are sent
+directly, \fIbypassing\fR the ISIS protocols server.
+Otherwise, messages are sent indirectly, at potentially high overhead.
+
+The bypass protocols are only used on broadcasts with a single
+destination, which must be a process group (or process list formed from
+a process group) to which the sender process also belongs or of which it
+is a client.
+One special case is supported: point-to-point replies to a bypass
+broadcast satisfying the basic group membership rule.
+
+When using the bypass protocol facility, ISIS can be asked to employ
+a message transport layer provided by the user.
+The interface is described in
+.IR isis_transport(3).
+Additionally, by using bcast_l option B, the user can
+specify that the program is expected to use bypass communication.
+If bypass mode is not possible, a warning message will be printed.
+This feature can be useful in debugging, but does not affect the
+rules employed to decide if bypass communication is practical.
+
+.SH SEE ALSO
+bcast(3), bcast_l(3), pl_create(3), pg_create(3), isis_transport(3),
+ISIS programming manual.

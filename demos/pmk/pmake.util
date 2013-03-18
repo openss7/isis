@@ -1,0 +1,61 @@
+#  $RCSfile: pmake.util,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:43 $
+S = /usr/u/isis/util
+MCHTYPE=SUN3
+CFLAGS = -D$(MCHTYPE) -I/usr/u/isis/include -c -O
+LDFLAGS =  -g
+LIBS = ../clib/lib1.a ../clib/lib2.a ../mlib/mlib.a
+
+all:	../bin/isis ../bin/rexec ../bin/news ../bin/rmgr \
+	../bin/rmgr_cmd ../bin/cmd ../bin/tabex ../bin/lmgr ../bin/prstat
+
+some:  ../bin/isis ../bin/rexec
+
+../bin/isis:	isis.o $(LIBS)
+	|cc -o ../bin/isis $(LDFLAGS) isis.o $(LIBS)
+../bin/tabex:	tabex.o
+	|cc -o ../bin/tabex tabex.o
+../bin/rexec:	rexec.o $(LIBS)
+	|cc -o ../bin/rexec $(LDFLAGS) rexec.o $(LIBS)
+../bin/news:	news.o $(LIBS)
+	|cc -o ../bin/news $(LDFLAGS) news.o $(LIBS)
+../bin/rmgr_cmd: rmgr_cmd.o $(LIBS)
+	|cc -o ../bin/rmgr_cmd $(LDFLAGS) rmgr_cmd.o $(LIBS)
+../bin/rmgr:	rmgr.o $(LIBS)
+	|cc -o ../bin/rmgr $(LDFLAGS) rmgr.o $(LIBS)
+../bin/cmd:	cmd.o cmdy.o cmdl.o $(LIBS)
+	|cc -o ../bin/cmd $(LDFLAGS) cmd.o cmdy.o cmdl.o $(LIBS)
+
+isis.o:		$(S)/isis.c
+	|cc $(CFLAGS) $(S)/isis.c
+tabex.o:	$(S)/tabex.c
+	|cc $(CFLAGS) $(S)/tabex.c
+rexec.o:	$(S)/rexec.c
+	|cc $(CFLAGS) $(S)/rexec.c
+news.o:		$(S)/news.c
+	|cc $(CFLAGS) $(S)/news.c
+rmgr.o:		$(S)/rmgr.c
+	|cc $(CFLAGS) $(S)/rmgr.c
+rmgr_cmd.o:	$(S)/rmgr_cmd.c
+	|cc $(CFLAGS) $(S)/rmgr_cmd.c
+lmgr.o: 	$(S)/lmgr.c
+	|cc $(CFLAGS) $(S)/lmgr.c
+
+cmd.o:		$(S)/cmd.c
+	|cc $(CFLAGS) $(S)/cmd.c
+cmdy.o:		cmdy.c
+	|cc $(CFLAGS) cmdy.c
+cmdl.o:		cmdl.c
+	|cc $(CFLAGS) cmdl.c
+cmdy.c:		$(S)/cmdy.y
+	|yacc -d $(S)/cmdy.y; mv y.tab.h cmdy.h; mv y.tab.c cmdy.c
+cmdl.c:		$(S)/cmdl.l
+	|lex $(S)/cmdl.l; mv lex.yy.c cmdl.c
+prstat.o:	$(S)/prstat.c
+	|cc $(CFLAGS) $(S)/prstat.c
+
+$(LIBS):
+	echo external dependency on lib
+
+clean:
+	rm -f ../bin/* *.o
+

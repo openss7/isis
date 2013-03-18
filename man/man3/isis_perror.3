@@ -1,0 +1,32 @@
+.TH ISIS_PERROR 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+isis_perror, isis_errno \- examine ISIS error return code
+.SH SYNOPSIS
+.B #include "isis_errno.h"
+.PP
+.B void isis_perror(s)
+.br
+.SM   
+.B char *s;
+.PP
+.B int isis_errno;
+
+.SH DESCRIPTION
+Upon abnormal return from an ISIS function 
+(often signified by returning -1) the global variable
+.I isis_errno 
+contains an indication of the error.
+
+.I isis_perror 
+prints out its argument on the standard output
+followed by ": " and then the ISIS error message associated
+with the current value of 
+.IR isis_errno .
+
+The set of possible error numbers is defined in the ISIS include file
+"isis_errno.h". 
+This include file is automatically included by the ISIS global 
+include file "isis.h".
+
+.SH "SEE ALSO"
+ISIS(3)

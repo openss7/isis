@@ -1,0 +1,46 @@
+.TH MSG_PRINTACCESS 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+pmsg, msg_printaccess \- ISIS message functions
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B void pmsg(msg_p);
+.br
+.B void msg_printaccess(msg_p);
+
+.SH DESCRIPTION
+A 
+.I message
+is a container for storing typed data and communicating
+it between processes. 
+These routines are used to print the contents of a message.
+
+.I pmsg 
+prints the address of the message, its sender and destinations, its size, and
+its msg-identifier.
+
+.I msg_printaccess
+calls 
+.I pmsg
+but then goes on to print a great deal of very detailed information about the
+contents of the message, including a complete list of the fields it contains, their
+length and where their data is stored, 
+information about the way the message is stored in memory,
+how many references there are to the message, and so forth.
+If a message contains sub-messages, msg_printaccess recursively prints these as well.
+
+.SH DIAGNOSTICS
+
+If passed a bad pointer, or a pointer to a previously deallocated message, both of these
+routines will give unpredictable behavior.
+
+.SH "SEE ALSO"
+msg_put(3),
+msg_format(3),
+msg_getsender(3), 
+msg_getdests(3), 
+msg_getid(3), 
+msg_read(3), 
+isis_define_type(3),
+address(3), bcast(3),
+ISIS(3)

@@ -1,0 +1,40 @@
+.TH RMGR 1  "1 February 1986" RMGR "ISIS COMMANDS"
+.SH NAME
+rmgr \- ISIS recovery manager daemon.
+.SH SYNOPSIS
+.B rmgr 
+.SH DESCRIPTION
+The
+.I rmgr
+program  is run from within the isis.rc file and triggers automated restart of ISIS programs
+when the system is rebooted.  It subsequently remains operational but idle and is used by
+rmgr_cmd to maintain a recovery manager database.
+A typical restart sequence in which rmgr is started is illustrated below:
+.nf
+% isis
+Site 4 (fafnir.cs.cornell.edu): isis is restarting...
+Is anyone there?
+... found no operational sites, checking again just in case
+Is anyone there?
+site 4 (fafnir.cs.cornell.edu) doing a total restart
+../bin/protos <isis-protos> -d/usr/u/isis/DEVEL/SUN4/run_demos/#.logdir
+../bin/rexec <isis-rexec> 1653 
+../bin/rmgr <isis-rmgr> 1653 
+../bin/lmgr <isis-lmgr> 1653 
+../bin/xmgr <isis-xmgr> 1653 
+Site 4/0 is up!
+site view has viewid 4/1
+    fafnir.cs.cornell.edu         [site_no 4  site_incarn 0]
+Transaction Manager: checking that lmgr is initialized...
+Log Manager: Startup Completed (exiting normally)
+isis: detected termination of <../bin/lmgr>
+Transaction Manager: lmgr initialized, resuming xmgr startup seq...
+Transaction Manager (xmgr): initialization complete.
+.fi
+
+Note that the coresponding isis.rc file does not specify 1653 as an argument to 
+the rmgr command, this is added by the system when it runs the rmgr daemon.
+
+.SH "SEE ALSO"
+
+SIS(3), isis(1)

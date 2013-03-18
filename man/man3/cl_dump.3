@@ -1,0 +1,34 @@
+.TH CL_DUMP 3  "1 February 1986" ISIS "ISIS LIBRARY FUNCTIONS"
+.SH NAME
+cl_dump \- print a formated dump of ISIS data structures
+.SH SYNOPSIS
+.B #include "isis.h"
+.PP
+.B 
+void *cl_dump (-1, why);
+.br
+.B char *why;
+.RE
+
+.SH DESCRIPTION
+cl_dump prints a dump of the calling process onto the console, or
+puts it into a file if bracketed by calls to isis_logging:
+.nr
+     isis_logging(1);
+     cl_dump(-1, "my reason for this dump");
+     isis_logging(0);
+.fi
+The dump will contain a great deal of information about what was
+going on inside your program, including lists of active tasks and
+the contents of almost all ISIS data structures.
+The ISIS programmers manual includes detailed examples and information
+on how these can be interpreted.
+
+If logged, the dump will be stored in the current directory
+in the file pid.log, where pid
+is the process-id of your program.
+Multiple logged calls will append to the log; while logging is
+enabled, all printed output will be diverted in this manner.
+
+.SH "SEE ALSO"
+paddrs(3), ISIS(3)

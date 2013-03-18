@@ -1,0 +1,136 @@
+.TH ISIS.RC 5  "1 February 1986" ISIS "ISIS FILE FORMATS"
+.SH NAME
+isis.rc \- ISIS startup configuration file
+.SH SYNOPSIS
+.B /usr/spool/isis/isis.rc
+.SH DESCRIPTION
+The restart file, named 
+.IR isis.rc, 
+usually is in the same place as the sites file.
+It lists the system services to start.  
+Here is a typical one that might be used
+from directory 
+.IR /usr/spool/isis.
+It assumes that a directory 
+.I /usr/spool/isis/bin
+contains the various executables.
+.br
+     bin/protos <isis-protocols> -a -d/usr/spool/isis/#.logdir
+.br
+     bin/rexec <isis-rexec>
+.br
+     bin/news  <isis-news>
+.br
+     bin/lmgr  <isis-lmgr>
+.br
+     bin/rmgr  <isis-rmgr>
+.br
+     bin/xmgr  <isis-xmgr>
+.br
+     bin/spooler  <isis-spooler>
+.br
+
+This tells the system to first start the ISIS protocols process,
+and then once it comes up to run the remote executive
+facility, the news program, the log manager cleanup program (which
+will exit shortly after restarting), 
+the recovery manager and the transaction manager.
+The first argument gives a path name to use and the second
+shows how the program should be listed if people run the
+UNIX
+.IR ps (3) 
+command.
+The 
+.I -a
+flag tells the protocols process to 
+.I append to its
+system log; by default it wipes the log clean each time it is started.
+The log called 
+.IR n .log, 
+for site 
+.IR n , 
+and is useful for understanding
+why the system crashed.  However, logs can get big over time, which is
+why the 
+.I -a
+flag is not the default.
+Protos has one other commonly specified argument: -f\fIn\fR (i.e. -f10), which
+is used to accelerate the site-level failure detection algorithm.
+In general, ISIS will react to a failure after about \fI3*n\fR seconds; in the
+default case \fIn\fR is 60 and ISIS needs about 3 minutes to detect a site failure.
+This works quite well for long-running, self-managing systems where one wants to
+avoid calling a machine down just because it is a bit loaded or has a problem
+talking to an NFS server.  A small value like -f10 (this is as small as one can make
+the value safely) is mostly useful for demos: your boss may not want to wait
+3 minutes to see the system respond to a "failure"; 30 seconds is easier to justify. 
+.PP
+You may chose to omit services, for example the 
+.I rmgr
+if you don't want to
+allow automatic restart of ISIS applications, the 
+.I rexec
+service if you
+don't want to allow remote executions through the 
+.IR isis_rexec (3)
+system call, or  
+.I xmgr
+if you don't use ISIS transactions.
+.I protos
+must be run first and 
+.I lmgr
+must be run before 
+.I rmgr
+and 
+.IR xmgr ;
+order is otherwise not important.  Most user-defined "services" are added
+using 
+.IR rmgr_cmd (1), 
+not by modifying the 
+.I isis.rc
+file.
+The spooler is the ISIS spooling facility, and must be active at some
+sites if the interface in spool(3) is to be used.
+
+One common option to the ISIS protocols process is ``-d directory'', which
+tells ISIS that it is being run in a directory other than ``/usr/spool/isis'',
+(the default, but you can specify it explicitly too).
+If you start ISIS up in a place other than ``/usr/spool/isis'', and you
+neglect to specify this option in the isis.rc file line for protos, 
+you will be unable to run the recovery manager, the transaction manager
+and logging services.
+Instead, error messages will be printed by each on the system console of your
+machine.  The directory is available from C programs in 
+a global variable called 
+.IR isis_dir .
+The notation #.logdir, used above, tells ISIS to create a directory that
+includes the local site number (i.e. 22.logdir) and keep files in that
+directory.  This is useful when several ISIS systems are run from the
+same directory, which can be convenient when using NFS remote-mounted file servers.
+
+One warning about the directory: ISIS needs to be able to create
+files in this place, so make sure it is writable and has adequate room 
+for (a small amount of) ISIS log files and 
+.I rmgr 
+and 
+.I news
+status files.
+ISIS also needs to be able to write the log file, and will complain if it
+comes up and is unable to get write permissions on this file.
+
+A final option to the protocols process (actually, there are many others,
+but not documented ones -- see protos/pr_main.c) is used to accelerate or
+decelerate the site failuire-detection protocol.  The option is specified in
+isis.rc on the protos command line as -fxx where xx is an integer number of
+seconds, normally in the range 10 to 90.  ISIS will detect site-failures
+when a site has been unresponsive for roughly this number of seconds -- although
+the protocol could be a bit slower than this if ISIS doesn't happen to be
+communicating with the site in question at the time the failure occurs.
+A value like 10 works well for demos -- impresses the boss with how
+responsible ISIS can be.
+A value like 60 (the default) works better for routine use of ISIS -- this
+prevents a site that has hung (say, due to a slow swap disk or unresponsive
+NFS server) from being called down overly rapidly.
+
+.SH "SEE ALSO"
+isis(1), rmgr_cmd(1), protos(1), lmgr(1), rmgr(1), xmgr(1), spooler(1), news(1),
+ISIS(3), rc.local(8)

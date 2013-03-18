@@ -1,0 +1,28 @@
+# pmake file for quick test
+#  $RCSfile: makeqtest,v $ $Revision: 2.1 $ $Date: 90/07/31 16:17:25 $
+
+runtest: qtest
+	|qtest
+
+qtest: qtest1.o qtest2.o qtest3.o qtest4.o qtest5.o
+	|cc -o qtest qtest1.o qtest2.o qtest3.o qtest4.o qtest5.o
+
+qtest1.o: qtest1.c
+	|cc -c qtest1.c
+
+qtest2.o: qtest2.c
+	|cc -c qtest2.c
+
+qtest3.o: qtest3.c
+	|cc -c qtest3.c
+
+qtest4.o: qtest4.c
+	|cc -c qtest4.c
+
+qtest5.o: qtest5.c
+	|cc -c qtest5.c
+
+clean:
+	rm qtest*.o
+	rm qtest
+
