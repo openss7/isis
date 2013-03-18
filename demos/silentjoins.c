@@ -20,245 +20,217 @@
 #define     ADD         0
 #define     DIV         1
 
-address     *gaddr;
-int         max_updates = 1000;
-int         my_index;
-int         fdes;
-void        join(), receive(), change(), display_input();
-void        do_xfer(), get_xfer(), error(), pick();
+address *gaddr;
+int max_updates = 1000;
+int my_index;
+int fdes;
+void join(), receive(), change(), display_input();
+void do_xfer(), get_xfer(), error(), pick();
 
 void
-main (argc, argv)
-  int   argc;
-  char  **argv;
+main(argc, argv)
+	int argc;
+	char **argv;
 {
-    int     port_no = 0;
-go = 1;
-mode = AB_MODE;
+	int port_no = 0;
 
-    /* Read in command line arguments */
-    while (argc-- > 1)
-        if (**++argv >= '0' && **argv <= '9')
-            port_no = atoi (*argv);
-        else if (**argv == '-')
-            switch ((*argv)[1])
-            {
-              case 'u':
-                max_updates = atoi (&((*argv)[2]));
-                break;
+	go = 1;
+	mode = AB_MODE;
 
-              case 'm':
-                mode = ((*argv)[2] == 'c' ? CB_MODE :
-                                ((*argv)[2] == 'g' ? GB_MODE :
-                                     ((*argv)[2] == 'r' ? NO_MODE : AB_MODE)));
-                break;
+	/* Read in command line arguments */
+	while (argc-- > 1)
+		if (**++argv >= '0' && **argv <= '9')
+			port_no = atoi(*argv);
+		else if (**argv == '-')
+			switch ((*argv)[1]) {
+			case 'u':
+				max_updates = atoi(&((*argv)[2]));
+				break;
 
-              default:
-                printf ("grid: invalid option %c\n", (*argv)[1]);
-                fflush (stdout);
-                break;
-            }
+			case 'm':
+				mode = ((*argv)[2] == 'c' ? CB_MODE :
+					((*argv)[2] == 'g' ? GB_MODE :
+					 ((*argv)[2] == 'r' ? NO_MODE : AB_MODE)));
+				break;
 
-    /* Initialize */
+			default:
+				printf("grid: invalid option %c\n", (*argv)[1]);
+				fflush(stdout);
+				break;
+			}
+
+	/* Initialize */
 /*    fdes = init_display();*/
-    SRANDOM (getpid());
+	SRANDOM(getpid());
 
-    /* Initialize and run ISIS */
-    isis_init (port_no);
-    isis_task (join, "join");
-    isis_entry (RECEIVE, receive, "receive");
+	/* Initialize and run ISIS */
+	isis_init(port_no);
+	isis_task(join, "join");
+	isis_entry(RECEIVE, receive, "receive");
 /*    isis_input (fdes, display_input);*/
 /*    isis_logging (1);*/
-    isis_mainloop (join, NULLARG);
+	isis_mainloop(join, NULLARG);
 }
-
-
-
 
 /* Join (or create) group "grid"; transfer state if joining */
 void
 join()
 {
-print ("join: calling pg_join\n");
-    gaddr = pg_join ("grid",
-                     PG_MONITOR, change, 0,
-                     PG_XFER, 0, do_xfer, get_xfer,
-                     0);
-    if (addr_isnull (gaddr))
-        error ("grid: join failed");
-    isis_start_done();
-print ("join: done\n");
+	print("join: calling pg_join\n");
+	gaddr = pg_join("grid", PG_MONITOR, change, 0, PG_XFER, 0, do_xfer, get_xfer, 0);
+	if (addr_isnull(gaddr))
+		error("grid: join failed");
+	isis_start_done();
+	print("join: done\n");
 }
-
-
 
 /* Pick a random update; transmit it to the group */
 void
 update()
 {
-    int                 x, y, op, arg, type;
-    static int          n_updates;
+	int x, y, op, arg, type;
+	static int n_updates;
 
-    if (n_updates++ == max_updates)
-        printf ("Completed %d updates!\n", max_updates);
-    if (!go || n_updates > max_updates)
-    {
-	printf("gp %d n_updates %d max_updates %d\n", go, n_updates, max_updates);
-        return;
-    }
+	if (n_updates++ == max_updates)
+		printf("Completed %d updates!\n", max_updates);
+	if (!go || n_updates > max_updates) {
+		printf("gp %d n_updates %d max_updates %d\n", go, n_updates, max_updates);
+		return;
+	}
 
-    pick (&x, &y, &op, &arg);
+	pick(&x, &y, &op, &arg);
 /* print ("update: %d %d %d %d\n", x, y, op, arg); */
-    if (mode == NO_MODE)
-    {
-        type = RANDOM() & 0xff;
-        if (type < 20)
-            type = GB_MODE;
-        else if (type < 120)
-            type = AB_MODE;
-        else if (type < 200)
-        type = CB_MODE;
-    }
-    else
-        type = mode;
-    switch (type)
-    {
-      case AB_MODE:
-        abcast (gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
-        break;
+	if (mode == NO_MODE) {
+		type = RANDOM() & 0xff;
+		if (type < 20)
+			type = GB_MODE;
+		else if (type < 120)
+			type = AB_MODE;
+		else if (type < 200)
+			type = CB_MODE;
+	} else
+		type = mode;
+	switch (type) {
+	case AB_MODE:
+		abcast(gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
+		break;
 
-      case CB_MODE:
-        cbcast (gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
-        break;
+	case CB_MODE:
+		cbcast(gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
+		break;
 
-      case GB_MODE:
-        gbcast (gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
-        break;
+	case GB_MODE:
+		gbcast(gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
+		break;
 
-      default:
-        fbcast (gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
-        break;
-    }
+	default:
+		fbcast(gaddr, RECEIVE, "%l%l%l%l", x, y, op, arg, 0);
+		break;
+	}
 }
-
-
 
 /* Receive an update message; perform update; do a new update if */
 /* a remote update has been received                             */
 void
-receive (mp)
-  register message  *mp;
+receive(mp)
+	register message *mp;
 {
-    int         x, y, op, arg;
-    static int  n_recd;
+	int x, y, op, arg;
+	static int n_recd;
 
-    msg_get (mp, "%l%l%l%l", &x, &y, &op, &arg);
+	msg_get(mp, "%l%l%l%l", &x, &y, &op, &arg);
 /* print ("receive:             %d %d %d %d\n", x, y, op, arg); */
 
-    switch (op)
-    {
-      case ADD:
-        value[x][y] += arg;
-        break;
+	switch (op) {
+	case ADD:
+		value[x][y] += arg;
+		break;
 
-      case DIV:
-        value[x][y] = value[x][y] / 2;
-        break;
+	case DIV:
+		value[x][y] = value[x][y] / 2;
+		break;
 
-      default:
-        error ("grid: received invalid operation %d", op);
-    }
-    color[x][y] = (color[x][y] ? 0 : 1);
+	default:
+		error("grid: received invalid operation %d", op);
+	}
+	color[x][y] = (color[x][y] ? 0 : 1);
 /*    display (x, y);*/
 
-    if (++n_recd >= n_memb)
-    {
-        n_recd = 0;
-        update();
-    }
+	if (++n_recd >= n_memb) {
+		n_recd = 0;
+		update();
+	}
 }
-
-
 
 /* If group membership changes, change the value of n_memb and my_index */
 void
-change (pg, arg)
-  register groupview    *pg;
-  int                   arg;
+change(pg, arg)
+	register groupview *pg;
+	int arg;
 {
-    gaddr = &pg->gv_gaddr;
-    n_memb = pg->gv_nmemb;
-    my_index = pg_rank (gaddr, &my_address);
-print ("change: n_memb = %d, my_index = %d\n", n_memb, my_index);
+	gaddr = &pg->gv_gaddr;
+	n_memb = pg->gv_nmemb;
+	my_index = pg_rank(gaddr, &my_address);
+	print("change: n_memb = %d, my_index = %d\n", n_memb, my_index);
 /*    display_title();*/
-    update();
+	update();
 }
-
-
 
 /* Do state transfer; send current values in table */
 void
-do_xfer (loc)
-  int   loc;
+do_xfer(loc)
+	int loc;
 {
-print ("do_xfer:\n");
-    if (loc == -1)
-        xfer_out (loc, "%L%C%l", value[0], sizeof (value) / sizeof (int),
-                                          color[0], sizeof (color), mode);
-print ("do_xfer: done\n");
+	print("do_xfer:\n");
+	if (loc == -1)
+		xfer_out(loc, "%L%C%l", value[0], sizeof(value) / sizeof(int),
+			 color[0], sizeof(color), mode);
+	print("do_xfer: done\n");
 }
-
 
 /* Receive transferred state; store in table */
 void
-get_xfer (loc, mp)
-  int       loc;
-  message   *mp;
+get_xfer(loc, mp)
+	int loc;
+	message *mp;
 {
-    int     rmode;
+	int rmode;
 
-print ("get_xfer:\n");
-   msg_get (mp, "%L%C%l", value[0], (int *) 0, color[0], (int *) 0, &rmode);
+	print("get_xfer:\n");
+	msg_get(mp, "%L%C%l", value[0], (int *) 0, color[0], (int *) 0, &rmode);
 /*   mode = rmode;*/
 /*   display_all();*/
-print ("get_xfer: done\n");
-}   
-
-
+	print("get_xfer: done\n");
+}
 
 /* Randomly pick a point in the grid, an operation, and an argument */
 void
-pick (x, y, op, arg)
-  int   *x, *y, *op, *arg;
+pick(x, y, op, arg)
+	int *x, *y, *op, *arg;
 {
-    if (mode == CB_MODE)
-    {
-        register int    n_for_me, xy;
+	if (mode == CB_MODE) {
+		register int n_for_me, xy;
 
-        n_for_me = (63 - my_index) / n_memb;
-        xy = ((RANDOM() & 0xffff) % n_for_me) * n_memb + my_index;
-        *x = (xy & 070) >> 3;
-        *y = xy & 07;
-    }
-    else
-    {
-        *x = RANDOM() & 0x7;
-        *y = RANDOM() & 0x7;
-    }
-    *op = RANDOM() & 0x1;
-    *arg = RANDOM() & 0xf;
+		n_for_me = (63 - my_index) / n_memb;
+		xy = ((RANDOM() & 0xffff) % n_for_me) * n_memb + my_index;
+		*x = (xy & 070) >> 3;
+		*y = xy & 07;
+	} else {
+		*x = RANDOM() & 0x7;
+		*y = RANDOM() & 0x7;
+	}
+	*op = RANDOM() & 0x1;
+	*arg = RANDOM() & 0xf;
 }
-
-    
 
 /* Print out error message and exit */
 void
-error (fmt, a0, a1, a2, a3)
-  char *fmt;
-  int a0, a1, a2, a3;
+error(fmt, a0, a1, a2, a3)
+	char *fmt;
+	int a0, a1, a2, a3;
 {
-    printf (fmt, a0, a1, a2, a3);
-    printf ("\n");
-    fflush (stdout);
-    exit(0);
+	printf(fmt, a0, a1, a2, a3);
+	printf("\n");
+	fflush(stdout);
+	exit(0);
 }

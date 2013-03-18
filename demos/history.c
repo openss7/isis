@@ -1,5 +1,6 @@
 /* History file for demos. */
-extern char demos_rcsid[] = "$Revision: 2.28 $$Date: 90/09/15 20:36:04 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/demos/RCS/history.c,v $";
+extern char demos_rcsid[] =
+    "$Revision: 2.28 $$Date: 90/09/15 20:36:04 $$Source: /usr/fsys/isisfsys/b/isis/isisv2.1/demos/RCS/history.c,v $";
 
 /* $Log:	history.c,v $
  * Revision 2.28  90/09/15  20:36:04  ken
@@ -660,4 +661,3 @@ extern char demos_rcsid[] = "$Revision: 2.28 $$Date: 90/09/15 20:36:04 $$Source:
  * 
  * ci -u1.1 bank.c display.c display10.c display11.c grid.c qa.c silentjoins.c sun_grid.c teller.c testjoins.c testtasks.c twenty.c bank.h grid.h twenty.h makefile make_grid history
  */
-

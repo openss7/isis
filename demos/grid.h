@@ -19,13 +19,13 @@
 #define GB_MODE     4
 #define NO_MODE     5
 
-int     value[8][8];
-char    color[8][8];
-int     mode;
-int     n_memb;
-char    go;
-int     nstopped;
-void    update();
+int value[8][8];
+char color[8][8];
+int mode;
+int n_memb;
+char go;
+int nstopped;
+void update();
 
 #if (HPUX)
 #define RANDOM rand
@@ -36,4 +36,3 @@ int srand(), rand();
 #define SRANDOM srandom
 int srandom(), random();
 #endif
-
